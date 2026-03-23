@@ -1,6 +1,663 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inmobiliaria Pedrosa — A Coruña</title>
+  <meta name="description" content="Inmobiliaria Pedrosa. Viviendas residenciales, locales comerciales y obra nueva en A Coruña.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --serif: 'Cormorant Garamond', serif;
+      --sans: 'DM Sans', sans-serif;
+      --stone: #1a1916;
+      --stone2: #3a3935;
+      --stone3: #6b6860;
+      --warm: #f7f4ef;
+      --warm2: #efe9e0;
+      --white: #ffffff;
+      --accent: #b8935a;
+      --accent2: #8a6b3e;
+      --line: rgba(26,25,22,0.1);
+      --line2: rgba(26,25,22,0.06);
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--sans); background: var(--warm); color: var(--stone); font-size: 15px; line-height: 1.6; }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(247,244,239,0.96);
+      backdrop-filter: blur(14px);
+      border-bottom: 0.5px solid var(--line);
+    }
+    .nav-inner {
+      max-width: 1100px; margin: 0 auto;
+      padding: 0 2.5rem;
+      display: flex; align-items: center; justify-content: space-between; height: 66px;
+    }
+    .logo { font-family: var(--serif); font-size: 20px; font-weight: 400; letter-spacing: 0.03em; color: var(--stone); text-decoration: none; }
+    .logo span { color: var(--accent); }
+    .nav-links { display: flex; gap: 2rem; list-style: none; align-items: center; }
+    .nav-links a { font-size: 12px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--stone2); text-decoration: none; transition: color .2s; }
+    .nav-links a:hover { color: var(--accent); }
+    .nav-cta {
+      background: var(--stone) !important; color: var(--warm) !important;
+      padding: 9px 22px; border-radius: 2px;
+    }
+    .nav-cta:hover { background: var(--accent2) !important; color: var(--warm) !important; }
+    .nav-burger { display: none; background: none; border: none; cursor: pointer; padding: 4px; }
+    .nav-burger span { display: block; width: 22px; height: 1.5px; background: var(--stone); margin: 5px 0; transition: all .3s; }
+
+    /* HERO */
+    .hero {
+      min-height: 90vh;
+      max-width: 1100px; margin: 0 auto; padding: 5rem 2.5rem;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;
+    }
+    .hero-eyebrow {
+      display: inline-block; font-size: 11px; letter-spacing: 0.13em; text-transform: uppercase;
+      color: var(--accent); border: 0.5px solid var(--accent);
+      padding: 5px 14px; border-radius: 1px; margin-bottom: 1.5rem;
+    }
+    .hero h1 {
+      font-family: var(--serif); font-size: clamp(44px, 5.5vw, 70px);
+      font-weight: 300; line-height: 1.04; color: var(--stone); margin-bottom: 1.5rem;
+    }
+    .hero h1 em { font-style: italic; color: var(--accent); }
+    .hero-lead { font-size: 16px; color: var(--stone2); line-height: 1.78; margin-bottom: 2.5rem; max-width: 420px; }
+    .hero-btns { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--stone); color: var(--warm);
+      padding: 13px 28px; border: none; border-radius: 2px;
+      font-family: var(--sans); font-size: 12px; letter-spacing: 0.07em; text-transform: uppercase;
+      cursor: pointer; transition: background .2s; text-decoration: none; display: inline-block;
+    }
+    .btn-primary:hover { background: var(--accent2); }
+    .btn-ghost {
+      background: none; border: 0.5px solid var(--stone); color: var(--stone);
+      padding: 13px 28px; border-radius: 2px;
+      font-family: var(--sans); font-size: 12px; letter-spacing: 0.07em; text-transform: uppercase;
+      cursor: pointer; transition: all .2s; text-decoration: none; display: inline-block;
+    }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+    .hero-visual { position: relative; }
+    .hero-img {
+      width: 100%; aspect-ratio: 4/5;
+      background: var(--warm2); border-radius: 3px; overflow: hidden;
+    }
+    .hero-img svg { width: 100%; height: 100%; }
+    .hero-badge-float {
+      position: absolute; bottom: -1.5rem; left: -1.5rem;
+      background: var(--white); border: 0.5px solid var(--line);
+      padding: 1.2rem 1.6rem; border-radius: 3px;
+    }
+    .hero-badge-num { font-family: var(--serif); font-size: 34px; font-weight: 300; color: var(--stone); }
+    .hero-badge-txt { font-size: 11px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--stone3); margin-top: 3px; }
+
+    /* STATS BAR */
+    .stats-bar { background: var(--stone); }
+    .stats-inner {
+      max-width: 1100px; margin: 0 auto; padding: 0 2.5rem;
+      display: grid; grid-template-columns: repeat(3, 1fr);
+    }
+    .stat-item { padding: 2.2rem 2rem; border-right: 0.5px solid rgba(255,255,255,0.08); }
+    .stat-item:last-child { border-right: none; }
+    .stat-num { font-family: var(--serif); font-size: 46px; font-weight: 300; color: var(--warm); }
+    .stat-lbl { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(247,244,239,0.45); margin-top: 6px; }
+
+    /* SECTION SHARED */
+    .section { padding: 6rem 2.5rem; }
+    .section-inner { max-width: 1100px; margin: 0 auto; }
+    .sec-label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem; }
+    .sec-title { font-family: var(--serif); font-size: clamp(32px, 4vw, 50px); font-weight: 300; line-height: 1.08; color: var(--stone); margin-bottom: 2.5rem; }
+    .sec-title em { font-style: italic; color: var(--accent); }
+
+    /* PROPERTIES */
+    .filters { display: flex; gap: 0.5rem; margin-bottom: 2.5rem; flex-wrap: wrap; }
+    .filter-btn {
+      padding: 8px 18px; border-radius: 2px;
+      font-size: 11px; letter-spacing: 0.07em; text-transform: uppercase;
+      cursor: pointer; transition: all .2s; font-family: var(--sans);
+      border: 0.5px solid var(--line); background: transparent; color: var(--stone2);
+    }
+    .filter-btn.active, .filter-btn:hover { background: var(--stone); color: var(--warm); border-color: var(--stone); }
+
+    .props-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+    .prop-card {
+      background: var(--white); border-radius: 3px; overflow: hidden;
+      border: 0.5px solid var(--line); transition: transform .3s, box-shadow .3s; cursor: pointer;
+    }
+    .prop-card:hover { transform: translateY(-5px); box-shadow: 0 14px 36px rgba(0,0,0,0.08); }
+    .prop-card[style*="none"] { display: none !important; }
+    .prop-img { aspect-ratio: 4/3; background: var(--warm2); position: relative; overflow: hidden; }
+    .prop-img svg { width: 100%; height: 100%; }
+    .prop-badge {
+      position: absolute; top: 12px; left: 12px;
+      background: var(--stone); color: var(--warm);
+      font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 4px 10px; border-radius: 1px;
+    }
+    .prop-badge.nueva { background: var(--accent); }
+    .prop-info { padding: 1.3rem; }
+    .prop-price { font-family: var(--serif); font-size: 23px; font-weight: 400; color: var(--stone); margin-bottom: 4px; }
+    .prop-name { font-size: 14px; color: var(--stone); font-weight: 500; margin-bottom: 3px; }
+    .prop-loc { font-size: 12px; color: var(--stone3); letter-spacing: 0.03em; margin-bottom: 12px; }
+    .prop-feats { display: flex; gap: 1rem; border-top: 0.5px solid var(--line2); padding-top: 10px; }
+    .prop-feat { font-size: 11px; color: var(--stone3); }
+    .prop-feat strong { color: var(--stone); font-weight: 500; }
+
+    /* ABOUT */
+    .about-section { background: var(--white); padding: 6rem 2.5rem; }
+    .about-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; }
+    .about-img { aspect-ratio: 1; background: var(--warm2); border-radius: 3px; overflow: hidden; }
+    .about-img svg { width: 100%; height: 100%; }
+    .about-lead { font-size: 19px; font-family: var(--serif); font-weight: 300; line-height: 1.6; color: var(--stone); margin-bottom: 1.25rem; }
+    .about-body { font-size: 15px; color: var(--stone2); line-height: 1.78; margin-bottom: 1.25rem; }
+    .values { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 2rem; }
+    .value { padding: 1rem; border-left: 2px solid var(--accent); }
+    .value-title { font-size: 13px; font-weight: 500; color: var(--stone); margin-bottom: 3px; }
+    .value-body { font-size: 12px; color: var(--stone3); }
+
+    /* CONTACT */
+    .contact-section { background: var(--warm); padding: 6rem 2.5rem; }
+    .contact-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1.2fr; gap: 5rem; align-items: start; }
+    .contact-title { font-family: var(--serif); font-size: clamp(28px, 3.5vw, 44px); font-weight: 300; line-height: 1.12; color: var(--stone); margin-bottom: 1.25rem; }
+    .contact-title em { font-style: italic; color: var(--accent); }
+    .contact-body { font-size: 15px; color: var(--stone2); line-height: 1.78; margin-bottom: 2rem; }
+    .contact-details { display: flex; flex-direction: column; gap: 1rem; }
+    .c-row { display: flex; gap: 1rem; align-items: flex-start; }
+    .c-icon {
+      width: 36px; height: 36px; flex-shrink: 0;
+      background: var(--stone); border-radius: 2px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .c-icon svg { width: 15px; height: 15px; stroke: var(--warm); fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    .c-text strong { display: block; font-size: 12px; letter-spacing: 0.04em; color: var(--stone); font-weight: 500; margin-bottom: 2px; }
+    .c-text span { font-size: 13px; color: var(--stone3); }
+
+    .contact-form { background: var(--white); padding: 2.5rem; border-radius: 3px; border: 0.5px solid var(--line); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-size: 10px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--stone3); margin-bottom: 6px; }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%; padding: 10px 13px;
+      border: 0.5px solid var(--line); border-radius: 2px;
+      font-family: var(--sans); font-size: 14px; color: var(--stone);
+      background: var(--warm); transition: border-color .2s; outline: none;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus { border-color: var(--accent); }
+    .form-group textarea { min-height: 96px; resize: vertical; }
+    .form-group select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6860' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 13px center; }
+    .btn-submit {
+      width: 100%; padding: 14px;
+      background: var(--stone); color: var(--warm);
+      border: none; border-radius: 2px;
+      font-family: var(--sans); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+      cursor: pointer; transition: background .2s; margin-top: 0.5rem;
+    }
+    .btn-submit:hover { background: var(--accent2); }
+    .form-note { font-size: 11px; color: var(--stone3); text-align: center; margin-top: 1rem; opacity: 0.7; }
+    .form-success { display: none; text-align: center; padding: 2rem; }
+    .form-success h3 { font-family: var(--serif); font-size: 24px; font-weight: 300; color: var(--stone); margin-bottom: 0.5rem; }
+    .form-success p { font-size: 14px; color: var(--stone3); }
+
+    /* FOOTER */
+    footer { background: var(--stone); padding: 2.5rem; }
+    .footer-inner { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+    .footer-logo { font-family: var(--serif); font-size: 18px; font-weight: 300; color: var(--warm); }
+    .footer-logo span { color: var(--accent); }
+    .footer-copy { font-size: 12px; color: rgba(247,244,239,0.4); }
+    .footer-links { display: flex; gap: 1.5rem; list-style: none; }
+    .footer-links a { font-size: 11px; letter-spacing: 0.05em; color: rgba(247,244,239,0.4); text-decoration: none; transition: color .2s; }
+    .footer-links a:hover { color: var(--accent); }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
+    .hero-content { animation: fadeUp .7s ease both; }
+    .hero-visual { animation: fadeUp .7s .18s ease both; }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; min-height: auto; padding-top: 3rem; }
+      .hero-visual { display: none; }
+      .props-grid { grid-template-columns: repeat(2, 1fr); }
+      .about-inner { grid-template-columns: 1fr; }
+      .about-img { display: none; }
+      .contact-inner { grid-template-columns: 1fr; }
+      .stats-inner { grid-template-columns: 1fr; }
+      .stat-item { border-right: none; border-bottom: 0.5px solid rgba(255,255,255,0.08); padding: 1.5rem 2rem; }
+    }
+    @media (max-width: 600px) {
+      .nav-links { display: none; }
+      .nav-links.open { display: flex; flex-direction: column; position: absolute; top: 66px; left: 0; right: 0; background: var(--warm); border-bottom: 0.5px solid var(--line); padding: 1.5rem 2.5rem; gap: 1.2rem; }
+      .nav-burger { display: block; }
+      .props-grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .values { grid-template-columns: 1fr; }
+      .hero { padding: 2.5rem 1.5rem; }
+      .section { padding: 4rem 1.5rem; }
+      .about-section, .contact-section { padding: 4rem 1.5rem; }
+    }
+  </style>
+</head>
 <body>
-<h1>Hola</h1>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="logo">PEDROSA<span>.</span></a>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="#propiedades">Propiedades</a></li>
+      <li><a href="#nosotros">Nosotros</a></li>
+      <li><a href="#contacto" class="nav-cta">Contactar</a></li>
+    </ul>
+    <button class="nav-burger" onclick="toggleMenu()" aria-label="Menú">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section>
+  <div class="hero">
+    <div class="hero-content">
+      <div class="hero-eyebrow">Inmobiliaria en A Coruña</div>
+      <h1>Tu próximo hogar,<br><em>en buenas manos</em></h1>
+      <p class="hero-lead">Viviendas residenciales, locales comerciales y obra nueva seleccionados con criterio. Más de 18 años acompañando a familias y empresas en A Coruña.</p>
+      <div class="hero-btns">
+        <a href="#propiedades" class="btn-primary">Ver propiedades</a>
+        <a href="#contacto" class="btn-ghost">Hablar con un agente</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-img">
+        <svg viewBox="0 0 400 500" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="500" fill="#e8e2d8"/>
+          <rect x="0" y="310" width="400" height="190" fill="#ddd6cc"/>
+          <rect x="55" y="95" width="290" height="230" rx="2" fill="#cdc5b9"/>
+          <rect x="75" y="115" width="100" height="175" fill="#bdb5a9"/>
+          <rect x="195" y="115" width="130" height="105" fill="#bdb5a9"/>
+          <rect x="195" y="240" width="58" height="48" fill="#bdb5a9"/>
+          <rect x="135" y="325" width="130" height="110" fill="#cdc5b9"/>
+          <rect x="152" y="345" width="42" height="78" fill="#bdb5a9"/>
+          <rect x="214" y="345" width="42" height="78" fill="#bdb5a9"/>
+          <rect x="20" y="355" width="88" height="90" fill="#d4ccbf"/>
+          <rect x="292" y="355" width="88" height="90" fill="#d4ccbf"/>
+          <ellipse cx="200" cy="68" rx="28" ry="18" fill="#f0ebe4" opacity="0.5"/>
+        </svg>
+      </div>
+      <div class="hero-badge-float">
+        <div class="hero-badge-num">+340</div>
+        <div class="hero-badge-txt">Propiedades entregadas</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stats-inner">
+    <div class="stat-item">
+      <div class="stat-num">18</div>
+      <div class="stat-lbl">Años de experiencia</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">97%</div>
+      <div class="stat-lbl">Clientes satisfechos</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">3</div>
+      <div class="stat-lbl">Tipologías disponibles</div>
+    </div>
+  </div>
+</div>
+
+<!-- PROPIEDADES -->
+<section class="section" id="propiedades">
+  <div class="section-inner">
+    <div class="sec-label">Nuestro portfolio</div>
+    <h2 class="sec-title">Propiedades <em>destacadas</em></h2>
+    <div class="filters">
+      <button class="filter-btn active" onclick="filterProps('all', this)">Todas</button>
+      <button class="filter-btn" onclick="filterProps('residencial', this)">Residencial</button>
+      <button class="filter-btn" onclick="filterProps('comercial', this)">Comercial</button>
+      <button class="filter-btn" onclick="filterProps('obra-nueva', this)">Obra nueva</button>
+    </div>
+    <div class="props-grid">
+
+      <div class="prop-card" data-type="residencial">
+        <div class="prop-img">
+          <svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg">
+            <rect width="320" height="240" fill="#ddd6cc"/>
+            <rect x="55" y="55" width="210" height="150" fill="#cdc5b9"/>
+            <rect x="75" y="75" width="75" height="110" fill="#bdb5a9"/>
+            <rect x="170" y="75" width="75" height="65" fill="#bdb5a9"/>
+            <rect x="130" y="165" width="60" height="40" fill="#b5ada1"/>
+            <rect x="0" y="205" width="320" height="35" fill="#d4ccbf"/>
+          </svg>
+          <span class="prop-badge">Venta</span>
+        </div>
+        <div class="prop-info">
+          <div class="prop-price">285.000 €</div>
+          <div class="prop-name">Piso en el Ensanche</div>
+          <div class="prop-loc">A Coruña · Centro</div>
+          <div class="prop-feats">
+            <div class="prop-feat"><strong>3</strong> hab.</div>
+            <div class="prop-feat"><strong>2</strong> baños</div>
+            <div class="prop-feat"><strong>95</strong> m²</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="prop-card" data-type="obra-nueva">
+        <div class="prop-img">
+          <svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg">
+            <rect width="320" height="240" fill="#ebe6dc"/>
+            <rect x="35" y="40" width="250" height="170" fill="#d4ccbf"/>
+            <rect x="55" y="58" width="70" height="132" fill="#c8c0b4"/>
+            <rect x="145" y="58" width="125" height="80" fill="#c8c0b4"/>
+            <rect x="145" y="158" width="55" height="32" fill="#c8c0b4"/>
+            <rect x="0" y="210" width="320" height="30" fill="#cdc5b9"/>
+          </svg>
+          <span class="prop-badge nueva">Obra nueva</span>
+        </div>
+        <div class="prop-info">
+          <div class="prop-price">420.000 €</div>
+          <div class="prop-name">Residencial Las Dunas</div>
+          <div class="prop-loc">A Coruña · Matogrande</div>
+          <div class="prop-feats">
+            <div class="prop-feat"><strong>4</strong> hab.</div>
+            <div class="prop-feat"><strong>2</strong> baños</div>
+            <div class="prop-feat"><strong>128</strong> m²</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="prop-card" data-type="comercial">
+        <div class="prop-img">
+          <svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg">
+            <rect width="320" height="240" fill="#d8d4cc"/>
+            <rect x="25" y="50" width="270" height="160" fill="#ccc4b8"/>
+            <rect x="45" y="68" width="230" height="30" fill="#bdb5a9"/>
+            <rect x="45" y="118" width="105" height="72" fill="#bdb5a9"/>
+            <rect x="165" y="118" width="110" height="72" fill="#bdb5a9"/>
+            <rect x="0" y="210" width="320" height="30" fill="#c5bcb0"/>
+          </svg>
+          <span class="prop-badge">Alquiler</span>
+        </div>
+        <div class="prop-info">
+          <div class="prop-price">1.800 €/mes</div>
+          <div class="prop-name">Local comercial</div>
+          <div class="prop-loc">A Coruña · Juan Flórez</div>
+          <div class="prop-feats">
+            <div class="prop-feat"><strong>2</strong> plantas</div>
+            <div class="prop-feat"><strong>Escaparate</strong></div>
+            <div class="prop-feat"><strong>180</strong> m²</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="prop-card" data-type="residencial">
+        <div class="prop-img">
+          <svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg">
+            <rect width="320" height="240" fill="#e0dbd2"/>
+            <rect x="75" y="80" width="170" height="135" fill="#cdc5b9"/>
+            <polygon points="65,80 160,22 255,80" fill="#c2b9ac"/>
+            <rect x="95" y="108" width="55" height="80" fill="#b5ada1"/>
+            <rect x="170" y="130" width="55" height="58" fill="#b5ada1"/>
+            <rect x="0" y="200" width="320" height="40" fill="#ccc4b8"/>
+          </svg>
+          <span class="prop-badge">Venta</span>
+        </div>
+        <div class="prop-info">
+          <div class="prop-price">195.000 €</div>
+          <div class="prop-name">Apartamento con terraza</div>
+          <div class="prop-loc">A Coruña · Eirís</div>
+          <div class="prop-feats">
+            <div class="prop-feat"><strong>2</strong> hab.</div>
+            <div class="prop-feat"><strong>1</strong> baño</div>
+            <div class="prop-feat"><strong>68</strong> m²</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="prop-card" data-type="obra-nueva">
+        <div class="prop-img">
+          <svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg">
+            <rect width="320" height="240" fill="#eae5db"/>
+            <rect x="38" y="48" width="244" height="170" fill="#d4ccbf"/>
+            <rect x="58" y="68" width="62" height="62" fill="#c5bcb0"/>
+            <rect x="138" y="68" width="62" height="62" fill="#c5bcb0"/>
+            <rect x="218" y="68" width="44" height="62" fill="#c5bcb0"/>
+            <rect x="58" y="150" width="62" height="50" fill="#c5bcb0"/>
+            <rect x="138" y="150" width="62" height="50" fill="#c5bcb0"/>
+          </svg>
+          <span class="prop-badge nueva">Obra nueva</span>
+        </div>
+        <div class="prop-info">
+          <div class="prop-price">320.000 €</div>
+          <div class="prop-name">Promoción Bens Mar</div>
+          <div class="prop-loc">A Coruña · Bens</div>
+          <div class="prop-feats">
+            <div class="prop-feat"><strong>3</strong> hab.</div>
+            <div class="prop-feat"><strong>2</strong> baños</div>
+            <div class="prop-feat"><strong>102</strong> m²</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="prop-card" data-type="comercial">
+        <div class="prop-img">
+          <svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg">
+            <rect width="320" height="240" fill="#dcd7cd"/>
+            <rect x="28" y="58" width="264" height="158" fill="#cdc5b9"/>
+            <rect x="48" y="78" width="224" height="38" fill="#bdb5a9"/>
+            <rect x="48" y="136" width="92" height="62" fill="#bdb5a9"/>
+            <rect x="158" y="136" width="114" height="62" fill="#bdb5a9"/>
+          </svg>
+          <span class="prop-badge">Venta</span>
+        </div>
+        <div class="prop-info">
+          <div class="prop-price">385.000 €</div>
+          <div class="prop-name">Oficinas zona puerto</div>
+          <div class="prop-loc">A Coruña · Puerto</div>
+          <div class="prop-feats">
+            <div class="prop-feat"><strong>Diáfano</strong></div>
+            <div class="prop-feat"><strong>Parking</strong></div>
+            <div class="prop-feat"><strong>240</strong> m²</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- NOSOTROS -->
+<section class="about-section" id="nosotros">
+  <div class="about-inner">
+    <div class="about-img">
+      <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+        <rect width="400" height="400" fill="#e8e2d8"/>
+        <circle cx="200" cy="200" r="180" fill="#ddd6cc"/>
+        <rect x="85" y="95" width="230" height="180" rx="2" fill="#cdc5b9"/>
+        <rect x="105" y="115" width="80" height="130" fill="#bdb5a9"/>
+        <rect x="205" y="115" width="90" height="75" fill="#bdb5a9"/>
+        <rect x="115" y="275" width="170" height="80" fill="#cdc5b9"/>
+        <rect x="135" y="292" width="55" height="63" fill="#bdb5a9"/>
+        <rect x="208" y="292" width="55" height="63" fill="#bdb5a9"/>
+        <circle cx="290" cy="82" rx="32" cy="82" r="28" fill="#f0ebe4" opacity="0.45"/>
+      </svg>
+    </div>
+    <div class="about-content">
+      <div class="sec-label">Quiénes somos</div>
+      <h2 class="sec-title">Expertos en el <em>mercado local</em></h2>
+      <p class="about-lead">Llevamos más de 18 años ayudando a familias y empresas a encontrar su espacio ideal en A Coruña y su área metropolitana.</p>
+      <p class="about-body">En Inmobiliaria Pedrosa combinamos un profundo conocimiento del mercado inmobiliario gallego con un trato cercano y personalizado. Creemos que cada cliente merece asesoramiento honesto, sin presiones y adaptado a su situación real.</p>
+      <p class="about-body">Trabajamos con viviendas residenciales, locales comerciales y promociones de obra nueva, ofreciendo un servicio integral desde la primera visita hasta la firma ante notario.</p>
+      <div class="values">
+        <div class="value">
+          <div class="value-title">Transparencia</div>
+          <div class="value-body">Sin comisiones ocultas ni sorpresas</div>
+        </div>
+        <div class="value">
+          <div class="value-title">Experiencia</div>
+          <div class="value-body">18 años en el mercado coruñés</div>
+        </div>
+        <div class="value">
+          <div class="value-title">Acompañamiento</div>
+          <div class="value-body">De la búsqueda a la firma</div>
+        </div>
+        <div class="value">
+          <div class="value-title">Red local</div>
+          <div class="value-body">Acceso a oferta exclusiva</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACTO -->
+<section class="contact-section" id="contacto">
+  <div class="contact-inner">
+    <div>
+      <div class="sec-label">Estamos aquí</div>
+      <h2 class="contact-title">Hablemos de<br><em>lo que necesitas</em></h2>
+      <p class="contact-body">Cuéntanos qué estás buscando y te asesoramos sin compromiso. Nuestros agentes responden en menos de 24 horas.</p>
+      <div class="contact-details">
+        <div class="c-row">
+          <div class="c-icon">
+            <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <div class="c-text">
+            <strong>Dirección</strong>
+            <span>Calle Real 45, 2º · A Coruña 15001</span>
+          </div>
+        </div>
+        <div class="c-row">
+          <div class="c-icon">
+            <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.58 3.26 2 2 0 0 1 3.54 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.5a16 16 0 0 0 6 6l.87-.87a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          </div>
+          <div class="c-text">
+            <strong>Teléfono</strong>
+            <span>+34 981 234 567</span>
+          </div>
+        </div>
+        <div class="c-row">
+          <div class="c-icon">
+            <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <div class="c-text">
+            <strong>Email</strong>
+            <span>contacto@dominio</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="contact-form">
+      <form id="contact-form" action="https://formspree.io/f/XXXXXXXX" method="POST">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="nombre">Nombre</label>
+            <input type="text" id="nombre" name="nombre" placeholder="Tu nombre" required>
+          </div>
+          <div class="form-group">
+            <label for="telefono">Teléfono</label>
+            <input type="tel" id="telefono" name="telefono" placeholder="+34 600 000 000">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="tu@email.com" required>
+        </div>
+        <div class="form-group">
+          <label for="interes">Me interesa</label>
+          <select id="interes" name="interes">
+            <option>Comprar una vivienda</option>
+            <option>Alquilar una vivienda</option>
+            <option>Local comercial</option>
+            <option>Obra nueva</option>
+            <option>Vender mi propiedad</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="mensaje">Mensaje</label>
+          <textarea id="mensaje" name="mensaje" placeholder="Cuéntanos qué estás buscando..."></textarea>
+        </div>
+        <button type="submit" class="btn-submit">Enviar consulta</button>
+        <p class="form-note">Respondemos en menos de 24 horas · Sin compromiso</p>
+      </form>
+      <div class="form-success" id="form-success">
+        <h3>¡Mensaje enviado!</h3>
+        <p>Nos pondremos en contacto contigo en menos de 24 horas.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">PEDROSA<span>.</span></div>
+    <div class="footer-copy">© 2025 Inmobiliaria Pedrosa · A Coruña</div>
+    <ul class="footer-links">
+      <li><a href="#">Aviso legal</a></li>
+      <li><a href="#">Privacidad</a></li>
+      <li><a href="#">Cookies</a></li>
+    </ul>
+  </div>
+</footer>
+
+<script>
+  function toggleMenu() {
+    document.getElementById('nav-links').classList.toggle('open');
+  }
+
+  function filterProps(type, btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.prop-card').forEach(card => {
+      card.style.display = (type === 'all' || card.dataset.type === type) ? 'block' : 'none';
+    });
+  }
+
+  // Formspree AJAX submit
+  const form = document.getElementById('contact-form');
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const btn = form.querySelector('.btn-submit');
+    btn.textContent = 'Enviando...';
+    btn.disabled = true;
+    try {
+      const res = await fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { 'Accept': 'application/json' }
+      });
+      if (res.ok) {
+        form.style.display = 'none';
+        document.getElementById('form-success').style.display = 'block';
+      } else {
+        btn.textContent = 'Error — inténtalo de nuevo';
+        btn.disabled = false;
+      }
+    } catch {
+      btn.textContent = 'Error — inténtalo de nuevo';
+      btn.disabled = false;
+    }
+  });
+</script>
 </body>
 </html>
