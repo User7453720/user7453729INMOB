@@ -372,6 +372,36 @@ footer{background:var(--green2);padding:3rem 2rem}
 .blog-cta-box p{color:rgba(255,255,255,.75);margin-bottom:1rem;font-size:14px}
 .blog-cta-box .btn-gold{display:inline-block;text-decoration:none}
 
+/* ── WHATSAPP WIDGET ── */
+.wa-btn{position:fixed;bottom:28px;right:28px;z-index:900;width:58px;height:58px;background:#25d366;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(37,211,102,.45);cursor:pointer;transition:transform .2s,box-shadow .2s;text-decoration:none}
+.wa-btn:hover{transform:scale(1.1);box-shadow:0 6px 24px rgba(37,211,102,.55)}
+.wa-btn svg{width:32px;height:32px;fill:#fff}
+.wa-tooltip{position:absolute;right:68px;background:var(--green2);color:#fff;font-size:12px;font-weight:700;letter-spacing:.04em;white-space:nowrap;padding:7px 14px;border-radius:3px;opacity:0;pointer-events:none;transition:opacity .2s}
+.wa-tooltip::after{content:'';position:absolute;right:-6px;top:50%;transform:translateY(-50%);border:6px solid transparent;border-right:none;border-left-color:var(--green2)}
+.wa-btn:hover .wa-tooltip{opacity:1}
+
+/* ── SEARCH BAR ── */
+.search-bar{background:var(--white);border:.5px solid var(--line);padding:1.5rem 2rem;margin-bottom:2rem}
+.search-bar-title{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--green3);font-weight:700;margin-bottom:1rem}
+.search-fields{display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:.75rem;align-items:end}
+.sf-group{display:flex;flex-direction:column;gap:5px}
+.sf-group label{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--gray);font-weight:700}
+.sf-group input,.sf-group select{padding:9px 12px;border:1px solid var(--line);font-family:var(--sans);font-size:13px;color:var(--green2);background:var(--cream);outline:none;transition:border-color .2s;width:100%}
+.sf-group input:focus,.sf-group select:focus{border-color:var(--green3)}
+.sf-group select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%235f6368' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+.search-btn{padding:10px 22px;background:var(--green);color:#fff;border:none;font-family:var(--sans);font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;cursor:pointer;transition:background .2s;white-space:nowrap;height:38px}
+.search-btn:hover{background:var(--green2)}
+.search-results-info{font-size:12px;color:var(--gray);margin-bottom:1rem;min-height:18px}
+@media(max-width:900px){.search-fields{grid-template-columns:1fr 1fr;}.search-btn{grid-column:span 2}}
+@media(max-width:600px){.search-fields{grid-template-columns:1fr;}.search-btn{grid-column:span 1}}
+
+/* ── HERO SEARCH (en slider inicio) ── */
+.hero-search{position:absolute;bottom:0;left:0;right:0;z-index:10;padding:0 2rem 2rem}
+.hero-search-inner{max-width:1200px;margin:0 auto;background:rgba(255,255,255,.97);border-top:3px solid var(--green3);padding:1.25rem 1.5rem}
+.hero-search-inner .search-fields{grid-template-columns:1fr 1fr 1fr 1fr auto}
+@media(max-width:900px){.hero-search-inner .search-fields{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.hero-search{padding:0 1rem 1rem}.hero-search-inner .search-fields{grid-template-columns:1fr}}
+
 /* ── ANIMATIONS ── */
 @keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
 .slide.active .slide-label{animation:fadeUp .6s .1s both}
@@ -428,10 +458,10 @@ footer{background:var(--green2);padding:3rem 2rem}
         <div class="dropdown">
           <div class="dd-item active" onclick="goSubTab('alquiler-general',this,event)">Todos los alquileres</div>
           <div class="dd-item" onclick="goSubTab('alquiler-est',this,event)">Estudiantes</div>
+          <div class="dd-item" onclick="goSubTab('vacacional',this,event)">Vacacional</div>
         </div>
       </div>
-      <div class="tab" id="tab-vacacional" onclick="goTab('vacacional')">Alquiler vacacional</div>
-      <div class="tab" id="tab-promociones" onclick="goTab('promociones')">Promociones</div>
+      <div class="tab" id="tab-promociones" onclick="goTab('promociones')">Obra nueva</div>
       <div class="tab" id="tab-captacion" onclick="goTab('captacion')">Captación</div>
       <div class="tab" id="tab-blog" onclick="goTab('blog')">Blog</div>
       <a class="tab" id="tab-clientes" href="https://inmobiliariapedrosa.administraciononline.taaf.es/#/" target="_blank">Área de clientes &#8599;</a>
@@ -504,6 +534,43 @@ footer{background:var(--green2);padding:3rem 2rem}
       <button class="slider-arrow" onclick="moveSlide(1)">&#8594;</button>
     </div>
     <div class="slider-dots" id="slider-dots"></div>
+    <!-- Buscador en inicio -->
+    <div class="hero-search">
+      <div class="hero-search-inner">
+        <div class="search-fields">
+          <div class="sf-group">
+            <label>Operación</label>
+            <select id="hs-op" onchange="heroSearch()">
+              <option value="">Compra o alquiler</option>
+              <option value="compra">Compra</option>
+              <option value="alquiler-general">Alquiler</option>
+              <option value="vacacional">Vacacional</option>
+              <option value="promociones">Obra nueva</option>
+            </select>
+          </div>
+          <div class="sf-group">
+            <label>Tipo de inmueble</label>
+            <select id="hs-tipo" onchange="heroSearch()">
+              <option value="">Todos</option>
+              <option value="piso">Vivienda / Piso</option>
+              <option value="chalet">Chalet / Casa</option>
+              <option value="local">Local comercial</option>
+              <option value="garaje">Garaje</option>
+              <option value="terreno">Terreno</option>
+            </select>
+          </div>
+          <div class="sf-group">
+            <label>Zona o municipio</label>
+            <input type="text" id="hs-zona" placeholder="Ej: Pontevedra centro..." oninput="heroSearch()">
+          </div>
+          <div class="sf-group">
+            <label>Referencia</label>
+            <input type="text" id="hs-ref" placeholder="Ej: INM-001" oninput="heroSearch()">
+          </div>
+          <button class="search-btn" onclick="heroSearch()">&#128269; Buscar</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- QUICK ACCESS -->
@@ -585,6 +652,17 @@ footer{background:var(--green2);padding:3rem 2rem}
         <div class="sec-label">En venta</div>
         <h2 class="sec-title">Propiedades en <em>compra</em></h2>
         <p class="sec-sub">Viviendas, chalets y locales en Pontevedra y su provincia.</p>
+        <div class="search-bar">
+          <div class="search-bar-title">&#128269; Buscar propiedades</div>
+          <div class="search-fields">
+            <div class="sf-group"><label>Tipo de inmueble</label><select onchange="searchPanel('compra',this.form||this.closest('.search-bar'))" id="sb-compra-tipo"><option value="">Todos</option><option value="piso">Vivienda / Piso</option><option value="chalet">Chalet / Casa</option><option value="local">Local comercial</option><option value="garaje">Garaje</option><option value="terreno">Terreno</option></select></div>
+            <div class="sf-group"><label>Precio máximo</label><select id="sb-compra-precio"><option value="">Sin límite</option><option value="100000">Hasta 100.000 €</option><option value="150000">Hasta 150.000 €</option><option value="200000">Hasta 200.000 €</option><option value="300000">Hasta 300.000 €</option><option value="400000">Hasta 400.000 €</option></select></div>
+            <div class="sf-group"><label>Zona o municipio</label><input type="text" id="sb-compra-zona" placeholder="Ej: Pontevedra, Poio..."></div>
+            <div class="sf-group"><label>Referencia</label><input type="text" id="sb-compra-ref" placeholder="Ej: INM-001"></div>
+            <button class="search-btn" onclick="searchPanel('compra')">&#128269; Buscar</button>
+          </div>
+          <div class="search-results-info" id="sb-compra-info"></div>
+        </div>
         <div class="prop-filters">
           <button class="pf active" onclick="filterG('compra','all',this)">Todos</button>
           <button class="pf" onclick="filterG('compra','piso',this)">Pisos</button>
@@ -647,6 +725,17 @@ footer{background:var(--green2);padding:3rem 2rem}
         <div class="sec-label">En alquiler</div>
         <h2 class="sec-title">Alquiler <em>residencial</em></h2>
         <p class="sec-sub">Pisos y viviendas en alquiler en Pontevedra ciudad y provincia.</p>
+        <div class="search-bar">
+          <div class="search-bar-title">&#128269; Buscar alquileres</div>
+          <div class="search-fields">
+            <div class="sf-group"><label>Tipo de inmueble</label><select id="sb-alq-tipo"><option value="">Todos</option><option value="piso">Vivienda / Piso</option><option value="chalet">Chalet / Casa</option><option value="local">Local comercial</option><option value="garaje">Garaje</option></select></div>
+            <div class="sf-group"><label>Precio máximo</label><select id="sb-alq-precio"><option value="">Sin límite</option><option value="400">Hasta 400 €/mes</option><option value="600">Hasta 600 €/mes</option><option value="800">Hasta 800 €/mes</option><option value="1000">Hasta 1.000 €/mes</option><option value="1500">Hasta 1.500 €/mes</option></select></div>
+            <div class="sf-group"><label>Zona o municipio</label><input type="text" id="sb-alq-zona" placeholder="Ej: Pontevedra, Lérez..."></div>
+            <div class="sf-group"><label>Referencia</label><input type="text" id="sb-alq-ref" placeholder="Ej: ALQ-001"></div>
+            <button class="search-btn" onclick="searchPanel('alquiler-general')">&#128269; Buscar</button>
+          </div>
+          <div class="search-results-info" id="sb-alquiler-general-info"></div>
+        </div>
         <div class="props-grid">
           <div class="prop-card" onclick='openCinema({"title":"Piso luminoso en A Parda","price":"750 €/mes","loc":"Pontevedra · A Parda","beds":3,"baths":1,"sqm":80,"floor":"4º","garage":false,"lift":true,"year":2002,"ref":"ALQ-001","desc":"Amplio piso de 80 m² en la tranquila zona de A Parda. Tres habitaciones luminosas, salón comedor con terraza, cocina americana y baño completo. La vivienda está en perfecto estado, pintado recientemente y con suelos de parquet nuevo.","features":["Terraza","Ascensor","Parquet nuevo","Luminoso","Zona tranquila","Transporte cerca"],"video":false,"tour":false,"plano":false})'>
             <div class="prop-img"><svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="240" fill="#ddd7cd"/><rect x="50" y="55" width="220" height="155" fill="#cec7bc"/><rect x="70" y="75" width="80" height="115" fill="#bdb7ac"/><rect x="170" y="75" width="80" height="70" fill="#bdb7ac"/><rect x="130" y="165" width="60" height="45" fill="#b5afa4"/><rect x="0" y="205" width="320" height="35" fill="#d4cec4"/></svg><span class="prop-tag tag-alquiler">Alquiler</span></div>
@@ -668,6 +757,17 @@ footer{background:var(--green2);padding:3rem 2rem}
         <div class="sec-label">Alquiler · Estudiantes</div>
         <h2 class="sec-title">Pisos para <em>estudiantes</em></h2>
         <p class="sec-sub">Habitaciones y pisos cerca del campus universitario y el centro de Pontevedra.</p>
+        <div class="search-bar">
+          <div class="search-bar-title">&#128269; Buscar alojamiento para estudiantes</div>
+          <div class="search-fields">
+            <div class="sf-group"><label>Tipo</label><select id="sb-est-tipo"><option value="">Todos</option><option value="piso">Piso completo</option><option value="habitacion">Habitación</option><option value="estudio">Estudio</option></select></div>
+            <div class="sf-group"><label>Precio máximo</label><select id="sb-est-precio"><option value="">Sin límite</option><option value="300">Hasta 300 €/mes</option><option value="450">Hasta 450 €/mes</option><option value="600">Hasta 600 €/mes</option><option value="800">Hasta 800 €/mes</option></select></div>
+            <div class="sf-group"><label>Zona</label><input type="text" id="sb-est-zona" placeholder="Ej: Campus, Centro..."></div>
+            <div class="sf-group"><label>Referencia</label><input type="text" id="sb-est-ref" placeholder="Ej: EST-001"></div>
+            <button class="search-btn" onclick="searchPanel('alquiler-est')">&#128269; Buscar</button>
+          </div>
+          <div class="search-results-info" id="sb-alquiler-est-info"></div>
+        </div>
         <div class="props-grid">
           <div class="prop-card" onclick='openCinema({"title":"Habitación piso compartido","price":"350 €/mes · hab.","loc":"Pontevedra · Campus universitario","beds":1,"baths":1,"sqm":15,"floor":"2º","garage":false,"lift":false,"year":2000,"ref":"EST-001","desc":"Habitación individual en piso compartido a 5 minutos a pie del campus universitario de Pontevedra. El piso tiene 3 habitaciones, salón, cocina y un baño. Incluye WiFi, calefacción y gastos de comunidad. Ambiente tranquilo y agradable.","features":["WiFi incluido","Calefacción incluida","A 5 min del campus","Piso de 3 habitaciones","Comunidad tranquila","Gastos incluidos"],"video":false,"tour":false,"plano":false})'>
             <div class="prop-img"><svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="240" fill="#ddd7cd"/><rect x="50" y="55" width="220" height="155" fill="#cec7bc"/><rect x="70" y="75" width="75" height="110" fill="#bdb7ac"/><rect x="165" y="75" width="75" height="65" fill="#bdb7ac"/><rect x="125" y="160" width="55" height="50" fill="#b5afa4"/><rect x="0" y="206" width="320" height="34" fill="#d4cec4"/></svg><span class="prop-tag tag-est">Estudiantes</span></div>
@@ -689,6 +789,17 @@ footer{background:var(--green2);padding:3rem 2rem}
         <div class="sec-label">Alquiler vacacional</div>
         <h2 class="sec-title">Alquiler <em>vacacional</em></h2>
         <p class="sec-sub">Apartamentos y casas para vacaciones en Pontevedra, Sanxenxo y las Rías Baixas.</p>
+        <div class="search-bar">
+          <div class="search-bar-title">&#128269; Buscar alojamiento vacacional</div>
+          <div class="search-fields">
+            <div class="sf-group"><label>Tipo de inmueble</label><select id="sb-vac-tipo"><option value="">Todos</option><option value="piso">Apartamento</option><option value="chalet">Casa / Villa</option><option value="estudio">Estudio</option></select></div>
+            <div class="sf-group"><label>Precio máximo / noche</label><select id="sb-vac-precio"><option value="">Sin límite</option><option value="50">Hasta 50 €/noche</option><option value="80">Hasta 80 €/noche</option><option value="120">Hasta 120 €/noche</option><option value="200">Hasta 200 €/noche</option></select></div>
+            <div class="sf-group"><label>Zona</label><input type="text" id="sb-vac-zona" placeholder="Ej: Sanxenxo, Poio..."></div>
+            <div class="sf-group"><label>Referencia</label><input type="text" id="sb-vac-ref" placeholder="Ej: VAC-001"></div>
+            <button class="search-btn" onclick="searchPanel('vacacional')">&#128269; Buscar</button>
+          </div>
+          <div class="search-results-info" id="sb-vacacional-info"></div>
+        </div>
         <div class="props-grid">
           <div class="prop-card" onclick='openCinema({"title":"Apartamento en Sanxenxo","price":"90 €/noche","loc":"Sanxenxo · Zona céntrica · Playa","beds":2,"baths":2,"sqm":56,"floor":"2º","garage":false,"lift":true,"year":2012,"ref":"VAC-001","desc":"Precioso apartamento a 200 metros de la playa de Sanxenxo. Dos habitaciones, dos baños, terraza con vistas al mar y cocina completamente equipada. Edificio con ascensor. Ideal para parejas o familia pequeña. Disponible por semanas en verano.","features":["200m de la playa","Terraza con vistas","Cocina equipada","Parking zona azul","Zona céntrica","WiFi incluido"],"video":false,"tour":true,"plano":false})'>
             <div class="prop-img"><svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="240" fill="#cfe6e4"/><rect x="50" y="60" width="220" height="150" fill="#b8d4d2"/><rect x="70" y="80" width="80" height="110" fill="#a0c0be"/><rect x="170" y="80" width="80" height="65" fill="#a0c0be"/><rect x="130" y="165" width="60" height="45" fill="#92b5b3"/><rect x="0" y="205" width="320" height="35" fill="#c2dede"/></svg><span class="prop-tag tag-vacacional">Vacacional</span><div class="prop-badges"><span class="media-badge"><svg viewBox="0 0 24 24"><path d="M15 3h6v6"/><path d="M10 14L21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>Tour</span></div></div>
@@ -1010,6 +1121,12 @@ footer{background:var(--green2);padding:3rem 2rem}
   </div>
 </footer>
 
+<!-- ── WHATSAPP ── -->
+<a class="wa-btn" href="https://wa.me/34986866618?text=Hola%2C%20me%20gustar%C3%ADa%20obtener%20informaci%C3%B3n%20sobre%20una%20propiedad." target="_blank" rel="noopener" title="Contactar por WhatsApp">
+  <span class="wa-tooltip">Habla con un agente</span>
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+</a>
+
 <!-- ── FULLSCREEN OVERLAY ── -->
 <div id="fs-overlay" class="fs-overlay">
   <button class="fs-close" onclick="closeFS()" title="Cerrar">&#10005;</button>
@@ -1086,7 +1203,7 @@ function goSlide(n){
   document.querySelectorAll('.dot')[curSlide].classList.add('active');
 }
 function moveSlide(d){goSlide(curSlide+d);resetTimer();}
-function resetTimer(){clearInterval(slideTimer);slideTimer=setInterval(function(){goSlide(curSlide+1);},3000);}
+function resetTimer(){clearInterval(slideTimer);slideTimer=setInterval(function(){goSlide(curSlide+1);},6000);}
 resetTimer();
 
 // ── TABS ──
@@ -1117,7 +1234,7 @@ function goTab(id){
   else if(id==='blog'){showPage('blog');activateTab('blog');window.scrollTo({top:0,behavior:'smooth'});}
   else if(pp.indexOf(id)>-1){
     showPage('props');showPanel(id);
-    if(id.indexOf('alquiler')===0)activateTab('alquiler');
+    if(id.indexOf('alquiler')===0||id==='vacacional')activateTab('alquiler');
     else activateTab(id);
     setTimeout(function(){var el=document.getElementById('propiedades');if(el)el.scrollIntoView({behavior:'smooth'});},50);
   }
@@ -1373,6 +1490,112 @@ document.getElementById('fs-overlay').addEventListener('click',function(e){
   // Cerrar si clic en el fondo negro
   if(e.target===document.getElementById('fs-overlay')||e.target===document.getElementById('fs-img-wrap'))closeFS();
 });
+
+// ── BUSCADOR ──
+function heroSearch(){
+  var op    = document.getElementById('hs-op').value;
+  var tipo  = document.getElementById('hs-tipo').value;
+  var zona  = document.getElementById('hs-zona').value.toLowerCase().trim();
+  var ref   = document.getElementById('hs-ref').value.toLowerCase().trim();
+
+  // Si hay referencia, buscar en todas las pestañas
+  if(ref){
+    searchAllPanels(ref,'');
+    return;
+  }
+
+  // Navegar a la pestaña correcta
+  var target = op || 'compra';
+  goTab(target);
+
+  // Esperar a que el panel esté visible y aplicar filtro
+  setTimeout(function(){
+    applySearchToPanel(target, tipo, zona, ref);
+  }, 200);
+}
+
+function searchPanel(panelId){
+  var tipo  = (document.getElementById('sb-'+panelId+'-tipo')  || document.getElementById('sb-alq-tipo') || {value:''}).value;
+  var zona  = (document.getElementById('sb-'+panelId+'-zona')  || document.getElementById('sb-alq-zona') || {value:''}).value.toLowerCase().trim();
+  var ref   = (document.getElementById('sb-'+panelId+'-ref')   || document.getElementById('sb-alq-ref')  || {value:''}).value.toLowerCase().trim();
+
+  // Selectors específicos por panel
+  var tipoEl   = document.getElementById('sb-'+panelId+'-tipo');
+  var zonaEl   = document.getElementById('sb-'+panelId+'-zona');
+  var refEl    = document.getElementById('sb-'+panelId+'-ref');
+  var precioEl = document.getElementById('sb-'+panelId+'-precio');
+
+  if(tipoEl)  tipo  = tipoEl.value;
+  if(zonaEl)  zona  = zonaEl.value.toLowerCase().trim();
+  if(refEl)   ref   = refEl.value.toLowerCase().trim();
+
+  applySearchToPanel(panelId, tipo, zona, ref, precioEl?precioEl.value:'');
+}
+
+function applySearchToPanel(panelId, tipo, zona, ref, maxPrecio){
+  var gridId = panelId === 'compra' ? 'grid-compra' : null;
+  var grid = gridId ? document.getElementById(gridId) : document.querySelector('#panel-'+panelId+' .props-grid');
+  if(!grid) return;
+
+  var cards = Array.from(grid.querySelectorAll('.prop-card'));
+  var shown = 0;
+
+  cards.forEach(function(card){
+    var cardTipo  = (card.dataset.type||'').toLowerCase();
+    var cardPrice = parseInt(card.dataset.price)||0;
+    var cardText  = card.innerText.toLowerCase();
+    var cardRef   = card.querySelector('.prop-ref') ? card.querySelector('.prop-ref').innerText.toLowerCase() : '';
+
+    var ok = true;
+    if(tipo   && cardTipo !== tipo)                     ok = false;
+    if(zona   && cardText.indexOf(zona) === -1)         ok = false;
+    if(ref    && cardRef.indexOf(ref)   === -1)         ok = false;
+    if(maxPrecio && cardPrice > parseInt(maxPrecio))    ok = false;
+
+    card.style.display = ok ? 'block' : 'none';
+    if(ok) shown++;
+  });
+
+  var infoEl = document.getElementById('sb-'+panelId+'-info');
+  if(infoEl){
+    if(tipo||zona||ref||maxPrecio){
+      infoEl.textContent = shown > 0
+        ? shown + ' propiedad' + (shown>1?'es':'') + ' encontrada' + (shown>1?'s':'')
+        : 'No se encontraron propiedades con esos criterios';
+      infoEl.style.color = shown > 0 ? 'var(--green3)' : '#c0392b';
+    } else {
+      infoEl.textContent = '';
+      // Restaurar todas al quitar filtros
+      cards.forEach(function(c){c.style.display='block';});
+    }
+  }
+}
+
+function searchAllPanels(ref, tipo){
+  // Buscar la referencia en todos los paneles y navegar al que la tenga
+  var panels = ['compra','alquiler-general','alquiler-est','vacacional','promociones'];
+  for(var i=0;i<panels.length;i++){
+    var panelId = panels[i];
+    var gridId  = panelId==='compra'?'grid-compra':null;
+    var grid    = gridId ? document.getElementById(gridId) : document.querySelector('#panel-'+panelId+' .props-grid');
+    if(!grid) continue;
+    var cards = Array.from(grid.querySelectorAll('.prop-card'));
+    for(var j=0;j<cards.length;j++){
+      var refEl = cards[j].querySelector('.prop-ref');
+      if(refEl && refEl.innerText.toLowerCase().indexOf(ref.toLowerCase())>-1){
+        goTab(panelId);
+        setTimeout(function(pid,r){applySearchToPanel(pid,'','',r,'');},200,panelId,ref);
+        return;
+      }
+    }
+  }
+  // Si no encuentra, mostrar en compra con mensaje
+  goTab('compra');
+  setTimeout(function(){
+    var infoEl=document.getElementById('sb-compra-info');
+    if(infoEl){infoEl.textContent='Referencia "'+ref+'" no encontrada';infoEl.style.color='#c0392b';}
+  },200);
+}
 
 // ── BLOG ──
 var blogArticles=[
