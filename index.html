@@ -1,432 +1,754 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Inmobiliaria Pedrosa — Pontevedra</title>
-  <meta name="description" content="Inmobiliaria Pedrosa. Compra, alquiler y obra nueva en Pontevedra. 35 años de experiencia.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-    :root {
-      --navy: #1b2a4a;
-      --navy2: #243560;
-      --gold: #c9a84c;
-      --gold2: #a8872e;
-      --cream: #f8f5f0;
-      --cream2: #efe9de;
-      --white: #ffffff;
-      --gray: #6b7280;
-      --gray2: #9ca3af;
-      --line: rgba(27,42,74,0.1);
-      --serif: 'Playfair Display', serif;
-      --sans: 'Lato', sans-serif;
-    }
-    html { scroll-behavior: smooth; }
-    body { font-family: var(--sans); background: var(--cream); color: var(--navy); font-size: 15px; line-height: 1.65; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inmobiliaria Pedrosa — Pontevedra</title>
+<meta name="description" content="Inmobiliaria Pedrosa. Compra, alquiler y obra nueva en Pontevedra. 35 años de experiencia.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --green:#2d5a27;
+  --green2:#1e3d1a;
+  --green3:#3a7232;
+  --gold:#c9a84c;
+  --gold2:#a8872e;
+  --cream:#f6f4f0;
+  --cream2:#ede8df;
+  --white:#ffffff;
+  --gray:#5f6368;
+  --gray2:#9ca3af;
+  --line:rgba(45,90,39,0.12);
+  --serif:'Playfair Display',serif;
+  --sans:'Lato',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--cream);color:var(--green2);font-size:15px;line-height:1.65;overflow-x:hidden}
 
-    nav { position: sticky; top: 0; z-index: 200; background: var(--navy); }
-    .nav-top { max-width: 1200px; margin: 0 auto; padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 68px; }
-    .logo { font-family: var(--serif); font-size: 22px; font-weight: 400; color: var(--white); text-decoration: none; letter-spacing: 0.02em; }
-    .logo span { color: var(--gold); }
-    .nav-contact { display: flex; gap: 1.5rem; align-items: center; }
-    .nav-phone { font-size: 13px; color: rgba(255,255,255,0.7); text-decoration: none; }
-    .nav-phone:hover { color: var(--gold); }
-    .nav-cta { background: var(--gold); color: var(--navy); padding: 8px 20px; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none; transition: background .2s; }
-    .nav-cta:hover { background: var(--gold2); }
+/* ── NAV ── */
+nav{position:sticky;top:0;z-index:500;background:var(--green)}
+.nav-top{max-width:1200px;margin:0 auto;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:66px}
+.logo{font-family:var(--serif);font-size:22px;font-weight:400;color:var(--white);text-decoration:none;letter-spacing:.02em}
+.logo span{color:var(--gold)}
+.nav-right{display:flex;gap:1.5rem;align-items:center}
+.nav-phone{font-size:13px;color:rgba(255,255,255,.75);text-decoration:none;transition:color .2s}
+.nav-phone:hover{color:var(--gold)}
+.nav-cta{background:var(--gold);color:var(--green2);padding:8px 20px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;transition:background .2s}
+.nav-cta:hover{background:var(--gold2)}
 
-    .main-tabs { background: var(--navy2); border-top: 1px solid rgba(255,255,255,0.08); }
-    .tabs-inner { max-width: 1200px; margin: 0 auto; padding: 0 2rem; display: flex; align-items: stretch; overflow-x: auto; }
-    .main-tab { padding: 0 1.4rem; height: 46px; display: flex; align-items: center; font-size: 12px; letter-spacing: 0.07em; text-transform: uppercase; font-weight: 700; color: rgba(255,255,255,0.6); cursor: pointer; border-bottom: 2px solid transparent; transition: all .2s; position: relative; user-select: none; white-space: nowrap; }
-    .main-tab:hover { color: var(--white); }
-    .main-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
-    .main-tab .arrow { margin-left: 5px; font-size: 10px; transition: transform .2s; display: inline-block; }
-    .main-tab.open .arrow { transform: rotate(180deg); }
-    .sub-menu { display: none; position: absolute; top: 100%; left: 0; background: var(--white); border-top: 2px solid var(--gold); min-width: 210px; z-index: 300; box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
-    .main-tab.open .sub-menu { display: block; }
-    .sub-item { display: block; padding: 11px 18px; font-size: 13px; color: var(--navy); cursor: pointer; transition: background .15s; border-bottom: 0.5px solid var(--line); font-weight: 400; text-transform: none; letter-spacing: 0; }
-    .sub-item:last-child { border-bottom: none; }
-    .sub-item:hover, .sub-item.active { background: var(--cream); color: var(--gold2); }
+/* ── TABS ── */
+.main-tabs{background:var(--green2);border-top:1px solid rgba(255,255,255,.06)}
+.tabs-inner{max-width:1200px;margin:0 auto;padding:0 2rem;display:flex;align-items:stretch;overflow-x:auto;scrollbar-width:none}
+.tabs-inner::-webkit-scrollbar{display:none}
+.tab{padding:0 1.2rem;height:46px;display:flex;align-items:center;gap:5px;font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;font-weight:700;color:rgba(255,255,255,.55);cursor:pointer;border-bottom:2.5px solid transparent;transition:all .2s;position:relative;user-select:none;white-space:nowrap;text-decoration:none}
+.tab:hover{color:var(--white)}
+.tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+.tab .arr{font-size:9px;transition:transform .2s;display:inline-block}
+.tab.open .arr{transform:rotate(180deg)}
 
-    .hero { background: var(--navy); min-height: 82vh; display: flex; align-items: center; position: relative; overflow: hidden; }
-    .hero-bg { position: absolute; inset: 0; opacity: 0.06; background-image: repeating-linear-gradient(45deg, var(--gold) 0, var(--gold) 1px, transparent 0, transparent 50%); background-size: 20px 20px; }
-    .hero-inner { max-width: 1200px; margin: 0 auto; padding: 5rem 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; position: relative; z-index: 1; width: 100%; }
-    .hero-badge { display: inline-block; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); border: 0.5px solid var(--gold); padding: 5px 14px; margin-bottom: 1.5rem; }
-    .hero h1 { font-family: var(--serif); font-size: clamp(40px, 5vw, 66px); font-weight: 400; line-height: 1.06; color: var(--white); margin-bottom: 1.5rem; }
-    .hero h1 em { font-style: italic; color: var(--gold); }
-    .hero-lead { font-size: 16px; color: rgba(255,255,255,0.7); line-height: 1.8; margin-bottom: 2.5rem; }
-    .hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; }
-    .btn-gold { background: var(--gold); color: var(--navy); padding: 13px 28px; border: none; font-family: var(--sans); font-size: 12px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; cursor: pointer; transition: background .2s; text-decoration: none; display: inline-block; }
-    .btn-gold:hover { background: var(--gold2); }
-    .btn-outline { background: none; border: 1px solid rgba(255,255,255,0.4); color: var(--white); padding: 13px 28px; font-family: var(--sans); font-size: 12px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; cursor: pointer; transition: all .2s; text-decoration: none; display: inline-block; }
-    .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
-    .hero-card { background: rgba(255,255,255,0.05); border: 0.5px solid rgba(255,255,255,0.15); padding: 2rem; }
-    .hero-card-title { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); margin-bottom: 1.5rem; }
-    .hero-stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-    .h-stat { border-left: 2px solid var(--gold); padding-left: 1rem; }
-    .h-stat-num { font-family: var(--serif); font-size: 38px; font-weight: 400; color: var(--white); line-height: 1; }
-    .h-stat-lbl { font-size: 11px; letter-spacing: 0.05em; color: rgba(255,255,255,0.5); margin-top: 4px; }
+/* ── DROPDOWN ── */
+.dropdown{display:none;position:absolute;top:calc(100% + 2px);left:0;background:var(--white);border-top:2px solid var(--green3);min-width:220px;z-index:600;box-shadow:0 8px 28px rgba(0,0,0,.12)}
+.tab.open .dropdown{display:block}
+.dd-item{display:block;padding:12px 18px;font-size:13px;color:var(--green2);cursor:pointer;transition:background .15s;border-bottom:.5px solid var(--line);font-weight:400;text-transform:none;letter-spacing:0;white-space:nowrap}
+.dd-item:last-child{border-bottom:none}
+.dd-item:hover,.dd-item.active{background:var(--cream);color:var(--green3)}
 
-    .stats-bar { background: var(--gold); }
-    .stats-inner { max-width: 1200px; margin: 0 auto; padding: 0 2rem; display: grid; grid-template-columns: repeat(4,1fr); }
-    .s-item { padding: 1.6rem 1.5rem; border-right: 1px solid rgba(27,42,74,0.15); }
-    .s-item:last-child { border-right: none; }
-    .s-num { font-family: var(--serif); font-size: 36px; font-weight: 400; color: var(--navy); }
-    .s-lbl { font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(27,42,74,0.6); margin-top: 3px; }
+/* ── SLIDER HERO ── */
+.slider{position:relative;height:92vh;min-height:500px;overflow:hidden;background:var(--green2)}
+.slide{position:absolute;inset:0;opacity:0;transition:opacity 1s ease;display:flex;align-items:center;justify-content:center}
+.slide.active{opacity:1}
+.slide-bg{position:absolute;inset:0;background-size:cover;background-position:center}
+.slide-overlay{position:absolute;inset:0;background:linear-gradient(to right,rgba(30,61,26,.82) 0%,rgba(30,61,26,.35) 60%,transparent 100%)}
+.slide-content{position:relative;z-index:2;max-width:1200px;width:100%;padding:0 2rem}
+.slide-label{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);border:.5px solid var(--gold);display:inline-block;padding:5px 14px;margin-bottom:1.2rem}
+.slide-title{font-family:var(--serif);font-size:clamp(38px,5.5vw,70px);font-weight:400;color:var(--white);line-height:1.05;margin-bottom:1.2rem}
+.slide-title em{font-style:italic;color:var(--gold)}
+.slide-sub{font-size:16px;color:rgba(255,255,255,.75);line-height:1.7;margin-bottom:2rem;max-width:480px}
+.slide-btns{display:flex;gap:1rem;flex-wrap:wrap}
+.btn-gold{background:var(--gold);color:var(--green2);padding:13px 28px;border:none;font-family:var(--sans);font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;cursor:pointer;transition:background .2s;text-decoration:none;display:inline-block}
+.btn-gold:hover{background:var(--gold2)}
+.btn-white{background:none;border:1.5px solid rgba(255,255,255,.6);color:var(--white);padding:13px 28px;font-family:var(--sans);font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-block}
+.btn-white:hover{border-color:var(--gold);color:var(--gold)}
+.slider-dots{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:10}
+.dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.35);cursor:pointer;transition:all .3s}
+.dot.active{background:var(--gold);width:24px;border-radius:4px}
+.slider-arrows{position:absolute;inset:0;display:flex;justify-content:space-between;align-items:center;padding:0 1.5rem;z-index:10;pointer-events:none}
+.slider-arrow{width:44px;height:44px;border:1.5px solid rgba(255,255,255,.4);background:rgba(255,255,255,.08);color:var(--white);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;pointer-events:all;backdrop-filter:blur(4px)}
+.slider-arrow:hover{border-color:var(--gold);color:var(--gold)}
 
-    .section { padding: 5rem 2rem; }
-    .section-inner { max-width: 1200px; margin: 0 auto; }
-    .sec-label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold2); margin-bottom: 0.6rem; }
-    .sec-title { font-family: var(--serif); font-size: clamp(28px, 3.5vw, 44px); font-weight: 400; line-height: 1.1; color: var(--navy); margin-bottom: 0.5rem; }
-    .sec-title em { font-style: italic; color: var(--gold2); }
-    .sec-sub { font-size: 15px; color: var(--gray); line-height: 1.7; margin-bottom: 2.5rem; max-width: 600px; }
+/* ── QUICK ACCESS ── */
+.quick-access{background:var(--white);border-bottom:1px solid var(--line);padding:0}
+.qa-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
+.qa-item{padding:1.6rem 1.2rem;text-align:center;cursor:pointer;transition:all .2s;border-right:.5px solid var(--line);text-decoration:none;display:block}
+.qa-item:last-child{border-right:none}
+.qa-item:hover{background:var(--cream);transform:translateY(-2px)}
+.qa-icon{width:40px;height:40px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto .7rem}
+.qa-icon svg{width:18px;height:18px;stroke:var(--gold);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.qa-label{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--green2)}
+.qa-sub{font-size:10px;color:var(--gray2);margin-top:2px}
 
-    .content-panel { display: none; }
-    .content-panel.active { display: block; }
+/* ── STATS BAR ── */
+.stats-bar{background:var(--gold)}
+.stats-inner{max-width:1200px;margin:0 auto;padding:0 2rem;display:grid;grid-template-columns:repeat(4,1fr)}
+.s-item{padding:1.5rem 1.2rem;border-right:1px solid rgba(30,61,26,.15)}
+.s-item:last-child{border-right:none}
+.s-num{font-family:var(--serif);font-size:34px;font-weight:400;color:var(--green2)}
+.s-lbl{font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:rgba(30,61,26,.65);margin-top:3px}
 
-    .inmovilla-banner { background: var(--cream2); border: 1px dashed var(--gold); padding: 1.2rem 1.8rem; margin-bottom: 2rem; display: flex; align-items: center; gap: 1.5rem; }
-    .inmovilla-icon { width: 38px; height: 38px; background: var(--gold); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .inmovilla-icon svg { width: 18px; height: 18px; stroke: var(--navy); fill: none; stroke-width: 2; }
-    .inmovilla-text strong { display: block; font-size: 13px; font-weight: 700; color: var(--navy); margin-bottom: 2px; }
-    .inmovilla-text span { font-size: 12px; color: var(--gray); }
+/* ── SECTIONS ── */
+.section{padding:5rem 2rem}
+.section-inner{max-width:1200px;margin:0 auto}
+.sec-label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--green3);margin-bottom:.5rem}
+.sec-title{font-family:var(--serif);font-size:clamp(28px,3.5vw,44px);font-weight:400;line-height:1.1;color:var(--green2);margin-bottom:.4rem}
+.sec-title em{font-style:italic;color:var(--green3)}
+.sec-sub{font-size:15px;color:var(--gray);line-height:1.7;margin-bottom:2.5rem;max-width:580px}
 
-    .prop-filters { display: flex; gap: 0.5rem; margin-bottom: 2rem; flex-wrap: wrap; align-items: center; }
-    .prop-filter { padding: 7px 16px; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; font-family: var(--sans); font-weight: 700; border: 1px solid var(--line); background: transparent; color: var(--gray); cursor: pointer; transition: all .2s; }
-    .prop-filter.active, .prop-filter:hover { background: var(--navy); color: var(--white); border-color: var(--navy); }
-    .prop-sort { margin-left: auto; padding: 7px 14px; font-size: 12px; font-family: var(--sans); border: 1px solid var(--line); background: var(--white); color: var(--navy); cursor: pointer; outline: none; }
+/* ── PANELS ── */
+.panel{display:none}
+.panel.active{display:block}
 
-    .props-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; }
-    .prop-card { background: var(--white); border: 0.5px solid var(--line); overflow: hidden; transition: transform .3s, box-shadow .3s; cursor: pointer; }
-    .prop-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(27,42,74,0.1); }
-    .prop-img { aspect-ratio: 4/3; background: var(--cream2); position: relative; overflow: hidden; }
-    .prop-img svg { width: 100%; height: 100%; display: block; }
-    .prop-tag { position: absolute; top: 12px; left: 12px; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 10px; }
-    .prop-tag.venta { background: var(--navy); color: var(--white); }
-    .prop-tag.alquiler { background: var(--gold); color: var(--navy); }
-    .prop-tag.nueva { background: var(--gold2); color: var(--white); }
-    .prop-tag.vacacional { background: #0f766e; color: var(--white); }
-    .prop-tag.estudiantes { background: #7c3aed; color: var(--white); }
-    .prop-exclusive { position: absolute; top: 12px; right: 12px; background: var(--gold); color: var(--navy); font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 8px; }
-    .prop-info { padding: 1.2rem; }
-    .prop-price { font-family: var(--serif); font-size: 22px; font-weight: 400; color: var(--navy); margin-bottom: 3px; }
-    .prop-name { font-size: 14px; color: var(--navy); font-weight: 700; margin-bottom: 2px; }
-    .prop-loc { font-size: 12px; color: var(--gray); margin-bottom: 10px; }
-    .prop-feats { display: flex; gap: 1rem; border-top: 0.5px solid var(--line); padding-top: 10px; }
-    .prop-feat { font-size: 11px; color: var(--gray); }
-    .prop-feat strong { color: var(--navy); font-weight: 700; }
-    .prop-ref { font-size: 10px; color: var(--gray2); margin-top: 6px; font-style: italic; }
+/* ── INMOVILLA BANNER ── */
+.inmovilla-banner{background:var(--cream2);border:1px dashed var(--green3);padding:1.1rem 1.6rem;margin-bottom:2rem;display:flex;align-items:center;gap:1.2rem;border-radius:2px}
+.ib-icon{width:36px;height:36px;background:var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ib-icon svg{width:16px;height:16px;stroke:var(--gold);fill:none;stroke-width:2}
+.ib-text strong{display:block;font-size:13px;font-weight:700;color:var(--green2);margin-bottom:2px}
+.ib-text span{font-size:12px;color:var(--gray)}
 
-    .cliente-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; margin-top: 2rem; }
-    .cliente-card { background: var(--white); border: 0.5px solid var(--line); padding: 2rem; text-align: center; transition: box-shadow .2s; }
-    .cliente-card:hover { box-shadow: 0 8px 24px rgba(27,42,74,0.08); }
-    .cliente-icon { width: 56px; height: 56px; background: var(--navy); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; }
-    .cliente-icon svg { width: 24px; height: 24px; stroke: var(--gold); fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
-    .cliente-title { font-size: 15px; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
-    .cliente-desc { font-size: 13px; color: var(--gray); line-height: 1.6; }
-    .cliente-login { max-width: 420px; margin: 3rem auto 0; background: var(--white); border: 0.5px solid var(--line); padding: 2.5rem; text-align: center; }
-    .cliente-login h3 { font-family: var(--serif); font-size: 24px; font-weight: 400; color: var(--navy); margin-bottom: 0.5rem; }
-    .cliente-login p { font-size: 13px; color: var(--gray); margin-bottom: 1.5rem; }
+/* ── FILTERS ── */
+.prop-filters{display:flex;gap:.5rem;margin-bottom:2rem;flex-wrap:wrap;align-items:center}
+.pf{padding:7px 16px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-family:var(--sans);font-weight:700;border:1px solid var(--line);background:transparent;color:var(--gray);cursor:pointer;transition:all .2s}
+.pf.active,.pf:hover{background:var(--green);color:var(--white);border-color:var(--green)}
+.psort{padding:7px 12px;font-size:12px;font-family:var(--sans);border:1px solid var(--line);background:var(--white);color:var(--green2);cursor:pointer;outline:none;margin-left:auto}
 
-    .form-group { margin-bottom: 1rem; text-align: left; }
-    .form-group label { display: block; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray); margin-bottom: 5px; }
-    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 13px; border: 1px solid var(--line); font-family: var(--sans); font-size: 14px; color: var(--navy); background: var(--cream); outline: none; transition: border-color .2s; }
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--gold); }
-    .form-group textarea { min-height: 90px; resize: vertical; }
-    .form-group select { cursor: pointer; }
-    .btn-navy { width: 100%; padding: 13px; background: var(--navy); color: var(--white); border: none; font-family: var(--sans); font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: background .2s; margin-top: 0.5rem; }
-    .btn-navy:hover { background: var(--navy2); }
+/* ── PROPERTY GRID ── */
+.props-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+.prop-card{background:var(--white);border:.5px solid var(--line);overflow:hidden;cursor:pointer;transition:transform .3s,box-shadow .3s}
+.prop-card:hover{transform:translateY(-4px);box-shadow:0 14px 36px rgba(45,90,39,.1)}
+.prop-img{aspect-ratio:4/3;background:var(--cream2);position:relative;overflow:hidden}
+.prop-img svg{width:100%;height:100%;display:block}
+.prop-tag{position:absolute;top:12px;left:12px;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px}
+.tag-venta{background:var(--green);color:var(--white)}
+.tag-alquiler{background:var(--gold);color:var(--green2)}
+.tag-nueva{background:var(--green3);color:var(--white)}
+.tag-vacacional{background:#0f766e;color:var(--white)}
+.tag-est{background:#7c3aed;color:var(--white)}
+.prop-excl{position:absolute;top:12px;right:12px;background:var(--gold);color:var(--green2);font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px}
+.prop-badges{position:absolute;bottom:12px;left:12px;display:flex;gap:6px}
+.media-badge{background:rgba(0,0,0,.65);color:var(--white);font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;display:flex;align-items:center;gap:4px;backdrop-filter:blur(4px)}
+.media-badge svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2}
+.prop-info{padding:1.2rem}
+.prop-price{font-family:var(--serif);font-size:22px;font-weight:400;color:var(--green2);margin-bottom:3px}
+.prop-name{font-size:14px;color:var(--green2);font-weight:700;margin-bottom:2px}
+.prop-loc{font-size:12px;color:var(--gray);margin-bottom:10px}
+.prop-feats{display:flex;gap:1rem;border-top:.5px solid var(--line);padding-top:10px}
+.prop-feat{font-size:11px;color:var(--gray)}
+.prop-feat strong{color:var(--green2);font-weight:700}
+.prop-ref{font-size:10px;color:var(--gray2);margin-top:5px;font-style:italic}
 
-    .about-section { background: var(--navy); padding: 5rem 2rem; }
-    .about-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; }
-    .about-img { aspect-ratio: 4/3; background: rgba(255,255,255,0.04); border: 0.5px solid rgba(255,255,255,0.1); overflow: hidden; }
-    .about-img svg { width: 100%; height: 100%; display: block; }
-    .about-label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.6rem; }
-    .about-title { font-family: var(--serif); font-size: clamp(28px,3.5vw,44px); font-weight: 400; color: var(--white); line-height: 1.1; margin-bottom: 1.25rem; }
-    .about-title em { font-style: italic; color: var(--gold); }
-    .about-body { font-size: 15px; color: rgba(255,255,255,0.65); line-height: 1.8; margin-bottom: 1.25rem; }
-    .about-values { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 2rem; }
-    .av-item { border-left: 2px solid var(--gold); padding-left: 1rem; }
-    .av-title { font-size: 13px; font-weight: 700; color: var(--white); margin-bottom: 3px; }
-    .av-body { font-size: 12px; color: rgba(255,255,255,0.5); }
+/* ── CINEMA MODE ── */
+.cinema-overlay{display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.95);flex-direction:column}
+.cinema-overlay.open{display:flex}
+.cinema-header{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.5rem;background:rgba(0,0,0,.5);flex-shrink:0}
+.cinema-header-title{font-family:var(--serif);font-size:18px;font-weight:400;color:var(--white)}
+.cinema-close{background:none;border:.5px solid rgba(255,255,255,.3);color:var(--white);width:38px;height:38px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .2s}
+.cinema-close:hover{border-color:var(--gold);color:var(--gold)}
+.cinema-body{flex:1;overflow-y:auto;overflow-x:hidden}
+.cinema-stage{position:relative;background:#000;width:100%;aspect-ratio:16/9;max-height:65vh}
+.cinema-stage img,.cinema-stage .cinema-placeholder{width:100%;height:100%;object-fit:cover;display:block}
+.cinema-placeholder{display:flex;align-items:center;justify-content:center;background:#111}
+.cinema-placeholder svg{width:100%;height:100%}
+.cinema-prev,.cinema-next{position:absolute;top:50%;transform:translateY(-50%);width:48px;height:48px;background:rgba(0,0,0,.5);border:1.5px solid rgba(255,255,255,.3);color:var(--white);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;z-index:10;backdrop-filter:blur(4px)}
+.cinema-prev{left:12px}
+.cinema-next{right:12px}
+.cinema-prev:hover,.cinema-next:hover{border-color:var(--gold);color:var(--gold)}
+.cinema-dots-row{display:flex;gap:6px;justify-content:center;padding:.75rem;background:#0a0a0a}
+.cinema-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.25);cursor:pointer;transition:all .3s;flex-shrink:0}
+.cinema-dot.active{background:var(--gold);width:20px;border-radius:3px}
+.cinema-media-row{display:flex;gap:.75rem;padding:1rem 1.5rem;background:#111;border-bottom:.5px solid rgba(255,255,255,.06);flex-wrap:wrap}
+.cmr-btn{display:flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(255,255,255,.06);border:.5px solid rgba(255,255,255,.15);color:rgba(255,255,255,.8);font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .2s}
+.cmr-btn svg{width:14px;height:14px;stroke:var(--gold);fill:none;stroke-width:2}
+.cmr-btn:hover{background:rgba(201,168,76,.12);border-color:var(--gold);color:var(--gold)}
+.cinema-detail{max-width:900px;margin:0 auto;padding:2rem 1.5rem}
+.cd-price{font-family:var(--serif);font-size:34px;font-weight:400;color:var(--white);margin-bottom:.25rem}
+.cd-name{font-size:18px;font-weight:700;color:rgba(255,255,255,.9);margin-bottom:.25rem}
+.cd-loc{font-size:14px;color:var(--gold);margin-bottom:1.8rem}
+.cd-icons{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:1rem;margin-bottom:2rem}
+.cd-icon-item{background:rgba(255,255,255,.05);border:.5px solid rgba(255,255,255,.1);padding:1rem;text-align:center}
+.cd-icon-item svg{width:24px;height:24px;stroke:var(--gold);fill:none;stroke-width:1.5;margin-bottom:.5rem;display:block;margin-left:auto;margin-right:auto}
+.cd-icon-val{font-size:16px;font-weight:700;color:var(--white);display:block}
+.cd-icon-lbl{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--gray2);display:block;margin-top:2px}
+.cd-divider{height:.5px;background:rgba(255,255,255,.08);margin:1.5rem 0}
+.cd-section-title{font-family:var(--serif);font-size:18px;font-weight:400;color:var(--white);margin-bottom:1rem}
+.cd-desc{font-size:15px;color:rgba(255,255,255,.65);line-height:1.8;margin-bottom:1.5rem}
+.cd-features{display:grid;grid-template-columns:repeat(2,1fr);gap:.5rem;margin-bottom:1.5rem}
+.cd-feat{display:flex;align-items:center;gap:.6rem;font-size:13px;color:rgba(255,255,255,.7)}
+.cd-feat::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0}
+.cd-cta{display:flex;gap:1rem;flex-wrap:wrap;margin-top:2rem;padding-top:1.5rem;border-top:.5px solid rgba(255,255,255,.08)}
 
-    .contact-section { background: var(--cream); padding: 5rem 2rem; }
-    .contact-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1.3fr; gap: 4rem; align-items: start; }
-    .contact-title { font-family: var(--serif); font-size: clamp(26px,3vw,40px); font-weight: 400; color: var(--navy); line-height: 1.12; margin-bottom: 1rem; }
-    .contact-title em { font-style: italic; color: var(--gold2); }
-    .contact-body { font-size: 15px; color: var(--gray); line-height: 1.78; margin-bottom: 2rem; }
-    .c-details { display: flex; flex-direction: column; gap: 1rem; }
-    .c-row { display: flex; gap: 1rem; align-items: flex-start; }
-    .c-ico { width: 38px; height: 38px; background: var(--navy); flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-    .c-ico svg { width: 16px; height: 16px; stroke: var(--gold); fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
-    .c-text strong { display: block; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--navy); font-weight: 700; margin-bottom: 2px; }
-    .c-text span { font-size: 13px; color: var(--gray); }
-    .contact-form-box { background: var(--white); padding: 2.5rem; border: 0.5px solid var(--line); }
-    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-    .form-note { font-size: 11px; color: var(--gray2); text-align: center; margin-top: 1rem; }
-    .form-success { display: none; text-align: center; padding: 2rem; }
-    .form-success h3 { font-family: var(--serif); font-size: 24px; font-weight: 400; color: var(--navy); margin-bottom: 0.5rem; }
-    .form-success p { font-size: 14px; color: var(--gray); }
+/* ── CAPTACION ── */
+.captacion-section{background:var(--white);padding:6rem 2rem}
+.captacion-inner{max-width:1100px;margin:0 auto}
+.captacion-hero{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center;margin-bottom:5rem}
+.captacion-visual{position:relative}
+.captacion-card-main{background:var(--green2);padding:2.5rem;position:relative;overflow:hidden}
+.captacion-card-main::before{content:'';position:absolute;top:-40px;right:-40px;width:160px;height:160px;border-radius:50%;background:rgba(201,168,76,.08)}
+.cap-num{font-family:var(--serif);font-size:64px;font-weight:400;color:rgba(255,255,255,.08);position:absolute;top:1rem;right:1.5rem;line-height:1}
+.captacion-card-main h3{font-family:var(--serif);font-size:28px;font-weight:400;color:var(--white);line-height:1.2;margin-bottom:.75rem}
+.captacion-card-main h3 em{font-style:italic;color:var(--gold)}
+.captacion-card-main p{font-size:14px;color:rgba(255,255,255,.6);line-height:1.7}
+.captacion-card-stat{display:flex;gap:2rem;margin-top:2rem;padding-top:1.5rem;border-top:.5px solid rgba(255,255,255,.1)}
+.cap-stat-num{font-family:var(--serif);font-size:32px;font-weight:400;color:var(--gold)}
+.cap-stat-lbl{font-size:11px;letter-spacing:.05em;color:rgba(255,255,255,.4);text-transform:uppercase;margin-top:3px}
+.captacion-text .sec-label{color:var(--green3)}
+.captacion-text .sec-title{color:var(--green2)}
+.captacion-text .sec-title em{color:var(--green3)}
+.captacion-text p{font-size:15px;color:var(--gray);line-height:1.8;margin-bottom:1.25rem}
+.captacion-promise{display:flex;flex-direction:column;gap:1rem;margin-top:1.5rem}
+.cap-promise-item{display:flex;align-items:flex-start;gap:1rem;padding:.9rem 1.1rem;background:var(--cream);border-left:2px solid var(--green3)}
+.cap-promise-icon{width:32px;height:32px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cap-promise-icon svg{width:14px;height:14px;stroke:var(--gold);fill:none;stroke-width:2}
+.cap-promise-title{font-size:13px;font-weight:700;color:var(--green2);margin-bottom:2px}
+.cap-promise-body{font-size:12px;color:var(--gray)}
 
-    .map-wrapper { width: 100%; height: 400px; border: none; display: block; }
+.captacion-steps{margin-bottom:4rem}
+.steps-title{font-family:var(--serif);font-size:28px;font-weight:400;color:var(--green2);margin-bottom:2rem;text-align:center}
+.steps-title em{font-style:italic;color:var(--green3)}
+.steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;position:relative}
+.steps-grid::before{content:'';position:absolute;top:28px;left:10%;right:10%;height:.5px;background:var(--line);z-index:0}
+.step-item{text-align:center;position:relative;z-index:1}
+.step-num{width:56px;height:56px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;font-family:var(--serif);font-size:22px;font-weight:400;color:var(--gold);border:2px solid var(--cream)}
+.step-title{font-size:13px;font-weight:700;color:var(--green2);margin-bottom:.4rem;letter-spacing:.02em}
+.step-body{font-size:12px;color:var(--gray);line-height:1.6}
 
-    footer { background: var(--navy); padding: 3rem 2rem; }
-    .footer-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 3rem; }
-    .footer-logo { font-family: var(--serif); font-size: 20px; font-weight: 400; color: var(--white); margin-bottom: 0.75rem; }
-    .footer-logo span { color: var(--gold); }
-    .footer-desc { font-size: 13px; color: rgba(255,255,255,0.45); line-height: 1.7; }
-    .footer-heading { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); font-weight: 700; margin-bottom: 1rem; }
-    .footer-links { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
-    .footer-links a { font-size: 13px; color: rgba(255,255,255,0.45); text-decoration: none; transition: color .2s; }
-    .footer-links a:hover { color: var(--gold); }
-    .footer-bottom { max-width: 1200px; margin: 2rem auto 0; padding-top: 1.5rem; border-top: 0.5px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
-    .footer-copy { font-size: 12px; color: rgba(255,255,255,0.3); }
-    .footer-legal { display: flex; gap: 1.5rem; list-style: none; }
-    .footer-legal a { font-size: 11px; color: rgba(255,255,255,0.3); text-decoration: none; }
-    .footer-legal a:hover { color: var(--gold); }
+.captacion-form-section{background:var(--cream2);padding:3rem;max-width:800px;margin:0 auto;border:.5px solid var(--line)}
+.captacion-form-section h3{font-family:var(--serif);font-size:28px;font-weight:400;color:var(--green2);margin-bottom:.5rem}
+.captacion-form-section p{font-size:14px;color:var(--gray);margin-bottom:2rem}
+.form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.form-group{margin-bottom:1rem}
+.form-group label{display:block;font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--gray);margin-bottom:5px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:11px 14px;border:1px solid var(--line);font-family:var(--sans);font-size:14px;color:var(--green2);background:var(--white);outline:none;transition:border-color .2s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--green3)}
+.form-group textarea{min-height:90px;resize:vertical}
+.form-group select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235f6368' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center}
+.btn-green{width:100%;padding:14px;background:var(--green);color:var(--white);border:none;font-family:var(--sans);font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:background .2s;margin-top:.5rem}
+.btn-green:hover{background:var(--green2)}
+.form-success{display:none;text-align:center;padding:2rem}
+.form-success h3{font-family:var(--serif);font-size:24px;font-weight:400;color:var(--green2);margin-bottom:.5rem}
+.form-success p{font-size:14px;color:var(--gray)}
 
-    @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
-    .hero-inner > * { animation: fadeUp .7s ease both; }
-    .hero-inner > *:last-child { animation-delay: .15s; }
+/* ── AREA CLIENTES ── */
+.clientes-link{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:5rem 2rem;text-align:center;min-height:400px}
+.cl-icon{width:80px;height:80px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem}
+.cl-icon svg{width:36px;height:36px;stroke:var(--gold);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.cl-title{font-family:var(--serif);font-size:32px;font-weight:400;color:var(--green2);margin-bottom:.75rem}
+.cl-title em{font-style:italic;color:var(--green3)}
+.cl-body{font-size:15px;color:var(--gray);line-height:1.75;max-width:460px;margin:0 auto 2rem}
+.btn-green-outline{display:inline-block;padding:14px 32px;background:none;border:1.5px solid var(--green);color:var(--green);font-family:var(--sans);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;transition:all .2s;margin-right:.75rem}
+.btn-green-outline:hover{background:var(--green);color:var(--white)}
+.cl-features{display:flex;justify-content:center;gap:2rem;flex-wrap:wrap;margin-top:2.5rem}
+.cl-feat{display:flex;align-items:center;gap:.5rem;font-size:12px;color:var(--gray)}
+.cl-feat::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green3)}
 
-    @media (max-width: 960px) {
-      .hero-inner { grid-template-columns: 1fr; }
-      .hero-card { display: none; }
-      .props-grid { grid-template-columns: repeat(2,1fr); }
-      .about-inner { grid-template-columns: 1fr; }
-      .about-img { display: none; }
-      .contact-inner { grid-template-columns: 1fr; }
-      .stats-inner { grid-template-columns: repeat(2,1fr); }
-      .footer-inner { grid-template-columns: 1fr 1fr; }
-      .cliente-grid { grid-template-columns: 1fr 1fr; }
-    }
-    @media (max-width: 600px) {
-      .props-grid { grid-template-columns: 1fr; }
-      .stats-inner { grid-template-columns: 1fr 1fr; }
-      .footer-inner { grid-template-columns: 1fr; }
-      .form-row-2 { grid-template-columns: 1fr; }
-      .about-values { grid-template-columns: 1fr; }
-      .cliente-grid { grid-template-columns: 1fr; }
-      .hero-inner { padding: 3rem 1.5rem; }
-      .section { padding: 4rem 1.5rem; }
-      .about-section, .contact-section { padding: 4rem 1.5rem; }
-    }
-  </style>
+/* ── ABOUT ── */
+.about-section{background:var(--green2);padding:5rem 2rem}
+.about-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center}
+.about-img{aspect-ratio:4/3;background:rgba(255,255,255,.04);border:.5px solid rgba(255,255,255,.08);overflow:hidden}
+.about-img svg{width:100%;height:100%;display:block}
+.about-label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:.6rem}
+.about-title{font-family:var(--serif);font-size:clamp(28px,3.5vw,44px);font-weight:400;color:var(--white);line-height:1.1;margin-bottom:1.25rem}
+.about-title em{font-style:italic;color:var(--gold)}
+.about-body{font-size:15px;color:rgba(255,255,255,.62);line-height:1.8;margin-bottom:1.25rem}
+.about-vals{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:2rem}
+.av{border-left:2px solid var(--gold);padding-left:1rem}
+.av-t{font-size:13px;font-weight:700;color:var(--white);margin-bottom:3px}
+.av-b{font-size:12px;color:rgba(255,255,255,.45)}
+
+/* ── CONTACT ── */
+.contact-section{background:var(--cream);padding:5rem 2rem}
+.contact-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1.3fr;gap:4rem;align-items:start}
+.contact-title{font-family:var(--serif);font-size:clamp(26px,3vw,40px);font-weight:400;color:var(--green2);line-height:1.12;margin-bottom:1rem}
+.contact-title em{font-style:italic;color:var(--green3)}
+.contact-body{font-size:15px;color:var(--gray);line-height:1.78;margin-bottom:2rem}
+.c-details{display:flex;flex-direction:column;gap:1rem}
+.c-row{display:flex;gap:1rem;align-items:flex-start}
+.c-ico{width:38px;height:38px;background:var(--green);flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.c-ico svg{width:16px;height:16px;stroke:var(--gold);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.c-text strong{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--green2);font-weight:700;margin-bottom:2px}
+.c-text span{font-size:13px;color:var(--gray)}
+.contact-form-box{background:var(--white);padding:2.5rem;border:.5px solid var(--line)}
+.form-note{font-size:11px;color:var(--gray2);text-align:center;margin-top:1rem}
+.form-success-contact{display:none;text-align:center;padding:2rem}
+.form-success-contact h3{font-family:var(--serif);font-size:24px;font-weight:400;color:var(--green2);margin-bottom:.5rem}
+.form-success-contact p{font-size:14px;color:var(--gray)}
+.btn-navy{width:100%;padding:13px;background:var(--green);color:var(--white);border:none;font-family:var(--sans);font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:background .2s;margin-top:.5rem}
+.btn-navy:hover{background:var(--green2)}
+
+/* ── MAP ── */
+.map-wrapper{width:100%;height:380px;border:none;display:block}
+
+/* ── FOOTER ── */
+footer{background:var(--green2);padding:3rem 2rem}
+.footer-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr;gap:3rem}
+.footer-logo{font-family:var(--serif);font-size:20px;font-weight:400;color:var(--white);margin-bottom:.75rem}
+.footer-logo span{color:var(--gold)}
+.footer-desc{font-size:13px;color:rgba(255,255,255,.4);line-height:1.7}
+.footer-heading{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:1rem}
+.footer-links{list-style:none;display:flex;flex-direction:column;gap:.6rem}
+.footer-links a{font-size:13px;color:rgba(255,255,255,.4);text-decoration:none;transition:color .2s}
+.footer-links a:hover{color:var(--gold)}
+.footer-bottom{max-width:1200px;margin:2rem auto 0;padding-top:1.5rem;border-top:.5px solid rgba(255,255,255,.07);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
+.footer-copy{font-size:12px;color:rgba(255,255,255,.28)}
+.footer-legal{display:flex;gap:1.5rem;list-style:none}
+.footer-legal a{font-size:11px;color:rgba(255,255,255,.28);text-decoration:none}
+.footer-legal a:hover{color:var(--gold)}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+.slide.active .slide-label{animation:fadeUp .6s .1s both}
+.slide.active .slide-title{animation:fadeUp .6s .25s both}
+.slide.active .slide-sub{animation:fadeUp .6s .4s both}
+.slide.active .slide-btns{animation:fadeUp .6s .55s both}
+
+/* ── RESPONSIVE ── */
+@media(max-width:960px){
+  .captacion-hero{grid-template-columns:1fr}
+  .captacion-visual{display:none}
+  .steps-grid{grid-template-columns:repeat(2,1fr)}
+  .steps-grid::before{display:none}
+  .props-grid{grid-template-columns:repeat(2,1fr)}
+  .about-inner{grid-template-columns:1fr}
+  .about-img{display:none}
+  .contact-inner{grid-template-columns:1fr}
+  .stats-inner{grid-template-columns:repeat(2,1fr)}
+  .footer-inner{grid-template-columns:1fr 1fr}
+  .qa-inner{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:600px){
+  .props-grid{grid-template-columns:1fr}
+  .stats-inner{grid-template-columns:1fr 1fr}
+  .footer-inner{grid-template-columns:1fr}
+  .form-row-2{grid-template-columns:1fr}
+  .about-vals{grid-template-columns:1fr}
+  .steps-grid{grid-template-columns:1fr 1fr}
+  .qa-inner{grid-template-columns:repeat(2,1fr)}
+  .cd-icons{grid-template-columns:repeat(3,1fr)}
+  .cd-features{grid-template-columns:1fr}
+  .slider{height:75vh}
+  .cinema-stage{max-height:45vw;min-height:200px}
+}
+</style>
 </head>
 <body>
 
+<!-- NAV -->
 <nav>
   <div class="nav-top">
-    <a href="#" class="logo">PEDROSA<span>.</span></a>
-    <div class="nav-contact">
+    <a href="#" class="logo" onclick="goTab('inicio')">PEDROSA<span>.</span></a>
+    <div class="nav-right">
       <a href="tel:+34686919424" class="nav-phone">&#128222; +34 686 919 424</a>
       <a href="#contacto" class="nav-cta">Contactar</a>
     </div>
   </div>
   <div class="main-tabs">
     <div class="tabs-inner">
-      <div class="main-tab active" onclick="showPanel('compra',this)">Compra</div>
-      <div class="main-tab" onclick="toggleSub(this)">
-        Alquiler <span class="arrow">&#9660;</span>
-        <div class="sub-menu">
-          <div class="sub-item active" onclick="showSubPanel('alquiler-general',this,event)">Todos los alquileres</div>
-          <div class="sub-item" onclick="showSubPanel('alquiler-estudiantes',this,event)">Estudiantes</div>
+      <div class="tab active" id="tab-inicio" onclick="goTab('inicio')">Inicio</div>
+      <div class="tab" id="tab-compra" onclick="goTab('compra')">Compra</div>
+      <div class="tab" id="tab-alquiler" onclick="toggleDD(this,event)">
+        Alquiler <span class="arr">&#9660;</span>
+        <div class="dropdown">
+          <div class="dd-item active" onclick="goSubTab('alquiler-general',this,event)">Todos los alquileres</div>
+          <div class="dd-item" onclick="goSubTab('alquiler-est',this,event)">Estudiantes</div>
         </div>
       </div>
-      <div class="main-tab" onclick="showPanel('vacacional',this)">Alquiler vacacional</div>
-      <div class="main-tab" onclick="showPanel('promociones',this)">Promociones</div>
-      <div class="main-tab" onclick="showPanel('clientes',this)">&#128274; Área de clientes</div>
+      <div class="tab" id="tab-vacacional" onclick="goTab('vacacional')">Alquiler vacacional</div>
+      <div class="tab" id="tab-promociones" onclick="goTab('promociones')">Promociones</div>
+      <div class="tab" id="tab-captacion" onclick="goTab('captacion')">Captación</div>
+      <a class="tab" id="tab-clientes" href="https://inmobiliariapedrosa.administraciononline.taaf.es/#/" target="_blank">Área de clientes &#8599;</a>
     </div>
   </div>
 </nav>
 
-<section class="hero">
-  <div class="hero-bg"></div>
-  <div class="hero-inner">
-    <div>
-      <div class="hero-badge">Tu inmobiliaria de confianza en Pontevedra</div>
-      <h1>35 años<br>cumpliendo <em>sueños</em></h1>
-      <p class="hero-lead">Compra, alquiler y obra nueva en Pontevedra y su provincia. Un equipo joven y dinámico con décadas de experiencia a tu lado.</p>
-      <div class="hero-btns">
-        <a href="#propiedades" class="btn-gold">Ver propiedades</a>
-        <a href="#contacto" class="btn-outline">Hablar con un agente</a>
+<!-- ── INICIO ── -->
+<div id="page-inicio">
+  <!-- SLIDER -->
+  <div class="slider" id="main-slider">
+    <!-- Slide 1 -->
+    <div class="slide active">
+      <div class="slide-bg" style="background-image:url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1600&q=80')"></div>
+      <div class="slide-overlay"></div>
+      <div class="slide-content">
+        <div class="slide-label">Pontevedra · Ciudad del Lérez</div>
+        <h1 class="slide-title">Tu hogar ideal<br><em>en Pontevedra</em></h1>
+        <p class="slide-sub">35 años ayudando a familias y empresas a encontrar su espacio perfecto en Galicia.</p>
+        <div class="slide-btns">
+          <a class="btn-gold" href="#propiedades" onclick="goTab('compra')">Ver propiedades</a>
+          <a class="btn-white" href="#contacto">Contactar</a>
+        </div>
       </div>
     </div>
-    <div class="hero-card">
-      <div class="hero-card-title">En números</div>
-      <div class="hero-stat-grid">
-        <div class="h-stat"><div class="h-stat-num">35</div><div class="h-stat-lbl">Años de experiencia</div></div>
-        <div class="h-stat"><div class="h-stat-num">+500</div><div class="h-stat-lbl">Propiedades gestionadas</div></div>
-        <div class="h-stat"><div class="h-stat-num">97%</div><div class="h-stat-lbl">Clientes satisfechos</div></div>
-        <div class="h-stat"><div class="h-stat-num">226</div><div class="h-stat-lbl">Inmuebles activos</div></div>
+    <!-- Slide 2 -->
+    <div class="slide">
+      <div class="slide-bg" style="background-image:url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1600&q=80')"></div>
+      <div class="slide-overlay"></div>
+      <div class="slide-content">
+        <div class="slide-label">Obra nueva · Pontevedra</div>
+        <h1 class="slide-title">Promociones<br><em>exclusivas</em></h1>
+        <p class="slide-sub">Viviendas de obra nueva en las mejores zonas de Pontevedra y su provincia.</p>
+        <div class="slide-btns">
+          <a class="btn-gold" href="#propiedades" onclick="goTab('promociones')">Ver promociones</a>
+          <a class="btn-white" href="#contacto">Más información</a>
+        </div>
       </div>
     </div>
+    <!-- Slide 3 -->
+    <div class="slide">
+      <div class="slide-bg" style="background-image:url('https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=1600&q=80')"></div>
+      <div class="slide-overlay"></div>
+      <div class="slide-content">
+        <div class="slide-label">Alquiler vacacional · Rías Baixas</div>
+        <h1 class="slide-title">Escápate a<br><em>las Rías Baixas</em></h1>
+        <p class="slide-sub">Apartamentos y casas para disfrutar de la costa gallega en Sanxenxo, Poio y alrededores.</p>
+        <div class="slide-btns">
+          <a class="btn-gold" href="#propiedades" onclick="goTab('vacacional')">Ver alquiler vacacional</a>
+          <a class="btn-white" href="#contacto">Reservar</a>
+        </div>
+      </div>
+    </div>
+    <!-- Slide 4 -->
+    <div class="slide">
+      <div class="slide-bg" style="background-image:url('https://images.unsplash.com/photo-1493397212122-2b85dda8106b?w=1600&q=80')"></div>
+      <div class="slide-overlay"></div>
+      <div class="slide-content">
+        <div class="slide-label">Captación · Vende con nosotros</div>
+        <h1 class="slide-title">¿Quieres vender<br><em>tu propiedad?</em></h1>
+        <p class="slide-sub">Tasación gratuita, máxima difusión y las mejores condiciones del mercado. 35 años de experiencia.</p>
+        <div class="slide-btns">
+          <a class="btn-gold" href="#captacion-form" onclick="goTab('captacion')">Solicitar tasación</a>
+          <a class="btn-white" href="#contacto">Más info</a>
+        </div>
+      </div>
+    </div>
+    <div class="slider-arrows">
+      <button class="slider-arrow" onclick="moveSlide(-1)">&#8592;</button>
+      <button class="slider-arrow" onclick="moveSlide(1)">&#8594;</button>
+    </div>
+    <div class="slider-dots" id="slider-dots"></div>
   </div>
-</section>
 
-<div class="stats-bar">
-  <div class="stats-inner">
-    <div class="s-item"><div class="s-num">35</div><div class="s-lbl">Años en el mercado</div></div>
-    <div class="s-item"><div class="s-num">226</div><div class="s-lbl">Propiedades disponibles</div></div>
-    <div class="s-item"><div class="s-num">97%</div><div class="s-lbl">Clientes satisfechos</div></div>
-    <div class="s-item"><div class="s-num">3</div><div class="s-lbl">Tipos de servicio</div></div>
+  <!-- QUICK ACCESS -->
+  <div class="quick-access">
+    <div class="qa-inner">
+      <a class="qa-item" href="#propiedades" onclick="goTab('compra')">
+        <div class="qa-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg></div>
+        <div class="qa-label">Compra</div><div class="qa-sub">Pisos, chalets, locales</div>
+      </a>
+      <a class="qa-item" href="#propiedades" onclick="goTab('alquiler-general')">
+        <div class="qa-icon"><svg viewBox="0 0 24 24"><path d="M20 9v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V9"/><path d="M9 22V12h6v10"/><path d="M2 10.6L12 2l10 8.6"/></svg></div>
+        <div class="qa-label">Alquiler</div><div class="qa-sub">Residencial y estudiantes</div>
+      </a>
+      <a class="qa-item" href="#propiedades" onclick="goTab('vacacional')">
+        <div class="qa-icon"><svg viewBox="0 0 24 24"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9z"/></svg></div>
+        <div class="qa-label">Vacacional</div><div class="qa-sub">Rías Baixas y Sanxenxo</div>
+      </a>
+      <a class="qa-item" href="#propiedades" onclick="goTab('promociones')">
+        <div class="qa-icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+        <div class="qa-label">Obra nueva</div><div class="qa-sub">Promociones exclusivas</div>
+      </a>
+      <a class="qa-item" href="#captacion-form" onclick="goTab('captacion')">
+        <div class="qa-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></div>
+        <div class="qa-label">Vende</div><div class="qa-sub">Tasación gratuita</div>
+      </a>
+    </div>
   </div>
+
+  <!-- STATS -->
+  <div class="stats-bar">
+    <div class="stats-inner">
+      <div class="s-item"><div class="s-num">35</div><div class="s-lbl">Años en el mercado</div></div>
+      <div class="s-item"><div class="s-num">226</div><div class="s-lbl">Propiedades activas</div></div>
+      <div class="s-item"><div class="s-num">97%</div><div class="s-lbl">Clientes satisfechos</div></div>
+      <div class="s-item"><div class="s-num">+500</div><div class="s-lbl">Familias atendidas</div></div>
+    </div>
+  </div>
+
+  <!-- NOSOTROS (en inicio) -->
+  <section class="about-section">
+    <div class="about-inner">
+      <div class="about-img">
+        <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="300" fill="rgba(255,255,255,.03)"/>
+          <rect x="60" y="50" width="280" height="200" rx="2" fill="rgba(255,255,255,.05)"/>
+          <rect x="80" y="70" width="100" height="155" fill="rgba(255,255,255,.07)"/>
+          <rect x="200" y="70" width="120" height="90" fill="rgba(255,255,255,.07)"/>
+          <rect x="200" y="180" width="55" height="45" fill="rgba(255,255,255,.07)"/>
+          <circle cx="310" cy="45" r="22" fill="rgba(201,168,76,.12)"/>
+        </svg>
+      </div>
+      <div>
+        <div class="about-label">Quiénes somos</div>
+        <h2 class="about-title">Tu partner<br><em>inmobiliario</em> en Pontevedra</h2>
+        <p class="about-body">Inmobiliaria Pedrosa lleva 35 años ayudando a familias y empresas de Pontevedra a encontrar su espacio ideal. Somos la referencia del mercado local.</p>
+        <p class="about-body">Contamos con un equipo joven y dinámico con amplia experiencia en compraventas, alquileres, tasaciones y obra nueva en toda la provincia.</p>
+        <div class="about-vals">
+          <div class="av"><div class="av-t">Transparencia</div><div class="av-b">Sin costes ocultos</div></div>
+          <div class="av"><div class="av-t">35 años de experiencia</div><div class="av-b">Conocemos el mercado local</div></div>
+          <div class="av"><div class="av-t">Acompañamiento total</div><div class="av-b">De la búsqueda a la firma</div></div>
+          <div class="av"><div class="av-t">Red provincial</div><div class="av-b">Toda la provincia</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
 </div>
 
-<section class="section" id="propiedades">
-  <div class="section-inner">
-
-    <div class="inmovilla-banner">
-      <div class="inmovilla-icon"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
-      <div class="inmovilla-text">
-        <strong>Integración con Inmovilla lista para activar</strong>
-        <span>Cuando conectes la API, las propiedades se actualizarán automáticamente desde tu CRM.</span>
+<!-- ── PROPERTIES PAGE ── -->
+<div id="page-props" style="display:none">
+  <section class="section" id="propiedades">
+    <div class="section-inner">
+      <div class="inmovilla-banner">
+        <div class="ib-icon"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+        <div class="ib-text"><strong>Integración con Inmovilla lista para activar</strong><span>Cuando conectes la API, estas propiedades se actualizarán automáticamente desde tu CRM.</span></div>
       </div>
-    </div>
 
-    <!-- COMPRA -->
-    <div class="content-panel active" id="panel-compra">
-      <div class="sec-label">En venta</div>
-      <h2 class="sec-title">Propiedades en <em>compra</em></h2>
-      <p class="sec-sub">Viviendas, chalets y locales en Pontevedra y su provincia.</p>
-      <div class="prop-filters">
-        <button class="prop-filter active" onclick="filterCards('compra','all',this)">Todos</button>
-        <button class="prop-filter" onclick="filterCards('compra','piso',this)">Pisos</button>
-        <button class="prop-filter" onclick="filterCards('compra','chalet',this)">Chalets</button>
-        <button class="prop-filter" onclick="filterCards('compra','local',this)">Locales</button>
-        <select class="prop-sort" onchange="sortCards('compra',this.value)">
-          <option value="">Ordenar por precio</option>
-          <option value="asc">Menor a mayor</option>
-          <option value="desc">Mayor a menor</option>
-        </select>
-      </div>
-      <div class="props-grid" id="grid-compra">
-        <div class="prop-card" data-type="piso" data-price="255000">
-          <div class="prop-img"><svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="240" fill="#ded8ce"/><rect x="50" y="55" width="220" height="155" fill="#cec7bc"/><rect x="70" y="75" width="80" height="115" fill="#bdb7ac"/><rect x="170" y="75" width="80" height="70" fill="#bdb7ac"/><rect x="130" y="165" width="60" height="45" fill="#b5afa4"/><rect x="0" y="205" width="320" height="35" fill="#d4cec4"/></svg><span class="prop-tag venta">Venta</span><span class="prop-exclusive">Exclusiva</span></div>
-          <div class="prop-info"><div class="prop-price">255.000 €</div><div class="prop-name">Piso en Fernández Ladreda</div><div class="prop-loc">Pontevedra · Zona Hospital</div><div class="prop-feats"><div class="prop-feat"><strong>4</strong> hab.</div><div class="prop-feat"><strong>2</strong> baños</div><div class="prop-feat"><strong>100</strong> m²</div></div><div class="prop-ref">Ref. INM-001 · Sincronizado con Inmovilla</div></div>
+      <!-- COMPRA -->
+      <div class="panel active" id="panel-compra">
+        <div class="sec-label">En venta</div>
+        <h2 class="sec-title">Propiedades en <em>compra</em></h2>
+        <p class="sec-sub">Viviendas, chalets y locales en Pontevedra y su provincia.</p>
+        <div class="prop-filters">
+          <button class="pf active" onclick="filterG('compra','all',this)">Todos</button>
+          <button class="pf" onclick="filterG('compra','piso',this)">Pisos</button>
+          <button class="pf" onclick="filterG('compra','chalet',this)">Chalets</button>
+          <button class="pf" onclick="filterG('compra','local',this)">Locales</button>
+          <select class="psort" onchange="sortG('compra',this.value)"><option value="">Ordenar</option><option value="asc">Precio ↑</option><option value="desc">Precio ↓</option></select>
         </div>
-        <div class="prop-card" data-type="piso" data-price="180000">
-          <div class="prop-img"><svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="240" fill="#e5e0d8"/><rect x="40" y="45" width="240" height="170" fill="#d4cec4"/><rect x="60" y="65" width="75" height="130" fill="#c8c2b8"/><rect x="155" y="65" width="105" height="80" fill="#c8c2b8"/><rect x="155" y="165" width="50" height="30" fill="#c8c2b8"/><rect x="0" y="210" width="320" height="30" fill="#cec7bc"/></svg><span class="prop-tag venta">Venta</span></div>
-          <div class="prop-info"><div class="prop-price">180.000 €</div><div class="prop-name">Piso en Os Salgueriños</div><div class="prop-loc">Pontevedra · A Parda</div><div class="prop-feats"><div class="prop-feat"><strong>3</strong> hab.</div><div class="prop-feat"><strong>1</strong> baño</div><div class="prop-feat"><strong>90</strong> m²</div></div><div class="prop-ref">Ref. INM-002 · Sincronizado con Inmovilla</div></div>
+        <div class="props-grid" id="grid-compra">
+          <div class="prop-card" data-type="piso" data-price="255000" onclick='openCinema({"title":"Piso en Fernández Ladreda","price":"255.000 €","loc":"Pontevedra · Zona Hospital","beds":4,"baths":2,"sqm":100,"floor":"3º","garage":true,"lift":true,"year":2005,"ref":"INM-001","desc":"Magnífico piso de 100 m² en pleno corazón de Pontevedra. Amplias habitaciones con armarios empotrados, cocina equipada de alta calidad, dos baños completos. El inmueble dispone de garaje incluido en el precio y trastero. Orientación sur con luz natural todo el día. Comunidad muy cuidada con ascensor recién modernizado.","features":["Calefacción central","Aire acondicionado","Suelo parquet","Ventanas PVC doble acristalamiento","Terraza de 8 m²","Trastero incluido"],"video":false,"tour":false,"plano":true})'>
+            <div class="prop-img">
+              <svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="240" fill="#ded8ce"/><rect x="50" y="55" width="220" height="155" fill="#cec7bc"/><rect x="70" y="75" width="80" height="115" fill="#bdb7ac"/><rect x="170" y="75" width="80" height="70" fill="#bdb7ac"/><rect x="130" y="165" width="60" height="45" fill="#b5afa4"/><rect x="0" y="205" width="320" height="35" fill="#d4cec4"/></svg>
+              <span class="prop-tag tag-venta">Venta</span><span class="prop-excl">Exclusiva</span>
+              <div class="prop-badges"><span class="media-badge"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Plano</span></div>
+            </div>
+            <div class="prop-info"><div class="prop-price">255.000 €</div><div class="prop-name">Piso en Fernández Ladreda</div><div class="prop-loc">Pontevedra · Zona Hospital</div><div class="prop-feats"><div class="prop-feat"><strong>4</strong> hab.</div><div class="prop-feat"><strong>2</strong> baños</div><div class="prop-feat"><strong>100</strong> m²</div></div><div class="prop-ref">Ref. INM-001 · Inmovilla</div></div>
+          </div>
+          <div class="prop-card" data-type="piso" data-price="180000" onclick='openCinema({"title":"Piso en Os Salgueriños","price":"180.000 €","loc":"Pontevedra · A Parda","beds":3,"baths":1,"sqm":90,"floor":"2º","garage":false,"lift":true,"year":1998,"ref":"INM-002","desc":"Luminoso piso en la zona de A Parda, a pocos minutos del centro de Pontevedra. Distribuido en tres habitaciones, salón comedor amplio, cocina independiente y baño completo. El inmueble fue reformado en 2019 con nuevos suelos, pintura y ventanas. Ideal para familias o como inversión.","features":["Reformado 2019","Ascensor","Calefacción individual","Trastero","Zona tranquila","Cerca transporte público"],"video":false,"tour":false,"plano":false})'>
+            <div class="prop-img">
+              <svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="240" fill="#e5e0d8"/><rect x="40" y="45" width="240" height="170" fill="#d4cec4"/><rect x="60" y="65" width="75" height="130" fill="#c8c2b8"/><rect x="155" y="65" width="105" height="80" fill="#c8c2b8"/><rect x="155" y="165" width="50" height="30" fill="#c8c2b8"/><rect x="0" y="210" width="320" height="30" fill="#cec7bc"/></svg>
+              <span class="prop-tag tag-venta">Venta</span>
+            </div>
+            <div class="prop-info"><div class="prop-price">180.000 €</div><div class="prop-name">Piso en Os Salgueriños</div><div class="prop-loc">Pontevedra · A Parda</div><div class="prop-feats"><div class="prop-feat"><strong>3</strong> hab.</div><div class="prop-feat"><strong>1</strong> baño</div><div class="prop-feat"><strong>90</strong> m²</div></div><div class="prop-ref">Ref. INM-002 · Inmovilla</div></div>
+          </div>
+          <div class="prop-card" data-type="chalet" data-price="383000" onclick='openCinema({"title":"Casa unifamiliar en San Blas","price":"383.000 €","loc":"Pontevedra · A 10 min del centro","beds":5,"baths":3,"sqm":161,"floor":"Planta baja","garage":true,"lift":false,"year":2010,"ref":"INM-003","desc":"Espectacular casa unifamiliar de 161 m² en la zona de San Blas. La vivienda cuenta con cinco habitaciones, tres baños, amplio salón con chimenea y cocina de diseño. Exterior con jardín privado de 300 m² y garaje para dos vehículos. Zona residencial tranquila a solo 10 minutos del centro de Pontevedra.","features":["Jardín privado 300 m²","Garaje doble","Chimenea","Cocina diseño","Zona residencial tranquila","Piscina comunitaria"],"video":true,"tour":true,"plano":true})'>
+            <div class="prop-img">
+              <svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="240" fill="#dbd5cb"/><rect x="70" y="90" width="180" height="130" fill="#cec7bc"/><polygon points="60,90 160,30 260,90" fill="#c3bcb1"/><rect x="90" y="115" width="55" height="80" fill="#b8b2a8"/><rect x="175" y="135" width="55" height="60" fill="#b8b2a8"/><rect x="0" y="205" width="320" height="35" fill="#d4cec4"/></svg>
+              <span class="prop-tag tag-venta">Venta</span>
+              <div class="prop-badges"><span class="media-badge"><svg viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>Vídeo</span><span class="media-badge"><svg viewBox="0 0 24 24"><path d="M15 3h6v6"/><path d="M10 14L21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>Tour</span><span class="media-badge"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Plano</span></div>
+            </div>
+            <div class="prop-info"><div class="prop-price">383.000 €</div><div class="prop-name">Casa unifamiliar en San Blas</div><div class="prop-loc">Pontevedra · A 10 min del centro</div><div class="prop-feats"><div class="prop-feat"><strong>5</strong> hab.</div><div class="prop-feat"><strong>3</strong> baños</div><div class="prop-feat"><strong>161</strong> m²</div></div><div class="prop-ref">Ref. INM-003 · Inmovilla</div></div>
+          </div>
+          <div class="prop-card" data-type="piso" data-price="310000" onclick='openCinema({"title":"Ático zona monumental","price":"310.000 €","loc":"Pontevedra · Centro · Echegaray","beds":2,"baths":2,"sqm":96,"floor":"Ático","garage":true,"lift":true,"year":2015,"ref":"INM-004","desc":"Exclusivo ático en el corazón del casco monumental de Pontevedra. Diseño contemporáneo con materiales de primera calidad. Terraza privada de 25 m² con vistas panorámicas al casco histórico. Cocina americana integrada al salón. Ambos baños en suite.","features":["Terraza privada 25 m²","Vistas casco histórico","Garaje incluido","Cocina americana","2 baños en suite","Domotizado"],"video":true,"tour":false,"plano":true})'>
+            <div class="prop-img">
+              <svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="240" fill="#e0dbd2"/><rect x="30" y="40" width="260" height="180" fill="#d4cec4"/><rect x="50" y="60" width="100" height="140" fill="#c8c2b8"/><rect x="170" y="60" width="100" height="85" fill="#c8c2b8"/><rect x="170" y="165" width="60" height="35" fill="#c8c2b8"/><rect x="0" y="210" width="320" height="30" fill="#cec7bc"/></svg>
+              <span class="prop-tag tag-venta">Venta</span><span class="prop-excl">Exclusiva</span>
+              <div class="prop-badges"><span class="media-badge"><svg viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>Vídeo</span><span class="media-badge"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Plano</span></div>
+            </div>
+            <div class="prop-info"><div class="prop-price">310.000 €</div><div class="prop-name">Ático zona monumental</div><div class="prop-loc">Pontevedra · Centro · Echegaray</div><div class="prop-feats"><div class="prop-feat"><strong>2</strong> hab.</div><div class="prop-feat"><strong>2</strong> baños</div><div class="prop-feat"><strong>96</strong> m²</div></div><div class="prop-ref">Ref. INM-004 · Inmovilla</div></div>
+          </div>
+          <div class="prop-card" data-type="chalet" data-price="350000" onclick='openCinema({"title":"Chalet en Zona Ladreda","price":"350.000 €","loc":"Pontevedra · Fernández Ladreda","beds":4,"baths":2,"sqm":150,"floor":"Planta baja","garage":true,"lift":false,"year":2008,"ref":"INM-005","desc":"Precioso chalet adosado en la exclusiva zona de Fernández Ladreda. Vivienda de 150 m² distribuida en dos plantas. Planta baja con salón-comedor, cocina, baño y garaje. Planta alta con cuatro dormitorios y baño completo. Jardín privado trasero de 80 m².","features":["Jardín privado 80 m²","Garaje incluido","Dos plantas","Zona exclusiva","Cerca de colegios","Comunidad tranquila"],"video":false,"tour":false,"plano":true})'>
+            <div class="prop-img">
+              <svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="240" fill="#ddd7cd"/><rect x="55" y="75" width="210" height="145" fill="#d0c9be"/><polygon points="45,75 160,18 275,75" fill="#c5beb3"/><rect x="80" y="105" width="60" height="95" fill="#b8b2a8"/><rect x="180" y="125" width="60" height="75" fill="#b8b2a8"/><rect x="0" y="205" width="320" height="35" fill="#ccc5bb"/></svg>
+              <span class="prop-tag tag-venta">Venta</span>
+              <div class="prop-badges"><span class="media-badge"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Plano</span></div>
+            </div>
+            <div class="prop-info"><div class="prop-price">350.000 €</div><div class="prop-name">Chalet en Zona Ladreda</div><div class="prop-loc">Pontevedra · Fernández Ladreda</div><div class="prop-feats"><div class="prop-feat"><strong>4</strong> hab.</div><div class="prop-feat"><strong>2</strong> baños</div><div class="prop-feat"><strong>150</strong> m²</div></div><div class="prop-ref">Ref. INM-005 · Inmovilla</div></div>
+          </div>
+          <div class="prop-card" data-type="local" data-price="115000" onclick='openCinema({"title":"Local en Plaza Peregrina","price":"115.000 €","loc":"Pontevedra · Centro histórico","beds":0,"baths":1,"sqm":85,"floor":"Planta baja","garage":false,"lift":false,"year":2000,"ref":"INM-006","desc":"Excelente local comercial en una de las ubicaciones más privilegiadas de Pontevedra: Plaza de la Peregrina. Amplio escaparate de 8 metros lineales con máxima visibilidad. Distribuido en planta diáfana, aseo y zona de almacén. Ideal para cualquier tipo de negocio comercial o de servicios.","features":["Escaparate 8 m lineales","Zona diáfana","Aseo incluido","Almacén trasero","Máxima visibilidad","Paso peatonal alto"],"video":false,"tour":false,"plano":false})'>
+            <div class="prop-img">
+              <svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="240" fill="#d8d3ca"/><rect x="25" y="50" width="270" height="165" fill="#ccc5bb"/><rect x="45" y="68" width="230" height="32" fill="#bdb7ac"/><rect x="45" y="118" width="108" height="75" fill="#bdb7ac"/><rect x="167" y="118" width="108" height="75" fill="#bdb7ac"/><rect x="0" y="210" width="320" height="30" fill="#c5beb3"/></svg>
+              <span class="prop-tag tag-venta">Venta</span>
+            </div>
+            <div class="prop-info"><div class="prop-price">115.000 €</div><div class="prop-name">Local en Plaza Peregrina</div><div class="prop-loc">Pontevedra · Centro histórico</div><div class="prop-feats"><div class="prop-feat"><strong>Planta baja</strong></div><div class="prop-feat"><strong>Escaparate</strong></div><div class="prop-feat"><strong>85</strong> m²</div></div><div class="prop-ref">Ref. INM-006 · Inmovilla</div></div>
+          </div>
         </div>
-        <div class="prop-card" data-type="chalet" data-price="383000">
-          <div class="prop-img"><svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="240" fill="#dbd5cb"/><rect x="70" y="90" width="180" height="130" fill="#cec7bc"/><polygon points="60,90 160,30 260,90" fill="#c3bcb1"/><rect x="90" y="115" width="55" height="80" fill="#b8b2a8"/><rect x="175" y="135" width="55" height="60" fill="#b8b2a8"/><rect x="0" y="205" width="320" height="35" fill="#d4cec4"/></svg><span class="prop-tag venta">Venta</span></div>
-          <div class="prop-info"><div class="prop-price">383.000 €</div><div class="prop-name">Casa unifamiliar en San Blas</div><div class="prop-loc">Pontevedra · A 10 min del centro</div><div class="prop-feats"><div class="prop-feat"><strong>5</strong> hab.</div><div class="prop-feat"><strong>3</strong> baños</div><div class="prop-feat"><strong>161</strong> m²</div></div><div class="prop-ref">Ref. INM-003 · Sincronizado con Inmovilla</div></div>
+      </div>
+
+      <!-- ALQUILER GENERAL -->
+      <div class="panel" id="panel-alquiler-general">
+        <div class="sec-label">En alquiler</div>
+        <h2 class="sec-title">Alquiler <em>residencial</em></h2>
+        <p class="sec-sub">Pisos y viviendas en alquiler en Pontevedra ciudad y provincia.</p>
+        <div class="props-grid">
+          <div class="prop-card" onclick='openCinema({"title":"Piso luminoso en A Parda","price":"750 €/mes","loc":"Pontevedra · A Parda","beds":3,"baths":1,"sqm":80,"floor":"4º","garage":false,"lift":true,"year":2002,"ref":"ALQ-001","desc":"Amplio piso de 80 m² en la tranquila zona de A Parda. Tres habitaciones luminosas, salón comedor con terraza, cocina americana y baño completo. La vivienda está en perfecto estado, pintado recientemente y con suelos de parquet nuevo.","features":["Terraza","Ascensor","Parquet nuevo","Luminoso","Zona tranquila","Transporte cerca"],"video":false,"tour":false,"plano":false})'>
+            <div class="prop-img"><svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="240" fill="#ddd7cd"/><rect x="50" y="55" width="220" height="155" fill="#cec7bc"/><rect x="70" y="75" width="80" height="115" fill="#bdb7ac"/><rect x="170" y="75" width="80" height="70" fill="#bdb7ac"/><rect x="130" y="165" width="60" height="45" fill="#b5afa4"/><rect x="0" y="205" width="320" height="35" fill="#d4cec4"/></svg><span class="prop-tag tag-alquiler">Alquiler</span></div>
+            <div class="prop-info"><div class="prop-price">750 €/mes</div><div class="prop-name">Piso luminoso en A Parda</div><div class="prop-loc">Pontevedra · A Parda</div><div class="prop-feats"><div class="prop-feat"><strong>3</strong> hab.</div><div class="prop-feat"><strong>1</strong> baño</div><div class="prop-feat"><strong>80</strong> m²</div></div><div class="prop-ref">Ref. ALQ-001 · Inmovilla</div></div>
+          </div>
+          <div class="prop-card" onclick='openCinema({"title":"Piso reformado zona Barcelos","price":"900 €/mes","loc":"Pontevedra · Plaza de Barcelos","beds":3,"baths":2,"sqm":78,"floor":"1º","garage":false,"lift":false,"year":2019,"ref":"ALQ-002","desc":"Completamente reformado en 2019, este piso de 78 m² está situado en la codiciada zona de Barcelos. Tres habitaciones con armarios empotrados, dos baños completos, cocina nueva de diseño y salón con suelo de madera natural.","features":["Reformado 2019","Cocina nueva","2 baños","Armarios empotrados","Suelo madera","Zona céntrica"],"video":false,"tour":false,"plano":false})'>
+            <div class="prop-img"><svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="240" fill="#e0dbd2"/><rect x="35" y="45" width="250" height="170" fill="#d4cec4"/><rect x="55" y="65" width="78" height="130" fill="#c8c2b8"/><rect x="153" y="65" width="112" height="80" fill="#c8c2b8"/><rect x="153" y="165" width="52" height="30" fill="#c8c2b8"/><rect x="0" y="210" width="320" height="30" fill="#cec7bc"/></svg><span class="prop-tag tag-alquiler">Alquiler</span></div>
+            <div class="prop-info"><div class="prop-price">900 €/mes</div><div class="prop-name">Piso reformado zona Barcelos</div><div class="prop-loc">Pontevedra · Plaza de Barcelos</div><div class="prop-feats"><div class="prop-feat"><strong>3</strong> hab.</div><div class="prop-feat"><strong>2</strong> baños</div><div class="prop-feat"><strong>78</strong> m²</div></div><div class="prop-ref">Ref. ALQ-002 · Inmovilla</div></div>
+          </div>
+          <div class="prop-card" onclick='openCinema({"title":"Apartamento en Lérez","price":"650 €/mes","loc":"Pontevedra · Lérez","beds":2,"baths":1,"sqm":60,"floor":"3º","garage":false,"lift":true,"year":2005,"ref":"ALQ-003","desc":"Acogedor apartamento de 60 m² en el barrio de Lérez. Dos habitaciones, salón comedor, cocina equipada y baño. El edificio dispone de ascensor. Situado cerca del parque y con excelentes comunicaciones.","features":["Ascensor","Cocina equipada","Zona verde próxima","Buenas comunicaciones","Orientación sur","Precio muy competitivo"],"video":false,"tour":false,"plano":false})'>
+            <div class="prop-img"><svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="240" fill="#dbd5cb"/><rect x="45" y="50" width="230" height="165" fill="#cec7bc"/><rect x="65" y="70" width="85" height="125" fill="#c3bcb1"/><rect x="170" y="70" width="85" height="75" fill="#c3bcb1"/><rect x="135" y="165" width="65" height="50" fill="#b8b2a8"/><rect x="0" y="208" width="320" height="32" fill="#d4cec4"/></svg><span class="prop-tag tag-alquiler">Alquiler</span></div>
+            <div class="prop-info"><div class="prop-price">650 €/mes</div><div class="prop-name">Apartamento en Lérez</div><div class="prop-loc">Pontevedra · Lérez</div><div class="prop-feats"><div class="prop-feat"><strong>2</strong> hab.</div><div class="prop-feat"><strong>1</strong> baño</div><div class="prop-feat"><strong>60</strong> m²</div></div><div class="prop-ref">Ref. ALQ-003 · Inmovilla</div></div>
+          </div>
         </div>
-        <div class="prop-card" data-type="piso" data-price="310000">
-          <div class="prop-img"><svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="240" fill="#e0dbd2"/><rect x="30" y="40" width="260" height="180" fill="#d4cec4"/><rect x="50" y="60" width="100" height="140" fill="#c8c2b8"/><rect x="170" y="60" width="100" height="85" fill="#c8c2b8"/><rect x="170" y="165" width="60" height="35" fill="#c8c2b8"/><rect x="0" y="210" width="320" height="30" fill="#cec7bc"/></svg><span class="prop-tag venta">Venta</span><span class="prop-exclusive">Exclusiva</span></div>
-          <div class="prop-info"><div class="prop-price">310.000 €</div><div class="prop-name">Ático zona monumental</div><div class="prop-loc">Pontevedra · Centro · Echegaray</div><div class="prop-feats"><div class="prop-feat"><strong>2</strong> hab.</div><div class="prop-feat"><strong>2</strong> baños</div><div class="prop-feat"><strong>96</strong> m²</div></div><div class="prop-ref">Ref. INM-004 · Sincronizado con Inmovilla</div></div>
+      </div>
+
+      <!-- ALQUILER ESTUDIANTES -->
+      <div class="panel" id="panel-alquiler-est">
+        <div class="sec-label">Alquiler · Estudiantes</div>
+        <h2 class="sec-title">Pisos para <em>estudiantes</em></h2>
+        <p class="sec-sub">Habitaciones y pisos cerca del campus universitario y el centro de Pontevedra.</p>
+        <div class="props-grid">
+          <div class="prop-card" onclick='openCinema({"title":"Habitación piso compartido","price":"350 €/mes · hab.","loc":"Pontevedra · Campus universitario","beds":1,"baths":1,"sqm":15,"floor":"2º","garage":false,"lift":false,"year":2000,"ref":"EST-001","desc":"Habitación individual en piso compartido a 5 minutos a pie del campus universitario de Pontevedra. El piso tiene 3 habitaciones, salón, cocina y un baño. Incluye WiFi, calefacción y gastos de comunidad. Ambiente tranquilo y agradable.","features":["WiFi incluido","Calefacción incluida","A 5 min del campus","Piso de 3 habitaciones","Comunidad tranquila","Gastos incluidos"],"video":false,"tour":false,"plano":false})'>
+            <div class="prop-img"><svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="240" fill="#ddd7cd"/><rect x="50" y="55" width="220" height="155" fill="#cec7bc"/><rect x="70" y="75" width="75" height="110" fill="#bdb7ac"/><rect x="165" y="75" width="75" height="65" fill="#bdb7ac"/><rect x="125" y="160" width="55" height="50" fill="#b5afa4"/><rect x="0" y="206" width="320" height="34" fill="#d4cec4"/></svg><span class="prop-tag tag-est">Estudiantes</span></div>
+            <div class="prop-info"><div class="prop-price">350 €/mes · hab.</div><div class="prop-name">Habitación piso compartido</div><div class="prop-loc">Pontevedra · Campus universitario</div><div class="prop-feats"><div class="prop-feat"><strong>1</strong> hab. propia</div><div class="prop-feat"><strong>WiFi</strong></div><div class="prop-feat"><strong>Gastos incl.</strong></div></div><div class="prop-ref">Ref. EST-001 · Inmovilla</div></div>
+          </div>
+          <div class="prop-card" onclick='openCinema({"title":"Estudio amueblado","price":"550 €/mes","loc":"Pontevedra · Centro","beds":1,"baths":1,"sqm":35,"floor":"1º","garage":false,"lift":false,"year":2010,"ref":"EST-002","desc":"Moderno estudio completamente amueblado y equipado en pleno centro de Pontevedra. Incluye cama de 135 cm, escritorio, armario, sofá, mesa de comedor, televisión, cocina completa y baño. Todo listo para entrar a vivir.","features":["Totalmente amueblado","TV incluida","Cocina completa","Internet disponible","Centro ciudad","Listo para vivir"],"video":false,"tour":false,"plano":false})'>
+            <div class="prop-img"><svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="240" fill="#e0dbd2"/><rect x="40" y="48" width="240" height="168" fill="#d4cec4"/><rect x="60" y="68" width="80" height="128" fill="#c8c2b8"/><rect x="160" y="68" width="100" height="78" fill="#c8c2b8"/><rect x="160" y="166" width="50" height="30" fill="#c8c2b8"/><rect x="0" y="210" width="320" height="30" fill="#cec7bc"/></svg><span class="prop-tag tag-est">Estudiantes</span></div>
+            <div class="prop-info"><div class="prop-price">550 €/mes</div><div class="prop-name">Estudio amueblado</div><div class="prop-loc">Pontevedra · Centro</div><div class="prop-feats"><div class="prop-feat"><strong>Estudio</strong></div><div class="prop-feat"><strong>Amueblado</strong></div><div class="prop-feat"><strong>35</strong> m²</div></div><div class="prop-ref">Ref. EST-002 · Inmovilla</div></div>
+          </div>
+          <div class="prop-card" onclick='openCinema({"title":"Piso completo 3 habitaciones","price":"680 €/mes","loc":"Pontevedra · Campolongo","beds":3,"baths":1,"sqm":65,"floor":"3º","garage":false,"lift":false,"year":1995,"ref":"EST-003","desc":"Piso de 65 m² ideal para compartir entre estudiantes. Tres habitaciones amplias, salón, cocina independiente y baño. Situado en Campolongo, barrio universitario por excelencia, rodeado de servicios y muy bien comunicado con el campus.","features":["Barrio universitario","3 habitaciones","Cocina independiente","Buenas comunicaciones","Comercios próximos","Precio por el piso completo"],"video":false,"tour":false,"plano":false})'>
+            <div class="prop-img"><svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="240" fill="#dbd5cb"/><rect x="45" y="50" width="230" height="165" fill="#cec7bc"/><rect x="65" y="70" width="85" height="125" fill="#c3bcb1"/><rect x="170" y="70" width="85" height="75" fill="#c3bcb1"/><rect x="135" y="165" width="65" height="50" fill="#b8b2a8"/><rect x="0" y="208" width="320" height="32" fill="#d4cec4"/></svg><span class="prop-tag tag-est">Estudiantes</span></div>
+            <div class="prop-info"><div class="prop-price">680 €/mes</div><div class="prop-name">Piso completo 3 habitaciones</div><div class="prop-loc">Pontevedra · Campolongo</div><div class="prop-feats"><div class="prop-feat"><strong>3</strong> hab.</div><div class="prop-feat"><strong>1</strong> baño</div><div class="prop-feat"><strong>65</strong> m²</div></div><div class="prop-ref">Ref. EST-003 · Inmovilla</div></div>
+          </div>
         </div>
-        <div class="prop-card" data-type="chalet" data-price="350000">
-          <div class="prop-img"><svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="240" fill="#ddd7cd"/><rect x="55" y="75" width="210" height="145" fill="#d0c9be"/><polygon points="45,75 160,18 275,75" fill="#c5beb3"/><rect x="80" y="105" width="60" height="95" fill="#b8b2a8"/><rect x="180" y="125" width="60" height="75" fill="#b8b2a8"/><rect x="0" y="205" width="320" height="35" fill="#ccc5bb"/></svg><span class="prop-tag venta">Venta</span></div>
-          <div class="prop-info"><div class="prop-price">350.000 €</div><div class="prop-name">Chalet en Zona Ladreda</div><div class="prop-loc">Pontevedra · Fernández Ladreda</div><div class="prop-feats"><div class="prop-feat"><strong>4</strong> hab.</div><div class="prop-feat"><strong>2</strong> baños</div><div class="prop-feat"><strong>150</strong> m²</div></div><div class="prop-ref">Ref. INM-005 · Sincronizado con Inmovilla</div></div>
+      </div>
+
+      <!-- VACACIONAL -->
+      <div class="panel" id="panel-vacacional">
+        <div class="sec-label">Alquiler vacacional</div>
+        <h2 class="sec-title">Alquiler <em>vacacional</em></h2>
+        <p class="sec-sub">Apartamentos y casas para vacaciones en Pontevedra, Sanxenxo y las Rías Baixas.</p>
+        <div class="props-grid">
+          <div class="prop-card" onclick='openCinema({"title":"Apartamento en Sanxenxo","price":"90 €/noche","loc":"Sanxenxo · Zona céntrica · Playa","beds":2,"baths":2,"sqm":56,"floor":"2º","garage":false,"lift":true,"year":2012,"ref":"VAC-001","desc":"Precioso apartamento a 200 metros de la playa de Sanxenxo. Dos habitaciones, dos baños, terraza con vistas al mar y cocina completamente equipada. Edificio con ascensor. Ideal para parejas o familia pequeña. Disponible por semanas en verano.","features":["200m de la playa","Terraza con vistas","Cocina equipada","Parking zona azul","Zona céntrica","WiFi incluido"],"video":false,"tour":true,"plano":false})'>
+            <div class="prop-img"><svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="240" fill="#cfe6e4"/><rect x="50" y="60" width="220" height="150" fill="#b8d4d2"/><rect x="70" y="80" width="80" height="110" fill="#a0c0be"/><rect x="170" y="80" width="80" height="65" fill="#a0c0be"/><rect x="130" y="165" width="60" height="45" fill="#92b5b3"/><rect x="0" y="205" width="320" height="35" fill="#c2dede"/></svg><span class="prop-tag tag-vacacional">Vacacional</span><div class="prop-badges"><span class="media-badge"><svg viewBox="0 0 24 24"><path d="M15 3h6v6"/><path d="M10 14L21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>Tour</span></div></div>
+            <div class="prop-info"><div class="prop-price">90 €/noche</div><div class="prop-name">Apartamento en Sanxenxo</div><div class="prop-loc">Sanxenxo · Zona céntrica · Playa</div><div class="prop-feats"><div class="prop-feat"><strong>2</strong> hab.</div><div class="prop-feat"><strong>2</strong> baños</div><div class="prop-feat"><strong>56</strong> m²</div></div><div class="prop-ref">Ref. VAC-001 · Inmovilla</div></div>
+          </div>
+          <div class="prop-card" onclick='openCinema({"title":"Casa con vistas a la ría","price":"140 €/noche","loc":"Poio · Vistas al mar · Parcela","beds":4,"baths":2,"sqm":200,"floor":"Planta baja","garage":true,"lift":false,"year":2005,"ref":"VAC-002","desc":"Magnífica casa de 200 m² con impresionantes vistas a la Ría de Pontevedra. Amplia parcela de 600 m² con jardín y barbacoa. Cuatro habitaciones, dos baños, salón con chimenea y cocina totalmente equipada. Garaje para dos coches. Ideal para grupos familiares.","features":["Vistas a la ría","Jardín 600 m²","Barbacoa","Chimenea","Garaje","WiFi incluido"],"video":true,"tour":true,"plano":false})'>
+            <div class="prop-img"><svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="240" fill="#d4e8e2"/><rect x="65" y="85" width="190" height="135" fill="#b8d4cc"/><polygon points="55,85 160,25 265,85" fill="#adc9c2"/><rect x="85" y="115" width="55" height="85" fill="#9bbfb8"/><rect x="180" y="135" width="55" height="65" fill="#9bbfb8"/><rect x="0" y="205" width="320" height="35" fill="#c5ddd8"/></svg><span class="prop-tag tag-vacacional">Vacacional</span><div class="prop-badges"><span class="media-badge"><svg viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>Vídeo</span><span class="media-badge"><svg viewBox="0 0 24 24"><path d="M15 3h6v6"/><path d="M10 14L21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>Tour</span></div></div>
+            <div class="prop-info"><div class="prop-price">140 €/noche</div><div class="prop-name">Casa con vistas a la ría</div><div class="prop-loc">Poio · Vistas al mar · Parcela</div><div class="prop-feats"><div class="prop-feat"><strong>4</strong> hab.</div><div class="prop-feat"><strong>2</strong> baños</div><div class="prop-feat"><strong>200</strong> m²</div></div><div class="prop-ref">Ref. VAC-002 · Inmovilla</div></div>
+          </div>
+          <div class="prop-card" onclick='openCinema({"title":"Estudio zona monumental","price":"65 €/noche","loc":"Pontevedra · Centro histórico","beds":1,"baths":1,"sqm":42,"floor":"1º","garage":false,"lift":false,"year":2018,"ref":"VAC-003","desc":"Encantador estudio en pleno corazón del casco monumental de Pontevedra. Completamente reformado y decorado con gusto. A metros de los principales monumentos, restaurantes y tiendas. Ideal para parejas que quieren disfrutar de la Pontevedra más auténtica.","features":["Casco histórico","Reformado 2018","A metros de monumentos","Decoración cuidada","WiFi ultrarrápido","Entrada autónoma"],"video":false,"tour":false,"plano":false})'>
+            <div class="prop-img"><svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="240" fill="#cce0dd"/><rect x="40" y="50" width="240" height="165" fill="#b5cecc"/><rect x="60" y="70" width="78" height="125" fill="#9ec0bd"/><rect x="158" y="70" width="102" height="75" fill="#9ec0bd"/><rect x="158" y="165" width="50" height="30" fill="#9ec0bd"/><rect x="0" y="210" width="320" height="30" fill="#c2dede"/></svg><span class="prop-tag tag-vacacional">Vacacional</span></div>
+            <div class="prop-info"><div class="prop-price">65 €/noche</div><div class="prop-name">Estudio zona monumental</div><div class="prop-loc">Pontevedra · Centro histórico</div><div class="prop-feats"><div class="prop-feat"><strong>Estudio</strong></div><div class="prop-feat"><strong>1</strong> baño</div><div class="prop-feat"><strong>42</strong> m²</div></div><div class="prop-ref">Ref. VAC-003 · Inmovilla</div></div>
+          </div>
         </div>
-        <div class="prop-card" data-type="local" data-price="115000">
-          <div class="prop-img"><svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="240" fill="#d8d3ca"/><rect x="25" y="50" width="270" height="165" fill="#ccc5bb"/><rect x="45" y="68" width="230" height="32" fill="#bdb7ac"/><rect x="45" y="118" width="108" height="75" fill="#bdb7ac"/><rect x="167" y="118" width="108" height="75" fill="#bdb7ac"/><rect x="0" y="210" width="320" height="30" fill="#c5beb3"/></svg><span class="prop-tag venta">Venta</span></div>
-          <div class="prop-info"><div class="prop-price">115.000 €</div><div class="prop-name">Local en Plaza Peregrina</div><div class="prop-loc">Pontevedra · Centro histórico</div><div class="prop-feats"><div class="prop-feat"><strong>Planta baja</strong></div><div class="prop-feat"><strong>Escaparate</strong></div><div class="prop-feat"><strong>85</strong> m²</div></div><div class="prop-ref">Ref. INM-006 · Sincronizado con Inmovilla</div></div>
+      </div>
+
+      <!-- PROMOCIONES -->
+      <div class="panel" id="panel-promociones">
+        <div class="sec-label">Obra nueva</div>
+        <h2 class="sec-title">Promociones <em>exclusivas</em></h2>
+        <p class="sec-sub">Viviendas de obra nueva y promociones propias en Pontevedra y provincia.</p>
+        <div class="props-grid">
+          <div class="prop-card" onclick='openCinema({"title":"Residencial Peregrina I","price":"Desde 285.000 €","loc":"Pontevedra · Centro · Entrega 2026","beds":4,"baths":2,"sqm":128,"floor":"Varios","garage":true,"lift":true,"year":2026,"ref":"PRO-001","desc":"Exclusiva promoción de 12 viviendas en el corazón de Pontevedra. Tipologías de 2 a 4 habitaciones con acabados de primera calidad. Garaje y trastero incluidos. Certificación energética A. Entrega prevista 2026. Quedan pocas unidades disponibles.","features":["12 viviendas","Certificación energética A","Garaje y trastero incluidos","Ascensor panorámico","Acabados premium","Solo 3 unidades disponibles"],"video":true,"tour":false,"plano":true})'>
+            <div class="prop-img"><svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="240" fill="#e8e3db"/><rect x="35" y="40" width="250" height="175" fill="#d8d2c8"/><rect x="55" y="60" width="65" height="135" fill="#cdc7bc"/><rect x="140" y="60" width="65" height="135" fill="#cdc7bc"/><rect x="225" y="60" width="40" height="135" fill="#cdc7bc"/><rect x="0" y="210" width="320" height="30" fill="#d4cec4"/></svg><span class="prop-tag tag-nueva">Obra nueva</span><span class="prop-excl">Promo</span><div class="prop-badges"><span class="media-badge"><svg viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>Vídeo</span><span class="media-badge"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Plano</span></div></div>
+            <div class="prop-info"><div class="prop-price">Desde 285.000 €</div><div class="prop-name">Residencial Peregrina I</div><div class="prop-loc">Pontevedra · Centro · Entrega 2026</div><div class="prop-feats"><div class="prop-feat"><strong>2–4</strong> hab.</div><div class="prop-feat"><strong>12</strong> viviendas</div><div class="prop-feat"><strong>Garaje incl.</strong></div></div><div class="prop-ref">Ref. PRO-001 · Inmovilla</div></div>
+          </div>
+          <div class="prop-card" onclick='openCinema({"title":"Promoción Salgueriños","price":"Desde 220.000 €","loc":"Pontevedra · A Seca · Entrega 2025","beds":3,"baths":2,"sqm":102,"floor":"Varios","garage":true,"lift":true,"year":2025,"ref":"PRO-002","desc":"Promoción de 8 viviendas de 3 habitaciones en la zona de A Seca. Construcción de alta calidad con certificación energética B. Cada vivienda incluye trastero y garaje. Zona residencial tranquila con todos los servicios cerca. Entrega prevista finales de 2025.","features":["8 viviendas","Certificación energética B","Garaje y trastero","Zona tranquila","Todos los servicios","Entrega fin 2025"],"video":false,"tour":false,"plano":true})'>
+            <div class="prop-img"><svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="240" fill="#eae5db"/><rect x="30" y="38" width="260" height="178" fill="#ddd7cd"/><rect x="50" y="58" width="60" height="138" fill="#d0c9be"/><rect x="130" y="58" width="60" height="138" fill="#d0c9be"/><rect x="210" y="58" width="60" height="138" fill="#d0c9be"/><rect x="0" y="210" width="320" height="30" fill="#d4cec4"/></svg><span class="prop-tag tag-nueva">Obra nueva</span><div class="prop-badges"><span class="media-badge"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Plano</span></div></div>
+            <div class="prop-info"><div class="prop-price">Desde 220.000 €</div><div class="prop-name">Promoción Salgueriños</div><div class="prop-loc">Pontevedra · A Seca · Entrega 2025</div><div class="prop-feats"><div class="prop-feat"><strong>3</strong> hab.</div><div class="prop-feat"><strong>8</strong> viviendas</div><div class="prop-feat"><strong>Trastero incl.</strong></div></div><div class="prop-ref">Ref. PRO-002 · Inmovilla</div></div>
+          </div>
+          <div class="prop-card" onclick='openCinema({"title":"Villas Ría de Pontevedra","price":"Desde 350.000 €","loc":"Poio · Vistas a la ría · Entrega 2026","beds":4,"baths":3,"sqm":180,"floor":"Planta baja","garage":true,"lift":false,"year":2026,"ref":"PRO-003","desc":"Exclusiva promoción de 6 villas adosadas con jardín privado y vistas privilegiadas a la Ría de Pontevedra. Construcción de lujo con materiales de primera calidad. Piscina comunitaria. Garaje para dos vehículos. Solo 6 unidades, no pierdas la oportunidad.","features":["6 villas exclusivas","Jardín privado","Piscina comunitaria","Vistas a la ría","Garaje doble","Solo 2 unidades disponibles"],"video":true,"tour":true,"plano":true})'>
+            <div class="prop-img"><svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="240" fill="#e5e0d8"/><rect x="40" y="45" width="240" height="170" fill="#ddd7cd"/><rect x="60" y="65" width="70" height="130" fill="#d0c9be"/><rect x="150" y="65" width="70" height="130" fill="#d0c9be"/><rect x="0" y="210" width="320" height="30" fill="#d4cec4"/></svg><span class="prop-tag tag-nueva">Obra nueva</span><span class="prop-excl">Promo</span><div class="prop-badges"><span class="media-badge"><svg viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>Vídeo</span><span class="media-badge"><svg viewBox="0 0 24 24"><path d="M15 3h6v6"/><path d="M10 14L21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>Tour</span><span class="media-badge"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Plano</span></div></div>
+            <div class="prop-info"><div class="prop-price">Desde 350.000 €</div><div class="prop-name">Villas Ría de Pontevedra</div><div class="prop-loc">Poio · Vistas a la ría · Entrega 2026</div><div class="prop-feats"><div class="prop-feat"><strong>4</strong> hab.</div><div class="prop-feat"><strong>6</strong> villas</div><div class="prop-feat"><strong>Jardín priv.</strong></div></div><div class="prop-ref">Ref. PRO-003 · Inmovilla</div></div>
+          </div>
         </div>
       </div>
     </div>
+  </section>
+</div>
 
-    <!-- ALQUILER GENERAL -->
-    <div class="content-panel" id="panel-alquiler-general">
-      <div class="sec-label">En alquiler</div>
-      <h2 class="sec-title">Alquiler <em>residencial</em></h2>
-      <p class="sec-sub">Pisos y viviendas en alquiler en Pontevedra ciudad y provincia.</p>
-      <div class="props-grid">
-        <div class="prop-card"><div class="prop-img"><svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="240" fill="#ddd7cd"/><rect x="50" y="55" width="220" height="155" fill="#cec7bc"/><rect x="70" y="75" width="80" height="115" fill="#bdb7ac"/><rect x="170" y="75" width="80" height="70" fill="#bdb7ac"/><rect x="130" y="165" width="60" height="45" fill="#b5afa4"/><rect x="0" y="205" width="320" height="35" fill="#d4cec4"/></svg><span class="prop-tag alquiler">Alquiler</span></div><div class="prop-info"><div class="prop-price">750 €/mes</div><div class="prop-name">Piso luminoso en A Parda</div><div class="prop-loc">Pontevedra · A Parda</div><div class="prop-feats"><div class="prop-feat"><strong>3</strong> hab.</div><div class="prop-feat"><strong>1</strong> baño</div><div class="prop-feat"><strong>80</strong> m²</div></div><div class="prop-ref">Ref. ALQ-001 · Sincronizado con Inmovilla</div></div></div>
-        <div class="prop-card"><div class="prop-img"><svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="240" fill="#e0dbd2"/><rect x="35" y="45" width="250" height="170" fill="#d4cec4"/><rect x="55" y="65" width="78" height="130" fill="#c8c2b8"/><rect x="153" y="65" width="112" height="80" fill="#c8c2b8"/><rect x="153" y="165" width="52" height="30" fill="#c8c2b8"/><rect x="0" y="210" width="320" height="30" fill="#cec7bc"/></svg><span class="prop-tag alquiler">Alquiler</span></div><div class="prop-info"><div class="prop-price">900 €/mes</div><div class="prop-name">Piso reformado zona Barcelos</div><div class="prop-loc">Pontevedra · Plaza de Barcelos</div><div class="prop-feats"><div class="prop-feat"><strong>3</strong> hab.</div><div class="prop-feat"><strong>2</strong> baños</div><div class="prop-feat"><strong>78</strong> m²</div></div><div class="prop-ref">Ref. ALQ-002 · Sincronizado con Inmovilla</div></div></div>
-        <div class="prop-card"><div class="prop-img"><svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="240" fill="#dbd5cb"/><rect x="45" y="50" width="230" height="165" fill="#cec7bc"/><rect x="65" y="70" width="85" height="125" fill="#c3bcb1"/><rect x="170" y="70" width="85" height="75" fill="#c3bcb1"/><rect x="135" y="165" width="65" height="50" fill="#b8b2a8"/><rect x="0" y="208" width="320" height="32" fill="#d4cec4"/></svg><span class="prop-tag alquiler">Alquiler</span></div><div class="prop-info"><div class="prop-price">650 €/mes</div><div class="prop-name">Apartamento en Lérez</div><div class="prop-loc">Pontevedra · Lérez</div><div class="prop-feats"><div class="prop-feat"><strong>2</strong> hab.</div><div class="prop-feat"><strong>1</strong> baño</div><div class="prop-feat"><strong>60</strong> m²</div></div><div class="prop-ref">Ref. ALQ-003 · Sincronizado con Inmovilla</div></div></div>
+<!-- ── CAPTACION PAGE ── -->
+<div id="page-captacion" style="display:none">
+  <section class="captacion-section" id="captacion-form">
+    <div class="captacion-inner">
+      <div class="captacion-hero">
+        <div class="captacion-visual">
+          <div class="captacion-card-main">
+            <div class="cap-num">35</div>
+            <h3>Vendemos tu<br>propiedad al <em>mejor precio</em></h3>
+            <p>Conocemos el mercado de Pontevedra como nadie. Nuestra red de compradores activos y nuestra presencia en los principales portales garantizan la máxima visibilidad para tu inmueble.</p>
+            <div class="captacion-card-stat">
+              <div><div class="cap-stat-num">97%</div><div class="cap-stat-lbl">Vendidos en precio</div></div>
+              <div><div class="cap-stat-num">42 días</div><div class="cap-stat-lbl">Tiempo medio venta</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="captacion-text">
+          <div class="sec-label">Vende con Pedrosa</div>
+          <h2 class="sec-title">Tu propiedad,<br><em>en las mejores manos</em></h2>
+          <p>En Inmobiliaria Pedrosa llevamos 35 años vendiendo propiedades en Pontevedra. Conocemos el mercado, los precios y los compradores. Somos tu mejor aliado.</p>
+          <p>Ofrecemos un servicio integral: tasación gratuita, reportaje fotográfico profesional, publicación en más de 15 portales y una cartera de compradores activos esperando.</p>
+          <div class="captacion-promise">
+            <div class="cap-promise-item">
+              <div class="cap-promise-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <div><div class="cap-promise-title">Tasación gratuita y sin compromiso</div><div class="cap-promise-body">Valoramos tu inmueble al precio real de mercado, sin inflar expectativas.</div></div>
+            </div>
+            <div class="cap-promise-item">
+              <div class="cap-promise-icon"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+              <div><div class="cap-promise-title">Reportaje fotográfico profesional</div><div class="cap-promise-body">Fotos y vídeo de calidad que destacan tu propiedad sobre la competencia.</div></div>
+            </div>
+            <div class="cap-promise-item">
+              <div class="cap-promise-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+              <div><div class="cap-promise-title">Máxima difusión online</div><div class="cap-promise-body">Tu propiedad en Idealista, Fotocasa, Habitaclia y más de 15 portales.</div></div>
+            </div>
+            <div class="cap-promise-item">
+              <div class="cap-promise-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+              <div><div class="cap-promise-title">Cartera de compradores activos</div><div class="cap-promise-body">Clientes buscando exactamente lo que tú ofreces, listos para comprar.</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="captacion-steps">
+        <h3 class="steps-title">¿Cómo <em>funciona</em>?</h3>
+        <div class="steps-grid">
+          <div class="step-item"><div class="step-num">1</div><div class="step-title">Contactas con nosotros</div><div class="step-body">Llámanos o rellena el formulario. Te responderemos en menos de 2 horas.</div></div>
+          <div class="step-item"><div class="step-num">2</div><div class="step-title">Tasamos tu propiedad</div><div class="step-body">Visitamos el inmueble y te damos una valoración realista y fundamentada.</div></div>
+          <div class="step-item"><div class="step-num">3</div><div class="step-title">Preparamos la venta</div><div class="step-body">Reportaje fotográfico, tour virtual y publicación en todos los portales.</div></div>
+          <div class="step-item"><div class="step-num">4</div><div class="step-title">Cerramos la operación</div><div class="step-body">Gestionamos ofertas, negociamos y te acompañamos hasta la firma.</div></div>
+        </div>
+      </div>
+
+      <div class="captacion-form-section">
+        <h3>Solicita tu tasación gratuita</h3>
+        <p>Sin compromiso. Un agente te contactará en menos de 2 horas.</p>
+        <form id="captacion-form-el" action="https://formspree.io/f/mwvrgvqd" method="POST">
+          <input type="hidden" name="tipo" value="Captación / Solicitud de tasación">
+          <div class="form-row-2">
+            <div class="form-group"><label>Nombre</label><input type="text" name="nombre" placeholder="Tu nombre" required></div>
+            <div class="form-group"><label>Teléfono</label><input type="tel" name="telefono" placeholder="+34 600 000 000" required></div>
+          </div>
+          <div class="form-row-2">
+            <div class="form-group"><label>Email</label><input type="email" name="email" placeholder="tu@email.com" required></div>
+            <div class="form-group"><label>Tipo de inmueble</label>
+              <select name="tipo_inmueble"><option>Piso</option><option>Casa / Chalet</option><option>Local comercial</option><option>Oficina</option><option>Garaje</option><option>Terreno</option><option>Otro</option></select>
+            </div>
+          </div>
+          <div class="form-group"><label>Dirección aproximada del inmueble</label><input type="text" name="direccion" placeholder="Calle, barrio o zona en Pontevedra"></div>
+          <div class="form-row-2">
+            <div class="form-group"><label>Superficie aproximada</label><input type="text" name="superficie" placeholder="Ej: 90 m²"></div>
+            <div class="form-group"><label>¿Cuándo quieres vender?</label>
+              <select name="urgencia"><option>Lo antes posible</option><option>En los próximos 3 meses</option><option>En los próximos 6 meses</option><option>Solo quiero saber el valor</option></select>
+            </div>
+          </div>
+          <div class="form-group"><label>Información adicional</label><textarea name="mensaje" placeholder="Cuéntanos algo más sobre el inmueble (año de construcción, estado, características especiales...)"></textarea></div>
+          <button type="submit" class="btn-green">Solicitar tasación gratuita</button>
+          <p class="form-note" style="margin-top:1rem">Respuesta garantizada en menos de 2 horas · Totalmente gratuito · Sin compromiso</p>
+        </form>
+        <div class="form-success" id="captacion-success">
+          <h3>¡Solicitud recibida!</h3>
+          <p>Un agente de Inmobiliaria Pedrosa te contactará en menos de 2 horas.</p>
+        </div>
       </div>
     </div>
+  </section>
+</div>
 
-    <!-- ALQUILER ESTUDIANTES -->
-    <div class="content-panel" id="panel-alquiler-estudiantes">
-      <div class="sec-label">Alquiler · Estudiantes</div>
-      <h2 class="sec-title">Pisos para <em>estudiantes</em></h2>
-      <p class="sec-sub">Habitaciones y pisos cerca del campus universitario y el centro de Pontevedra.</p>
-      <div class="props-grid">
-        <div class="prop-card"><div class="prop-img"><svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="240" fill="#ddd7cd"/><rect x="50" y="55" width="220" height="155" fill="#cec7bc"/><rect x="70" y="75" width="75" height="110" fill="#bdb7ac"/><rect x="165" y="75" width="75" height="65" fill="#bdb7ac"/><rect x="125" y="160" width="55" height="50" fill="#b5afa4"/><rect x="0" y="206" width="320" height="34" fill="#d4cec4"/></svg><span class="prop-tag estudiantes">Estudiantes</span></div><div class="prop-info"><div class="prop-price">350 €/mes · hab.</div><div class="prop-name">Habitación piso compartido</div><div class="prop-loc">Pontevedra · Campus universitario</div><div class="prop-feats"><div class="prop-feat"><strong>1</strong> hab. propia</div><div class="prop-feat"><strong>Zona común</strong></div><div class="prop-feat"><strong>WiFi</strong></div></div><div class="prop-ref">Ref. EST-001 · Sincronizado con Inmovilla</div></div></div>
-        <div class="prop-card"><div class="prop-img"><svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="240" fill="#e0dbd2"/><rect x="40" y="48" width="240" height="168" fill="#d4cec4"/><rect x="60" y="68" width="80" height="128" fill="#c8c2b8"/><rect x="160" y="68" width="100" height="78" fill="#c8c2b8"/><rect x="160" y="166" width="50" height="30" fill="#c8c2b8"/><rect x="0" y="210" width="320" height="30" fill="#cec7bc"/></svg><span class="prop-tag estudiantes">Estudiantes</span></div><div class="prop-info"><div class="prop-price">550 €/mes</div><div class="prop-name">Estudio amueblado</div><div class="prop-loc">Pontevedra · Centro</div><div class="prop-feats"><div class="prop-feat"><strong>Estudio</strong></div><div class="prop-feat"><strong>Amueblado</strong></div><div class="prop-feat"><strong>35</strong> m²</div></div><div class="prop-ref">Ref. EST-002 · Sincronizado con Inmovilla</div></div></div>
-        <div class="prop-card"><div class="prop-img"><svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="240" fill="#dbd5cb"/><rect x="45" y="50" width="230" height="165" fill="#cec7bc"/><rect x="65" y="70" width="85" height="125" fill="#c3bcb1"/><rect x="170" y="70" width="85" height="75" fill="#c3bcb1"/><rect x="135" y="165" width="65" height="50" fill="#b8b2a8"/><rect x="0" y="208" width="320" height="32" fill="#d4cec4"/></svg><span class="prop-tag estudiantes">Estudiantes</span></div><div class="prop-info"><div class="prop-price">680 €/mes</div><div class="prop-name">Piso completo 3 habitaciones</div><div class="prop-loc">Pontevedra · Campolongo</div><div class="prop-feats"><div class="prop-feat"><strong>3</strong> hab.</div><div class="prop-feat"><strong>1</strong> baño</div><div class="prop-feat"><strong>65</strong> m²</div></div><div class="prop-ref">Ref. EST-003 · Sincronizado con Inmovilla</div></div></div>
-      </div>
-    </div>
-
-    <!-- VACACIONAL -->
-    <div class="content-panel" id="panel-vacacional">
-      <div class="sec-label">Alquiler vacacional</div>
-      <h2 class="sec-title">Alquiler <em>vacacional</em></h2>
-      <p class="sec-sub">Apartamentos y casas para vacaciones en Pontevedra, Sanxenxo y las Rías Baixas.</p>
-      <div class="props-grid">
-        <div class="prop-card"><div class="prop-img"><svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="240" fill="#cfe6e4"/><rect x="50" y="60" width="220" height="150" fill="#b8d4d2"/><rect x="70" y="80" width="80" height="110" fill="#a0c0be"/><rect x="170" y="80" width="80" height="65" fill="#a0c0be"/><rect x="130" y="165" width="60" height="45" fill="#92b5b3"/><rect x="0" y="205" width="320" height="35" fill="#c2dede"/></svg><span class="prop-tag vacacional">Vacacional</span></div><div class="prop-info"><div class="prop-price">90 €/noche</div><div class="prop-name">Apartamento en Sanxenxo</div><div class="prop-loc">Sanxenxo · Zona céntrica · Playa</div><div class="prop-feats"><div class="prop-feat"><strong>2</strong> hab.</div><div class="prop-feat"><strong>2</strong> baños</div><div class="prop-feat"><strong>56</strong> m²</div></div><div class="prop-ref">Ref. VAC-001 · Sincronizado con Inmovilla</div></div></div>
-        <div class="prop-card"><div class="prop-img"><svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="240" fill="#d4e8e2"/><rect x="65" y="85" width="190" height="135" fill="#b8d4cc"/><polygon points="55,85 160,25 265,85" fill="#adc9c2"/><rect x="85" y="115" width="55" height="85" fill="#9bbfb8"/><rect x="180" y="135" width="55" height="65" fill="#9bbfb8"/><rect x="0" y="205" width="320" height="35" fill="#c5ddd8"/></svg><span class="prop-tag vacacional">Vacacional</span></div><div class="prop-info"><div class="prop-price">140 €/noche</div><div class="prop-name">Casa con vistas a la ría</div><div class="prop-loc">Poio · Vistas al mar · Parcela</div><div class="prop-feats"><div class="prop-feat"><strong>4</strong> hab.</div><div class="prop-feat"><strong>2</strong> baños</div><div class="prop-feat"><strong>200</strong> m²</div></div><div class="prop-ref">Ref. VAC-002 · Sincronizado con Inmovilla</div></div></div>
-        <div class="prop-card"><div class="prop-img"><svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="240" fill="#cce0dd"/><rect x="40" y="50" width="240" height="165" fill="#b5cecc"/><rect x="60" y="70" width="78" height="125" fill="#9ec0bd"/><rect x="158" y="70" width="102" height="75" fill="#9ec0bd"/><rect x="158" y="165" width="50" height="30" fill="#9ec0bd"/><rect x="0" y="210" width="320" height="30" fill="#c2dede"/></svg><span class="prop-tag vacacional">Vacacional</span></div><div class="prop-info"><div class="prop-price">65 €/noche</div><div class="prop-name">Estudio zona monumental</div><div class="prop-loc">Pontevedra · Centro histórico</div><div class="prop-feats"><div class="prop-feat"><strong>Estudio</strong></div><div class="prop-feat"><strong>1</strong> baño</div><div class="prop-feat"><strong>42</strong> m²</div></div><div class="prop-ref">Ref. VAC-003 · Sincronizado con Inmovilla</div></div></div>
-      </div>
-    </div>
-
-    <!-- PROMOCIONES -->
-    <div class="content-panel" id="panel-promociones">
-      <div class="sec-label">Obra nueva</div>
-      <h2 class="sec-title">Promociones <em>exclusivas</em></h2>
-      <p class="sec-sub">Viviendas de obra nueva y promociones propias en Pontevedra y provincia.</p>
-      <div class="props-grid">
-        <div class="prop-card"><div class="prop-img"><svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="240" fill="#e8e3db"/><rect x="35" y="40" width="250" height="175" fill="#d8d2c8"/><rect x="55" y="60" width="65" height="135" fill="#cdc7bc"/><rect x="140" y="60" width="65" height="135" fill="#cdc7bc"/><rect x="225" y="60" width="40" height="135" fill="#cdc7bc"/><rect x="0" y="210" width="320" height="30" fill="#d4cec4"/></svg><span class="prop-tag nueva">Obra nueva</span><span class="prop-exclusive">Promo</span></div><div class="prop-info"><div class="prop-price">Desde 285.000 €</div><div class="prop-name">Residencial Peregrina I</div><div class="prop-loc">Pontevedra · Centro · Entrega 2026</div><div class="prop-feats"><div class="prop-feat"><strong>2–4</strong> hab.</div><div class="prop-feat"><strong>12</strong> viviendas</div><div class="prop-feat"><strong>Garaje incl.</strong></div></div><div class="prop-ref">Ref. PRO-001 · Sincronizado con Inmovilla</div></div></div>
-        <div class="prop-card"><div class="prop-img"><svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="240" fill="#eae5db"/><rect x="30" y="38" width="260" height="178" fill="#ddd7cd"/><rect x="50" y="58" width="60" height="138" fill="#d0c9be"/><rect x="130" y="58" width="60" height="138" fill="#d0c9be"/><rect x="210" y="58" width="60" height="138" fill="#d0c9be"/><rect x="0" y="210" width="320" height="30" fill="#d4cec4"/></svg><span class="prop-tag nueva">Obra nueva</span></div><div class="prop-info"><div class="prop-price">Desde 220.000 €</div><div class="prop-name">Promoción Salgueriños</div><div class="prop-loc">Pontevedra · A Seca · Entrega 2025</div><div class="prop-feats"><div class="prop-feat"><strong>3</strong> hab.</div><div class="prop-feat"><strong>8</strong> viviendas</div><div class="prop-feat"><strong>Trastero incl.</strong></div></div><div class="prop-ref">Ref. PRO-002 · Sincronizado con Inmovilla</div></div></div>
-        <div class="prop-card"><div class="prop-img"><svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="240" fill="#e5e0d8"/><rect x="40" y="45" width="240" height="170" fill="#ddd7cd"/><rect x="60" y="65" width="70" height="130" fill="#d0c9be"/><rect x="150" y="65" width="70" height="130" fill="#d0c9be"/><rect x="0" y="210" width="320" height="30" fill="#d4cec4"/></svg><span class="prop-tag nueva">Obra nueva</span><span class="prop-exclusive">Promo</span></div><div class="prop-info"><div class="prop-price">Desde 350.000 €</div><div class="prop-name">Villas Ría de Pontevedra</div><div class="prop-loc">Poio · Vistas a la ría · Entrega 2026</div><div class="prop-feats"><div class="prop-feat"><strong>4</strong> hab.</div><div class="prop-feat"><strong>6</strong> villas</div><div class="prop-feat"><strong>Jardín priv.</strong></div></div><div class="prop-ref">Ref. PRO-003 · Sincronizado con Inmovilla</div></div></div>
-      </div>
-    </div>
-
-    <!-- ÁREA CLIENTES -->
-    <div class="content-panel" id="panel-clientes">
-      <div class="sec-label">Acceso privado</div>
-      <h2 class="sec-title">Área de <em>clientes</em></h2>
-      <p class="sec-sub">Gestiona tus inmuebles, consulta contratos y accede a tu documentación personal.</p>
-      <div class="cliente-grid">
-        <div class="cliente-card"><div class="cliente-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg></div><div class="cliente-title">Mis propiedades</div><div class="cliente-desc">Consulta y gestiona los inmuebles que tienes con nosotros en venta o alquiler.</div></div>
-        <div class="cliente-card"><div class="cliente-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="cliente-title">Mis documentos</div><div class="cliente-desc">Accede a contratos, escrituras y documentación de tus operaciones.</div></div>
-        <div class="cliente-card"><div class="cliente-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div class="cliente-title">Mis citas</div><div class="cliente-desc">Gestiona tus visitas y reuniones programadas con nuestros agentes.</div></div>
-      </div>
-      <div class="cliente-login">
-        <h3>Acceder a mi cuenta</h3>
-        <p>Introduce tus credenciales para acceder al área privada.</p>
-        <div class="form-group"><label>Email</label><input type="email" placeholder="tu@email.com"></div>
-        <div class="form-group"><label>Contraseña</label><input type="password" placeholder="••••••••"></div>
-        <button class="btn-navy">Entrar</button>
-        <p style="font-size:12px;color:var(--gray2);margin-top:1rem;"><a href="#contacto" style="color:var(--gold2);text-decoration:none;">¿Eres cliente? Contáctanos</a> para activar tu acceso.</p>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-<section class="about-section" id="nosotros">
-  <div class="about-inner">
-    <div class="about-img">
-      <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
-        <rect width="400" height="300" fill="rgba(255,255,255,0.03)"/>
-        <rect x="60" y="50" width="280" height="200" rx="2" fill="rgba(255,255,255,0.05)"/>
-        <rect x="80" y="70" width="100" height="155" fill="rgba(255,255,255,0.07)"/>
-        <rect x="200" y="70" width="120" height="90" fill="rgba(255,255,255,0.07)"/>
-        <rect x="200" y="180" width="55" height="45" fill="rgba(255,255,255,0.07)"/>
-        <circle cx="310" cy="45" r="22" fill="rgba(201,168,76,0.15)"/>
-      </svg>
-    </div>
-    <div>
-      <div class="about-label">Quiénes somos</div>
-      <h2 class="about-title">Tu partner<br><em>inmobiliario</em> en Pontevedra</h2>
-      <p class="about-body">Inmobiliaria Pedrosa lleva 35 años ayudando a familias y empresas de Pontevedra a encontrar su espacio ideal. Miles de clientes nos avalan.</p>
-      <p class="about-body">Contamos con un equipo joven y dinámico con amplia experiencia en el mercado gallego. Gestionamos compraventas, alquileres, tasaciones y obra nueva en toda la provincia.</p>
-      <div class="about-values">
-        <div class="av-item"><div class="av-title">Transparencia</div><div class="av-body">Sin costes ocultos ni sorpresas</div></div>
-        <div class="av-item"><div class="av-title">35 años de experiencia</div><div class="av-body">Conocemos el mercado local</div></div>
-        <div class="av-item"><div class="av-title">Acompañamiento total</div><div class="av-body">De la búsqueda a la firma</div></div>
-        <div class="av-item"><div class="av-title">Red provincial</div><div class="av-body">Toda la provincia de Pontevedra</div></div>
-      </div>
-    </div>
-  </div>
-</section>
-
+<!-- CONTACT (visible en todos los modos) -->
 <section class="contact-section" id="contacto">
   <div class="contact-inner">
     <div>
@@ -448,21 +770,13 @@
         </div>
         <div class="form-group"><label>Email</label><input type="email" name="email" placeholder="tu@email.com" required></div>
         <div class="form-group"><label>Me interesa</label>
-          <select name="interes">
-            <option>Comprar una vivienda</option>
-            <option>Alquiler residencial</option>
-            <option>Alquiler estudiantes</option>
-            <option>Alquiler vacacional</option>
-            <option>Obra nueva / Promociones</option>
-            <option>Vender mi propiedad</option>
-            <option>Tasación</option>
-          </select>
+          <select name="interes"><option>Comprar una vivienda</option><option>Alquiler residencial</option><option>Alquiler estudiantes</option><option>Alquiler vacacional</option><option>Obra nueva</option><option>Vender mi propiedad</option><option>Tasación gratuita</option></select>
         </div>
         <div class="form-group"><label>Mensaje</label><textarea name="mensaje" placeholder="Cuéntanos qué estás buscando..."></textarea></div>
         <button type="submit" class="btn-navy">Enviar consulta</button>
         <p class="form-note">Respondemos en menos de 24 horas · Sin compromiso</p>
       </form>
-      <div class="form-success" id="form-success">
+      <div class="form-success-contact" id="form-success">
         <h3>¡Mensaje enviado!</h3>
         <p>Nos pondremos en contacto contigo en menos de 24 horas.</p>
       </div>
@@ -470,116 +784,209 @@
   </div>
 </section>
 
-<iframe class="map-wrapper" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2965.4!2d-8.6446!3d42.4336!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd2f62017b4b4b4b%3A0x1!2sPlaza+de+la+Peregrina+6%2C+36001+Pontevedra!5e0!3m2!1ses!2ses!4v1700000000000" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Inmobiliaria Pedrosa — Plaza de la Peregrina 6, Pontevedra"></iframe>
+<iframe class="map-wrapper" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2965.4!2d-8.6446!3d42.4336!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd2f62017b4b4b4b%3A0x1!2sPlaza+de+la+Peregrina+6%2C+36001+Pontevedra!5e0!3m2!1ses!2ses!4v1700000000000" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Inmobiliaria Pedrosa"></iframe>
 
 <footer>
   <div class="footer-inner">
-    <div>
-      <div class="footer-logo">PEDROSA<span>.</span></div>
-      <p class="footer-desc">Tu inmobiliaria de confianza en Pontevedra desde hace 35 años. Compra, alquiler, vacacional y obra nueva en toda la provincia.</p>
-    </div>
+    <div><div class="footer-logo">PEDROSA<span>.</span></div><p class="footer-desc">Tu inmobiliaria de confianza en Pontevedra desde hace 35 años. Compra, alquiler, vacacional, obra nueva y captación en toda la provincia.</p></div>
     <div>
       <div class="footer-heading">Servicios</div>
       <ul class="footer-links">
-        <li><a href="#propiedades" onclick="showPanel('compra',null)">Compra</a></li>
-        <li><a href="#propiedades" onclick="showPanel('alquiler-general',null)">Alquiler</a></li>
-        <li><a href="#propiedades" onclick="showPanel('vacacional',null)">Vacacional</a></li>
-        <li><a href="#propiedades" onclick="showPanel('promociones',null)">Promociones</a></li>
+        <li><a href="#" onclick="goTab('compra')">Compra</a></li>
+        <li><a href="#" onclick="goTab('alquiler-general')">Alquiler</a></li>
+        <li><a href="#" onclick="goTab('vacacional')">Vacacional</a></li>
+        <li><a href="#" onclick="goTab('promociones')">Obra nueva</a></li>
+        <li><a href="#" onclick="goTab('captacion')">Vende tu piso</a></li>
       </ul>
     </div>
     <div>
       <div class="footer-heading">Contacto</div>
       <ul class="footer-links">
-        <li><a href="#">Plaza Peregrina 6, 1º Izq. · Pontevedra</a></li>
+        <li><a href="#">Plaza Peregrina 6, 1º Izq.</a></li>
         <li><a href="tel:+34686919424">+34 686 919 424</a></li>
         <li><a href="mailto:user7453729@proton.me">user7453729@proton.me</a></li>
-        <li><a href="https://www.inmobiliariapedrosa.com" target="_blank">&#127760; Web principal</a></li>
+        <li><a href="https://inmobiliariapedrosa.administraciononline.taaf.es/#/" target="_blank">Área de clientes &#8599;</a></li>
+        <li><a href="https://www.inmobiliariapedrosa.com" target="_blank">Web principal &#8599;</a></li>
       </ul>
     </div>
   </div>
   <div class="footer-bottom">
-    <div class="footer-copy">© 2025 Inmobiliaria Pedrosa · Pontevedra · Todos los derechos reservados</div>
-    <ul class="footer-legal">
-      <li><a href="#">Aviso legal</a></li>
-      <li><a href="#">Privacidad</a></li>
-      <li><a href="#">Cookies</a></li>
-    </ul>
+    <div class="footer-copy">© 2025 Inmobiliaria Pedrosa · Plaza de la Peregrina 6 · 36001 Pontevedra</div>
+    <ul class="footer-legal"><li><a href="#">Aviso legal</a></li><li><a href="#">Privacidad</a></li><li><a href="#">Cookies</a></li></ul>
   </div>
 </footer>
 
+<!-- ── CINEMA OVERLAY ── -->
+<div class="cinema-overlay" id="cinema">
+  <div class="cinema-header">
+    <div class="cinema-header-title" id="cinema-title"></div>
+    <button class="cinema-close" onclick="closeCinema()">&#10005;</button>
+  </div>
+  <div class="cinema-body">
+    <div class="cinema-stage" id="cinema-stage">
+      <div class="cinema-placeholder" id="cinema-placeholder"></div>
+      <button class="cinema-prev" onclick="cinemaPrev()">&#8592;</button>
+      <button class="cinema-next" onclick="cinemaNext()">&#8594;</button>
+    </div>
+    <div class="cinema-dots-row" id="cinema-dots-row"></div>
+    <div class="cinema-media-row" id="cinema-media-row"></div>
+    <div class="cinema-detail" id="cinema-detail"></div>
+  </div>
+</div>
+
 <script>
-  function showPanel(id, tabEl) {
-    document.querySelectorAll('.content-panel').forEach(p => p.classList.remove('active'));
-    const panel = document.getElementById('panel-' + id);
-    if (panel) panel.classList.add('active');
-    if (tabEl) {
-      document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active','open'));
-      tabEl.classList.add('active');
-    }
-    document.getElementById('propiedades').scrollIntoView({ behavior: 'smooth' });
+// ── SLIDER ──
+let curSlide=0,slideTimer;
+const slides=document.querySelectorAll('.slide');
+const dotsEl=document.getElementById('slider-dots');
+slides.forEach((_,i)=>{const d=document.createElement('div');d.className='dot'+(i===0?' active':'');d.onclick=()=>goSlide(i);dotsEl.appendChild(d)});
+function goSlide(n){slides[curSlide].classList.remove('active');document.querySelectorAll('.dot')[curSlide].classList.remove('active');curSlide=(n+slides.length)%slides.length;slides[curSlide].classList.add('active');document.querySelectorAll('.dot')[curSlide].classList.add('active')}
+function moveSlide(d){goSlide(curSlide+d);resetTimer()}
+function resetTimer(){clearInterval(slideTimer);slideTimer=setInterval(()=>goSlide(curSlide+1),3000)}
+resetTimer();
+
+// ── TABS ──
+const PANEL_MAP={'compra':'compra','alquiler-general':'alquiler-general','alquiler-est':'alquiler-est','vacacional':'vacacional','promociones':'promociones'};
+function showPage(id){
+  document.getElementById('page-inicio').style.display='none';
+  document.getElementById('page-props').style.display='none';
+  document.getElementById('page-captacion').style.display='none';
+  if(id==='inicio'){document.getElementById('page-inicio').style.display='block'}
+  else if(id==='captacion'){document.getElementById('page-captacion').style.display='block'}
+  else{document.getElementById('page-props').style.display='block'}
+}
+function showPanel(id){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  const p=document.getElementById('panel-'+id);
+  if(p)p.classList.add('active');
+}
+function activateTab(id){
+  document.querySelectorAll('.tab').forEach(t=>{t.classList.remove('active');t.classList.remove('open')});
+  const t=document.getElementById('tab-'+id)||document.getElementById('tab-alquiler');
+  if(t)t.classList.add('active');
+}
+function goTab(id){
+  const propPanels=['compra','alquiler-general','alquiler-est','vacacional','promociones'];
+  if(id==='inicio'){showPage('inicio');activateTab('inicio')}
+  else if(id==='captacion'){showPage('captacion');activateTab('captacion')}
+  else if(propPanels.includes(id)){
+    showPage('props');showPanel(id);
+    if(id.startsWith('alquiler'))activateTab('alquiler');
+    else activateTab(id);
+    setTimeout(()=>document.getElementById('propiedades')?.scrollIntoView({behavior:'smooth'}),50);
   }
+  return false;
+}
+function toggleDD(tabEl,e){
+  e.stopPropagation();
+  const open=tabEl.classList.contains('open');
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('open'));
+  if(!open)tabEl.classList.add('open');
+}
+function goSubTab(id,el,e){
+  e.stopPropagation();
+  document.querySelectorAll('.dd-item').forEach(d=>d.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('open'));
+  goTab(id);
+}
+document.addEventListener('click',()=>document.querySelectorAll('.tab').forEach(t=>t.classList.remove('open')));
 
-  function toggleSub(tabEl) {
-    const isOpen = tabEl.classList.contains('open');
-    document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('open'));
-    if (!isOpen) tabEl.classList.add('open');
-  }
+// ── FILTERS ──
+function filterG(grid,type,btn){
+  btn.closest('.prop-filters').querySelectorAll('.pf').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('#grid-'+grid+' .prop-card').forEach(c=>c.style.display=(type==='all'||c.dataset.type===type)?'block':'none');
+}
+function sortG(grid,dir){
+  if(!dir)return;
+  const g=document.getElementById('grid-'+grid);
+  const cards=Array.from(g.querySelectorAll('.prop-card'));
+  cards.sort((a,b)=>dir==='asc'?(+a.dataset.price)-(+b.dataset.price):(+b.dataset.price)-(+a.dataset.price));
+  cards.forEach(c=>g.appendChild(c));
+}
 
-  function showSubPanel(id, subEl, e) {
-    e.stopPropagation();
-    document.querySelectorAll('.sub-item').forEach(s => s.classList.remove('active'));
-    subEl.classList.add('active');
-    document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active','open'));
-    subEl.closest('.main-tab').classList.add('active');
-    showPanel(id, null);
-  }
+// ── CINEMA ──
+let cinemaData=null,cinemaIdx=0;
+const fakeSlides=['#1b3a18','#2d5a27','#1e3d1a','#3a7232'];
+function openCinema(data){
+  cinemaData=data;cinemaIdx=0;
+  document.getElementById('cinema').classList.add('open');
+  document.body.style.overflow='hidden';
+  renderCinema();
+}
+function closeCinema(){
+  document.getElementById('cinema').classList.remove('open');
+  document.body.style.overflow='';
+}
+function renderCinema(){
+  const d=cinemaData;
+  document.getElementById('cinema-title').textContent=d.title;
+  // Stage - placeholder colored slides
+  const stage=document.getElementById('cinema-stage');
+  const ph=document.getElementById('cinema-placeholder');
+  ph.innerHTML=`<svg viewBox="0 0 900 506" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%"><rect width="900" height="506" fill="${fakeSlides[cinemaIdx%fakeSlides.length]}"/><rect x="200" y="80" width="500" height="346" rx="4" fill="rgba(255,255,255,.04)"/><rect x="240" y="120" width="180" height="260" fill="rgba(255,255,255,.06)"/><rect x="450" y="120" width="220" height="160" fill="rgba(255,255,255,.06)"/><rect x="450" y="300" width="100" height="80" fill="rgba(255,255,255,.06)"/><text x="450" y="460" fill="rgba(255,255,255,.25)" text-anchor="middle" font-size="14" font-family="Lato,sans-serif">Foto ${cinemaIdx+1} de 4 · ${d.ref}</text></svg>`;
+  // Dots
+  const dotsRow=document.getElementById('cinema-dots-row');
+  dotsRow.innerHTML='';
+  [0,1,2,3].forEach(i=>{const dot=document.createElement('div');dot.className='cinema-dot'+(i===cinemaIdx?' active':'');dot.onclick=()=>{cinemaIdx=i;renderCinema()};dotsRow.appendChild(dot)});
+  // Media row
+  const mr=document.getElementById('cinema-media-row');
+  mr.innerHTML='';
+  if(d.video){mr.innerHTML+=`<button class="cmr-btn"><svg viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>Ver vídeo</button>`}
+  if(d.tour){mr.innerHTML+=`<button class="cmr-btn"><svg viewBox="0 0 24 24"><path d="M15 3h6v6"/><path d="M10 14L21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>Tour virtual</button>`}
+  if(d.plano){mr.innerHTML+=`<button class="cmr-btn"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Ver plano</button>`}
+  if(!d.video&&!d.tour&&!d.plano)mr.style.display='none'; else mr.style.display='flex';
+  // Detail
+  const icons=[];
+  if(d.beds>0)icons.push({svg:'<path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/>',val:d.beds,lbl:'Habitaciones'});
+  icons.push({svg:'<path d="M9 6 C9 3 5 3 5 6 5 9 9 9 9 6z"/><path d="M9 6h6"/><path d="M15 6c0-3 4-3 4 0 0 3-4 3-4 0z"/><path d="M3 20h18"/><path d="M5 20v-5a3 3 0 0 1 3-3h8a3 3 0 0 1 3 3v5"/>',val:d.baths,lbl:'Baños'});
+  icons.push({svg:'<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',val:d.sqm+' m²',lbl:'Superficie'});
+  if(d.floor)icons.push({svg:'<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>',val:d.floor,lbl:'Planta'});
+  if(d.garage)icons.push({svg:'<rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>',val:'Sí',lbl:'Garaje'});
+  if(d.lift)icons.push({svg:'<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 6v4"/><path d="M10 8l2-2 2 2"/><path d="M12 18v-4"/><path d="M10 16l2 2 2-2"/>',val:'Sí',lbl:'Ascensor'});
+  if(d.year)icons.push({svg:'<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',val:d.year,lbl:'Año'});
+  const iconsHtml=icons.map(ic=>`<div class="cd-icon-item"><svg viewBox="0 0 24 24" style="width:24px;height:24px;stroke:var(--gold);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;margin:0 auto .5rem;display:block">${ic.svg}</svg><span class="cd-icon-val">${ic.val}</span><span class="cd-icon-lbl">${ic.lbl}</span></div>`).join('');
+  const featsHtml=d.features.map(f=>`<div class="cd-feat">${f}</div>`).join('');
+  document.getElementById('cinema-detail').innerHTML=`
+    <div class="cd-price">${d.price}</div>
+    <div class="cd-name">${d.title}</div>
+    <div class="cd-loc">${d.loc}</div>
+    <div class="cd-icons">${iconsHtml}</div>
+    <div class="cd-divider"></div>
+    <div class="cd-section-title">Descripción</div>
+    <div class="cd-desc">${d.desc}</div>
+    <div class="cd-section-title">Características</div>
+    <div class="cd-features">${featsHtml}</div>
+    <div class="cd-divider"></div>
+    <div class="cd-cta">
+      <a class="btn-gold" href="#contacto" onclick="closeCinema();return true">Solicitar información</a>
+      <a class="btn-white" href="tel:+34686919424" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.3);color:var(--white);padding:13px 28px;font-family:var(--sans);font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;text-decoration:none;display:inline-block">&#128222; Llamar ahora</a>
+      <span style="font-size:11px;color:rgba(255,255,255,.35);align-self:center">Ref. ${d.ref}</span>
+    </div>`;
+}
+function cinemaPrev(){cinemaIdx=(cinemaIdx-1+4)%4;renderCinema()}
+function cinemaNext(){cinemaIdx=(cinemaIdx+1)%4;renderCinema()}
+document.getElementById('cinema').addEventListener('keydown',e=>{if(e.key==='ArrowLeft')cinemaPrev();if(e.key==='ArrowRight')cinemaNext();if(e.key==='Escape')closeCinema()});
+document.getElementById('cinema').addEventListener('click',e=>{if(e.target===document.getElementById('cinema'))closeCinema()});
 
-  document.addEventListener('click', function(e) {
-    if (!e.target.closest('.main-tab')) {
-      document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('open'));
-    }
-  });
-
-  function filterCards(grid, type, btn) {
-    btn.closest('.prop-filters').querySelectorAll('.prop-filter').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    document.querySelectorAll('#grid-' + grid + ' .prop-card').forEach(card => {
-      card.style.display = (type === 'all' || card.dataset.type === type) ? 'block' : 'none';
-    });
-  }
-
-  function sortCards(grid, dir) {
-    if (!dir) return;
-    const gridEl = document.getElementById('grid-' + grid);
-    const cards = Array.from(gridEl.querySelectorAll('.prop-card'));
-    cards.sort((a, b) => {
-      const pa = parseInt(a.dataset.price) || 0;
-      const pb = parseInt(b.dataset.price) || 0;
-      return dir === 'asc' ? pa - pb : pb - pa;
-    });
-    cards.forEach(c => gridEl.appendChild(c));
-  }
-
-  const form = document.getElementById('contact-form');
-  form.addEventListener('submit', async function(e) {
+// ── FORMS ──
+async function handleForm(formId,successId){
+  const form=document.getElementById(formId);
+  if(!form)return;
+  form.addEventListener('submit',async function(e){
     e.preventDefault();
-    const btn = form.querySelector('.btn-navy');
-    btn.textContent = 'Enviando...';
-    btn.disabled = true;
-    try {
-      const res = await fetch(form.action, { method: 'POST', body: new FormData(form), headers: { 'Accept': 'application/json' } });
-      if (res.ok) {
-        form.style.display = 'none';
-        document.getElementById('form-success').style.display = 'block';
-      } else {
-        btn.textContent = 'Error — inténtalo de nuevo';
-        btn.disabled = false;
-      }
-    } catch {
-      btn.textContent = 'Error — inténtalo de nuevo';
-      btn.disabled = false;
-    }
+    const btn=form.querySelector('button[type=submit]');
+    btn.textContent='Enviando...';btn.disabled=true;
+    try{
+      const res=await fetch(form.action,{method:'POST',body:new FormData(form),headers:{'Accept':'application/json'}});
+      if(res.ok){form.style.display='none';document.getElementById(successId).style.display='block';}
+      else{btn.textContent='Error — inténtalo de nuevo';btn.disabled=false;}
+    }catch{btn.textContent='Error — inténtalo de nuevo';btn.disabled=false;}
   });
+}
+handleForm('contact-form','form-success');
+handleForm('captacion-form-el','captacion-success');
 </script>
 </body>
 </html>
