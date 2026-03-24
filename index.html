@@ -1122,7 +1122,7 @@ footer{background:var(--green2);padding:3rem 2rem}
 </footer>
 
 <!-- ── WHATSAPP ── -->
-<a class="wa-btn" href="https://wa.me/34986866618?text=Hola%2C%20me%20gustar%C3%ADa%20obtener%20informaci%C3%B3n%20sobre%20una%20propiedad." target="_blank" rel="noopener" title="Contactar por WhatsApp">
+<a class="wa-btn" href="https://wa.me/34656929249?text=Hola%2C%20me%20gustar%C3%ADa%20obtener%20informaci%C3%B3n%20sobre%20una%20propiedad." target="_blank" rel="noopener" title="Contactar por WhatsApp">
   <span class="wa-tooltip">Habla con un agente</span>
   <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
 </a>
@@ -1203,7 +1203,7 @@ function goSlide(n){
   document.querySelectorAll('.dot')[curSlide].classList.add('active');
 }
 function moveSlide(d){goSlide(curSlide+d);resetTimer();}
-function resetTimer(){clearInterval(slideTimer);slideTimer=setInterval(function(){goSlide(curSlide+1);},6000);}
+function resetTimer(){clearInterval(slideTimer);slideTimer=setInterval(function(){goSlide(curSlide+1);},9000);}
 resetTimer();
 
 // ── TABS ──
@@ -1601,275 +1601,293 @@ function searchAllPanels(ref, tipo){
 var blogArticles=[
 {
   cat:'Compra · Fiscalidad',
-  date:'15 enero 2025',
-  title:'Compra de vivienda habitual en Galicia: todas las deducciones fiscales',
+  date:'Actualizado marzo 2025',
+  title:'Compra de vivienda habitual en Galicia: deducciones fiscales 2025',
   content:`
-    <h2>¿Qué ventajas fiscales existen al comprar vivienda en Galicia?</h2>
-    <p>Cuando adquieres tu vivienda habitual en Galicia, la normativa autonómica contempla una serie de deducciones en el IRPF que pueden reducir significativamente tu factura fiscal. Aquí te explicamos las más importantes vigentes en 2025.</p>
-    <h2>Deducción por inversión en vivienda habitual (régimen transitorio)</h2>
-    <p>Si compraste tu vivienda antes del 1 de enero de 2013 y tienes derecho al régimen transitorio, puedes deducirte el <strong>15% de las cantidades aportadas</strong> (tanto capital como intereses de hipoteca), con un límite anual de 9.040 €. Esta deducción no aplica a compras posteriores.</p>
-    <h2>Deducción autonómica gallega por adquisición de vivienda habitual</h2>
-    <p>La Xunta de Galicia establece deducciones adicionales en el tramo autonómico del IRPF para la compra de vivienda habitual:</p>
-    <ul>
-      <li>Deducción del <strong>7,5%</strong> de las cantidades satisfechas en el período impositivo para adquisición de vivienda habitual, con límite de 9.040 € anuales</li>
-      <li>El porcentaje se eleva al <strong>7,5% + 2,5% adicional</strong> para determinados colectivos (familias numerosas, minusvalías, etc.)</li>
-    </ul>
-    <div class="highlight-box"><strong>Importante:</strong> Para aplicar esta deducción, la vivienda debe constituir o vaya a constituir la residencia habitual del contribuyente durante al menos 3 años continuados.</div>
-    <h2>Impuesto de Transmisiones Patrimoniales (ITP)</h2>
-    <p>En Galicia, el tipo general del ITP para la compra de vivienda de segunda mano es del <strong>10%</strong>. Sin embargo, existen tipos reducidos:</p>
+    <h2>El ITP en Galicia 2025: tipo general del 8%</h2>
+    <p>El Impuesto de Transmisiones Patrimoniales (ITP) es el principal tributo al comprar una vivienda de segunda mano en Galicia. Para 2025, el tipo general es del <strong>8%</strong> sobre el valor de referencia del inmueble. Sin embargo, existen tipos reducidos importantes según el perfil del comprador.</p>
+    <h2>Tipos reducidos del ITP en Galicia 2025</h2>
     <table>
-      <tr><th>Supuesto</th><th>Tipo ITP</th></tr>
-      <tr><td>Tipo general</td><td>10%</td></tr>
-      <tr><td>Vivienda habitual (hasta 150.000 €)</td><td>8%</td></tr>
-      <tr><td>Menores de 36 años (vivienda habitual)</td><td>6%</td></tr>
-      <tr><td>Familia numerosa</td><td>4%</td></tr>
-      <tr><td>Vivienda protegida</td><td>4%</td></tr>
+      <tr><th>Supuesto</th><th>Tipo ITP</th><th>Requisitos clave</th></tr>
+      <tr><td>Tipo general</td><td><strong>8%</strong></td><td>Cualquier compra</td></tr>
+      <tr><td>Vivienda habitual (con límite patrimonio)</td><td><strong>7%</strong></td><td>Destino: vivienda habitual. Patrimonio ≤ 200.000 € + 30.000 € por miembro adicional</td></tr>
+      <tr><td>Menores de 36 años</td><td><strong>3%</strong></td><td>Primera vivienda habitual. Patrimonio ≤ 240.000 € + 30.000 € por miembro adicional</td></tr>
+      <tr><td>Familia numerosa</td><td><strong>3%</strong></td><td>Vivienda habitual. Patrimonio ≤ 400.000 € + 50.000 € por miembro adicional al mínimo</td></tr>
+      <tr><td>Discapacidad ≥ 65%</td><td><strong>3%</strong></td><td>Vivienda habitual. Precio ≤ 150.000 €</td></tr>
+      <tr><td>Víctimas violencia de género</td><td><strong>3%</strong></td><td>Vivienda habitual. Precio ≤ 150.000 €</td></tr>
+      <tr><td>Zona rural poco poblada</td><td><strong>4-6%</strong></td><td>Parroquias declaradas zonas poco pobladas por la Xunta</td></tr>
+      <tr><td>Zona rural + colectivo beneficiario</td><td><strong>0%</strong></td><td>Menores 36, familia numerosa, discapacidad... en zonas poco pobladas</td></tr>
     </table>
-    <h2>Gastos deducibles en la declaración</h2>
-    <p>Además de las deducciones por la hipoteca, puedes incluir como mayor valor de adquisición del inmueble (relevante para calcular la ganancia patrimonial en una futura venta) los siguientes gastos:</p>
-    <ul>
-      <li>Notaría y registro de la propiedad</li>
-      <li>Impuesto de Transmisiones Patrimoniales o IVA</li>
-      <li>Actos Jurídicos Documentados</li>
-      <li>Honorarios de agencia inmobiliaria</li>
-      <li>Tasación de la vivienda</li>
-    </ul>
-    <div class="blog-cta-box"><p>¿Tienes dudas sobre tu caso concreto? En Inmobiliaria Pedrosa te orientamos y te ponemos en contacto con asesores fiscales especializados.</p><a class="btn-gold" href="#contacto" onclick="closeBlog()">Consultar gratuitamente</a></div>
+    <div class="highlight-box"><strong>Novedad Ley 5/2025 (en vigor desde enero 2026):</strong> Se amplía la deducción del 100% en ITP a familias monoparentales en áreas rurales y se actualizan los límites de patrimonio para menores de 36 años, que pasan a 240.000 € (antes 200.000 €).</div>
+    <h2>Plazo para pagar el ITP</h2>
+    <p>Tienes <strong>un mes</strong> desde la firma de la escritura pública ante notario para liquidar el ITP mediante el modelo 600 ante la Axencia Tributaria de Galicia (ATRIGA), de forma telemática o presencial.</p>
+    <h2>AJD: Actos Jurídicos Documentados</h2>
+    <p>En compraventa de segunda mano no hay AJD adicional significativo para el comprador. El AJD de la escritura de hipoteca <strong>lo paga el banco desde 2019</strong> (Ley 5/2019 de Crédito Inmobiliario).</p>
+    <h2>Otros gastos al comprar en Galicia</h2>
+    <table>
+      <tr><th>Gasto</th><th>Importe orientativo</th><th>Quién paga</th></tr>
+      <tr><td>ITP</td><td>3%-8% del valor</td><td>Comprador</td></tr>
+      <tr><td>Notaría (escritura)</td><td>600–1.200 €</td><td>Comprador</td></tr>
+      <tr><td>Registro de la Propiedad</td><td>400–700 €</td><td>Comprador</td></tr>
+      <tr><td>Tasación (si hay hipoteca)</td><td>250–500 €</td><td>Comprador</td></tr>
+      <tr><td>Gestoría (si hay hipoteca)</td><td>300–500 €</td><td>Comprador</td></tr>
+      <tr><td>Notaría hipoteca</td><td>—</td><td>Banco (desde 2019)</td></tr>
+      <tr><td>AJD hipoteca</td><td>—</td><td>Banco (desde 2019)</td></tr>
+    </table>
+    <div class="blog-cta-box"><p>¿Tienes dudas sobre qué tipo de ITP te corresponde? En Inmobiliaria Pedrosa te orientamos y te ponemos en contacto con asesores fiscales especializados en Pontevedra.</p><a class="btn-gold" href="#contacto" onclick="closeBlog()">Consultar gratuitamente</a></div>
   `
 },
 {
   cat:'Jóvenes · Compra',
-  date:'20 enero 2025',
-  title:'Menores de 36 años: deducciones especiales por compra de vivienda en Galicia',
+  date:'Actualizado marzo 2025',
+  title:'Menores de 36 años: ITP al 3% y deducciones en Galicia 2025',
   content:`
-    <h2>¿Qué ventajas tiene ser menor de 36 años al comprar piso en Galicia?</h2>
-    <p>La Xunta de Galicia contempla incentivos específicos para facilitar el acceso a la vivienda a los jóvenes. Si tienes menos de 36 años y vas a comprar tu primera vivienda habitual, puedes beneficiarte de condiciones fiscales más ventajosas tanto en el ITP como en el IRPF autonómico.</p>
-    <h2>ITP reducido al 6% para menores de 36 años</h2>
-    <p>El tipo del Impuesto de Transmisiones Patrimoniales se reduce del 10% general al <strong>6%</strong> si cumples estas condiciones:</p>
+    <h2>ITP reducido al 3% para menores de 36 años en Galicia</h2>
+    <p>Si tienes menos de 36 años y compras tu primera vivienda habitual en Galicia, puedes tributar al <strong>3% en el ITP</strong> en lugar del 8% general. El ahorro puede ser muy significativo.</p>
+    <div class="highlight-box"><strong>Ejemplo práctico:</strong> Compra de piso de 150.000 €. Con el tipo general (8%) pagarías 12.000 €. Con el tipo para jóvenes (3%) pagarías 4.500 €. <strong>Ahorro: 7.500 €.</strong></div>
+    <h2>Requisitos para acceder al 3% (2025)</h2>
     <ul>
-      <li>Tener menos de 36 años en la fecha de devengo del impuesto</li>
-      <li>Que la vivienda vaya a ser tu residencia habitual</li>
-      <li>Que el valor de la vivienda no supere los <strong>200.000 €</strong></li>
-      <li>No disponer de otra vivienda en propiedad, salvo que sea inutilizable o esté en proceso de venta</li>
+      <li>Tener <strong>menos de 36 años</strong> en la fecha de firma de la escritura</li>
+      <li>Que sea tu <strong>primera vivienda habitual</strong></li>
+      <li>Que el inmueble se destine efectivamente a residencia habitual durante al menos <strong>5 años</strong></li>
+      <li>Límite de patrimonio: la suma del patrimonio de todos los adquirentes y su unidad familiar no debe superar <strong>240.000 €</strong> más 30.000 € adicionales por cada miembro de la unidad familiar que exceda del primero (actualizado por Ley 5/2025, vigente desde 2026)</li>
+      <li>No poseer otra vivienda en propiedad en España (salvo que sea inutilizable)</li>
     </ul>
-    <div class="highlight-box"><strong>Ejemplo práctico:</strong> Si compras un piso de 150.000 €, con el tipo general pagarías 15.000 € de ITP. Con el tipo reducido para jóvenes pagarías solo 9.000 €. Un ahorro de 6.000 €.</div>
-    <h2>Deducción en el IRPF autonómico</h2>
-    <p>Adicionalmente, en la declaración de la renta puedes aplicar una deducción autonómica del <strong>10%</strong> de las cantidades satisfechas en el ejercicio para adquisición de vivienda habitual (frente al 7,5% general), con los mismos límites establecidos.</p>
-    <h2>Deducción por primera adquisición de vivienda habitual por jóvenes</h2>
-    <p>La normativa gallega contempla también una deducción específica de <strong>600 €</strong> para jóvenes menores de 36 años que adquieran su primera vivienda habitual. Esta deducción es compatible con las anteriores.</p>
-    <h2>Requisitos generales</h2>
+    <h2>Bonus: 0% ITP en zonas rurales poco pobladas</h2>
+    <p>Si eres menor de 36 años y la vivienda está en una <strong>parroquia declarada zona poco poblada</strong> por la Xunta de Galicia, el ITP es del <strong>0%</strong>. Galicia tiene muchas parroquias rurales que cumplen este requisito. Consulta el listado actualizado en la web de ATRIGA.</p>
+    <h2>Deducción en el IRPF autonómico gallego</h2>
+    <p>Adicionalmente al ITP reducido, en la declaración de la renta (IRPF) gallego puedes aplicar deducciones por la inversión en vivienda habitual si tienes contrato de hipoteca anterior a 2013 (régimen transitorio). Para hipotecas posteriores, no existe deducción estatal, pero sí pueden aplicarse las autonómicas gallegas para ciertos colectivos.</p>
+    <h2>Documentación necesaria</h2>
     <ul>
-      <li>La vivienda debe situarse en Galicia</li>
-      <li>Debe constituir la residencia habitual durante al menos 3 años</li>
-      <li>La base imponible del IRPF no debe superar 22.000 € (tributación individual) o 31.000 € (conjunta)</li>
+      <li>DNI acreditando la edad en la fecha de la escritura</li>
+      <li>Escritura pública de compraventa indicando que es vivienda habitual</li>
+      <li>Declaración del Impuesto sobre el Patrimonio (o declaración responsable si no estás obligado)</li>
+      <li>Modelo 600 de autoliquidación del ITP (plazo: 1 mes desde la escritura)</li>
     </ul>
-    <div class="blog-cta-box"><p>¿Eres menor de 36 años y buscas piso en Pontevedra? En Inmobiliaria Pedrosa conocemos las mejores opciones y te asesoramos en todo el proceso.</p><a class="btn-gold" href="#contacto" onclick="closeBlog()">Ver propiedades</a></div>
+    <div class="blog-cta-box"><p>¿Eres menor de 36 años y buscas piso en Pontevedra? Nuestros agentes conocen las mejores opciones del mercado y te acompañan en todo el proceso.</p><a class="btn-gold" href="#contacto" onclick="closeBlog()">Ver propiedades</a></div>
   `
 },
 {
-  cat:'Familia numerosa',
-  date:'28 enero 2025',
-  title:'Familia numerosa en Galicia: ventajas fiscales al comprar vivienda',
+  cat:'Familia numerosa · Compra',
+  date:'Actualizado marzo 2025',
+  title:'Familia numerosa en Galicia: ITP al 3% y exención en zonas rurales',
   content:`
-    <h2>Beneficios fiscales para familias numerosas que compran vivienda en Galicia</h2>
-    <p>Las familias numerosas gozan de un tratamiento fiscal especialmente ventajoso en Galicia, tanto en el impuesto que se paga al comprar como en las deducciones posteriores en el IRPF. Estos son los principales beneficios disponibles en 2025.</p>
-    <h2>ITP al 4%: el tipo más reducido de Galicia</h2>
-    <p>Las familias numerosas que adquieran su vivienda habitual en Galicia tributan al <strong>4% en el ITP</strong>, el tipo más bajo disponible en la comunidad autónoma. Los requisitos son:</p>
+    <h2>Ventajas fiscales para familias numerosas al comprar vivienda en Galicia 2025</h2>
+    <p>Las familias numerosas disponen de uno de los tipos reducidos más favorables del ITP en Galicia: el <strong>3%</strong>, frente al 8% general. Además, en determinadas zonas pueden acceder a la <strong>exención total del 0%</strong>.</p>
+    <h2>ITP al 3% para familias numerosas</h2>
+    <p>Requisitos para acceder al tipo del 3%:</p>
     <ul>
-      <li>Ser titular del título de familia numerosa en vigor</li>
-      <li>Que la vivienda se destine a residencia habitual de la unidad familiar</li>
-      <li>En familias numerosas de categoría especial (5 o más hijos), el beneficio es aún mayor: <strong>exención total del ITP</strong> si la vivienda no supera determinado valor</li>
+      <li>Disponer del <strong>Título de Familia Numerosa vigente</strong> en la fecha de la escritura</li>
+      <li>Que la vivienda sea la <strong>residencia habitual</strong> de la familia durante al menos 5 años</li>
+      <li>Que el valor de la vivienda no supere los <strong>200.000 €</strong></li>
+      <li>Límite de patrimonio de la unidad familiar: <strong>400.000 €</strong> más 50.000 € adicionales por cada hijo que exceda el mínimo para ser considerada familia numerosa</li>
+      <li>Los ingresos anuales de la unidad familiar deben estar dentro de los límites establecidos en los Presupuestos Generales del Estado</li>
     </ul>
-    <div class="highlight-box"><strong>Ahorro comparativo:</strong> En una vivienda de 200.000 €, con el tipo general pagarías 20.000 € de ITP. Con el tipo de familia numerosa pagarías solo 8.000 €. Un ahorro de 12.000 €.</div>
-    <h2>Deducción autonómica en el IRPF</h2>
-    <p>En la declaración de la renta gallega, las familias numerosas pueden aplicar las siguientes deducciones:</p>
-    <table>
-      <tr><th>Tipo de deducción</th><th>Importe</th></tr>
-      <tr><td>Deducción por cada hijo (3.º y siguientes)</td><td>250 € / hijo</td></tr>
-      <tr><td>Familia numerosa de categoría general</td><td>250 € adicionales</td></tr>
-      <tr><td>Familia numerosa de categoría especial</td><td>400 € adicionales</td></tr>
-      <tr><td>Deducción por adquisición vivienda habitual</td><td>Tipo del 10%</td></tr>
-    </table>
-    <h2>Exención en el Impuesto de Sucesiones y Donaciones</h2>
-    <p>Las familias numerosas también se benefician de reducciones en el Impuesto de Sucesiones y Donaciones al recibir una vivienda como herencia o donación, lo que puede resultar de gran interés para planificaciones patrimoniales a largo plazo.</p>
+    <div class="highlight-box"><strong>Ejemplo práctico:</strong> Familia numerosa compra piso de 180.000 €. Con el tipo general (8%) pagarían 14.400 €. Con el tipo de familia numerosa (3%) pagarían 5.400 €. <strong>Ahorro: 9.000 €.</strong></div>
+    <h2>Exención total (0%) en zonas rurales poco pobladas</h2>
+    <p>Si la vivienda se encuentra en una <strong>parroquia declarada zona poco poblada</strong> por la Xunta de Galicia, las familias numerosas pueden obtener la <strong>exención total del ITP</strong> (deducción del 100% de la cuota). Esta medida busca frenar el despoblamiento rural gallego.</p>
     <h2>Cómo acreditar la condición de familia numerosa</h2>
-    <p>Es imprescindible aportar el <strong>Título de Familia Numerosa</strong> vigente en el momento de la firma de la escritura de compraventa. Si el título está en trámite, conviene esperar a tenerlo para aplicar los beneficios fiscales.</p>
-    <div class="blog-cta-box"><p>Somos especialistas en ayudar a familias numerosas a encontrar la vivienda adecuada en Pontevedra. Contacta con nosotros.</p><a class="btn-gold" href="#contacto" onclick="closeBlog()">Hablar con un agente</a></div>
+    <p>Es imprescindible presentar el <strong>Título de Familia Numerosa en vigor</strong> antes de firmar la escritura. Si está en trámite, conviene esperar a tenerlo porque el tipo aplicable se determina en el momento del devengo (fecha de la escritura). No se puede solicitar la devolución posterior.</p>
+    <h2>Deducciones adicionales en el IRPF gallego</h2>
+    <table>
+      <tr><th>Deducción</th><th>Importe</th></tr>
+      <tr><td>Por cada hijo (3.º y siguientes)</td><td>250 € / hijo</td></tr>
+      <tr><td>Familia numerosa categoría general</td><td>250 € adicionales</td></tr>
+      <tr><td>Familia numerosa categoría especial</td><td>400 € adicionales</td></tr>
+    </table>
+    <div class="blog-cta-box"><p>Somos especialistas en ayudar a familias numerosas a encontrar su vivienda ideal en Pontevedra y provincia. Contáctanos.</p><a class="btn-gold" href="#contacto" onclick="closeBlog()">Hablar con un agente</a></div>
   `
 },
 {
   cat:'Alquiler · Fiscal',
-  date:'5 febrero 2025',
-  title:'Deducciones fiscales por alquiler de vivienda habitual en Galicia',
+  date:'Actualizado abril 2025',
+  title:'Deducción por alquiler de vivienda habitual en Galicia: IRPF 2024-2025',
   content:`
-    <h2>Fiscalidad del alquiler de vivienda habitual en Galicia (2025)</h2>
-    <p>El alquiler de vivienda habitual tiene un tratamiento fiscal favorable tanto para el propietario arrendador como para el inquilino. La normativa gallega añade beneficios adicionales al marco estatal.</p>
-    <h2>Para el inquilino: deducción autonómica por alquiler</h2>
-    <p>La Xunta de Galicia contempla una deducción específica en el IRPF autonómico para los inquilinos que alquilen su vivienda habitual:</p>
+    <h2>Deducción autonómica gallega por alquiler de vivienda habitual</h2>
+    <p>En la declaración de la renta (IRPF 2024, a presentar en 2025), los inquilinos gallegos que cumplan los requisitos pueden aplicar una <strong>deducción autonómica del 10%</strong> de las cantidades pagadas en concepto de alquiler de su vivienda habitual.</p>
+    <h2>Cuantías y límites (IRPF 2024)</h2>
+    <table>
+      <tr><th>Supuesto</th><th>Porcentaje</th><th>Límite máximo</th></tr>
+      <tr><td>Caso general</td><td>10%</td><td>300 € / contrato / año</td></tr>
+      <tr><td>Con 2 o más hijos menores de edad</td><td>20%</td><td>600 € / contrato / año</td></tr>
+      <tr><td>Con discapacidad ≥ 33%</td><td>10% o 20%</td><td>Se duplica: 600 € o 1.200 €</td></tr>
+      <tr><td>Con 2+ hijos y discapacidad ≥ 33%</td><td>40%</td><td>1.200 €</td></tr>
+    </table>
+    <h2>Requisitos obligatorios</h2>
     <ul>
-      <li>Deducción del <strong>10% de las cantidades satisfechas</strong> en el período impositivo en concepto de alquiler de vivienda habitual</li>
-      <li>Límite máximo: <strong>300 € anuales</strong> (con carácter general) o <strong>600 € anuales</strong> para familias numerosas, menores de 36 años o personas con discapacidad</li>
-      <li>Requisito: la base imponible no debe superar 22.000 € en declaración individual o 31.000 € en conjunta</li>
+      <li><strong>Edad:</strong> tener 35 años o menos a 31 de diciembre del ejercicio fiscal (en tributación conjunta, basta que lo cumpla uno de los cónyuges)</li>
+      <li><strong>Contrato posterior al 1 de enero de 2003</strong></li>
+      <li><strong>Fianza depositada</strong> ante el IGVS (Instituto Galego da Vivenda e Solo). Si el arrendador no la depositó, debes tener denuncia por ello</li>
+      <li><strong>Base imponible</strong> (general + ahorro, casillas 435 y 460) ≤ <strong>22.000 €</strong> tanto en tributación individual como conjunta — atención, en Galicia el límite es el mismo para ambas modalidades, a diferencia de otras comunidades</li>
+      <li>El arrendador debe haber declarado las rentas del alquiler en su IRPF</li>
     </ul>
-    <div class="highlight-box"><strong>Condición importante:</strong> El arrendador debe haber declarado las rentas del alquiler en su IRPF. Si no lo hace, el inquilino pierde el derecho a la deducción.</div>
-    <h2>Para el propietario: reducción en el IRPF estatal</h2>
-    <p>El arrendador que alquile una vivienda destinada a residencia habitual del inquilino puede aplicar una <strong>reducción del 50% sobre el rendimiento neto</strong> obtenido (en algunos supuestos puede elevarse hasta el 90% en zonas tensionadas). Los rendimientos netos se calculan como:</p>
-    <ul>
-      <li>Ingresos íntegros del alquiler</li>
-      <li>Menos gastos deducibles: IBI, comunidad, seguro, amortización del inmueble, intereses de hipoteca, reparaciones y conservación</li>
-    </ul>
+    <div class="highlight-box"><strong>Error frecuente:</strong> Muchos contribuyentes gallegos creen que en tributación conjunta el límite de renta es mayor. En Galicia el límite de 22.000 € es el mismo tanto en declaración individual como conjunta. No confundir con otras comunidades autónomas.</div>
+    <h2>Casilla de la declaración</h2>
+    <p>La deducción por alquiler de vivienda habitual en Galicia se declara en la <strong>casilla 1026</strong> del modelo de la renta.</p>
+    <h2>Para el propietario arrendador: reducción estatal del 50%</h2>
+    <p>El propietario que alquile su vivienda como residencia habitual del inquilino puede aplicar una <strong>reducción del 50%</strong> sobre el rendimiento neto (ingresos menos gastos deducibles). Esta reducción puede elevarse hasta el 90% en zonas de mercado residencial tensionado declaradas por el Estado.</p>
     <h2>Gastos deducibles para el arrendador</h2>
     <table>
       <tr><th>Gasto</th><th>Deducible</th></tr>
-      <tr><td>Intereses del préstamo hipotecario</td><td>Sí, con límite</td></tr>
-      <tr><td>IBI y tasas municipales</td><td>Sí, 100%</td></tr>
-      <tr><td>Cuotas de comunidad</td><td>Sí, 100%</td></tr>
-      <tr><td>Seguro del hogar</td><td>Sí, 100%</td></tr>
-      <tr><td>Reparaciones y conservación</td><td>Sí, con límite</td></tr>
-      <tr><td>Amortización del inmueble</td><td>3% del valor construcción</td></tr>
-      <tr><td>Honorarios de gestión</td><td>Sí, 100%</td></tr>
+      <tr><td>IBI y tasas municipales</td><td>100%</td></tr>
+      <tr><td>Comunidad de propietarios</td><td>100%</td></tr>
+      <tr><td>Seguro del hogar</td><td>100%</td></tr>
+      <tr><td>Intereses hipoteca</td><td>Sí, con límite del rendimiento íntegro</td></tr>
+      <tr><td>Reparaciones y conservación</td><td>Sí, con límite del rendimiento íntegro</td></tr>
+      <tr><td>Amortización del inmueble</td><td>3% del valor de construcción</td></tr>
+      <tr><td>Honorarios agencia / gestión</td><td>100%</td></tr>
+      <tr><td>Certificado eficiencia energética</td><td>100%</td></tr>
     </table>
-    <div class="blog-cta-box"><p>¿Tienes un piso en Pontevedra y quieres alquilarlo con todas las garantías? Gestionamos tu alquiler y te asesoramos fiscalmente.</p><a class="btn-gold" href="#captacion-form" onclick="closeBlog();goTab('captacion')">Alquilar mi piso</a></div>
+    <div class="blog-cta-box"><p>¿Tienes un piso en Pontevedra y quieres alquilarlo con todas las garantías? Gestionamos tu alquiler y te asesoramos sobre tus obligaciones fiscales.</p><a class="btn-gold" href="#captacion-form" onclick="closeBlog();goTab('captacion')">Alquilar mi piso</a></div>
   `
 },
 {
   cat:'Alquiler · Fiscal',
-  date:'14 febrero 2025',
-  title:'Alquiler de vivienda no habitual: obligaciones fiscales del propietario',
+  date:'Actualizado abril 2025',
+  title:'Alquiler vacacional y no habitual en Galicia: obligaciones fiscales del propietario',
   content:`
-    <h2>¿Qué se considera alquiler de vivienda no habitual?</h2>
-    <p>El alquiler de vivienda no habitual incluye los arrendamientos de segunda residencia, apartamentos vacacionales y cualquier alquiler en el que el inquilino no destine la vivienda como su residencia habitual. Este tipo de alquiler tiene un tratamiento fiscal significativamente diferente al de la vivienda habitual.</p>
-    <h2>Sin reducción del 50%</h2>
-    <p>A diferencia del arrendamiento de vivienda habitual, el alquiler de vivienda no habitual <strong>no permite aplicar la reducción del 50%</strong> (ni del 90%) sobre el rendimiento neto. El propietario tributa por el <strong>100% del beneficio obtenido</strong>.</p>
-    <h2>Alquiler vacacional: régimen especial</h2>
-    <p>Si alquilas tu vivienda por temporadas cortas (alquiler turístico), debes tener en cuenta:</p>
+    <h2>Diferencias fiscales entre alquiler habitual y no habitual</h2>
+    <p>El tratamiento fiscal del alquiler depende fundamentalmente de si la vivienda va a ser la <strong>residencia habitual del inquilino o no</strong>. El alquiler vacacional, de temporada o de segunda residencia tiene obligaciones fiscales diferentes y más onerosas para el propietario.</p>
+    <h2>Alquiler de vivienda NO habitual: sin reducción del 50%</h2>
+    <p>A diferencia del alquiler de vivienda habitual, el arrendamiento temporal o vacacional <strong>no permite aplicar la reducción del 50%</strong> sobre el rendimiento neto. El propietario tributa por el <strong>100% del beneficio obtenido</strong> en el IRPF.</p>
+    <h2>Alquiler vacacional en Galicia: requisitos legales 2025</h2>
+    <p>Si alquilas por temporadas cortas (alquiler turístico), debes cumplir:</p>
     <ul>
-      <li>Obligación de <strong>inscripción en el Registro de Empresas e Actividades Turísticas de Galicia</strong></li>
-      <li>Si prestas servicios propios de la industria hotelera (limpieza periódica, cambio de ropa, recepción), el rendimiento tributa como <strong>actividad económica</strong>, no como rendimiento del capital inmobiliario</li>
-      <li>Si no hay servicios hoteleros, tributa como rendimiento del capital inmobiliario sin reducción</li>
+      <li><strong>Inscripción obligatoria</strong> en el Registro de Empresas e Actividades Turísticas de Galicia (REAT) antes de iniciar la actividad</li>
+      <li>Obtener la <strong>licencia de vivienda de uso turístico (VUT)</strong> del ayuntamiento correspondiente</li>
+      <li>Si prestas servicios propios de la industria hotelera (limpieza periódica durante la estancia, recepción, cambio de ropa), el rendimiento tributa como <strong>actividad económica</strong> y estás sujeto a <strong>IVA al 10%</strong></li>
+      <li>Si solo alquilas sin servicios hoteleros, tributa como rendimiento del capital inmobiliario sin reducción y <strong>sin IVA</strong></li>
     </ul>
-    <div class="highlight-box"><strong>IVA en alquiler vacacional:</strong> Si prestas servicios hoteleros, estarás sujeto a IVA al tipo del 10%. Si es arrendamiento sin servicios, estará exento de IVA pero sujeto al IRPF.</div>
-    <h2>Imputación de rentas por vivienda vacía o desocupada</h2>
-    <p>Si tienes una segunda residencia que no alquilas, Hacienda te imputa una renta ficticia en el IRPF:</p>
+    <div class="highlight-box"><strong>Importante 2025:</strong> El incumplimiento de la inscripción en el REAT puede conllevar multas de hasta 30.000 €. Regulariza tu situación antes de iniciar el alquiler vacacional.</div>
+    <h2>Imputación de rentas por vivienda vacía</h2>
+    <p>Si tienes una segunda vivienda que no alquilas, Hacienda te imputa una renta ficticia en el IRPF:</p>
     <ul>
-      <li>El <strong>2% del valor catastral</strong> (o el 1,1% si el valor catastral ha sido revisado en los últimos 10 años)</li>
-      <li>Esta imputación aplica a todos los días que la vivienda esté a tu disposición y no alquilada</li>
+      <li><strong>1,1%</strong> del valor catastral si fue revisado en los últimos 10 años (la mayoría en Galicia)</li>
+      <li><strong>2%</strong> del valor catastral si no ha sido revisado recientemente</li>
+      <li>Esta imputación aplica a todos los días que la vivienda esté a tu disposición</li>
     </ul>
-    <h2>Gastos deducibles en alquiler no habitual</h2>
-    <p>Los gastos deducibles son los mismos que en el alquiler habitual (IBI, comunidad, seguro, amortización, etc.), pero solo en proporción a los días que el inmueble haya estado efectivamente alquilado. Los días en que esté a disposición del propietario generan imputación de rentas.</p>
+    <h2>Gastos deducibles proporcionales</h2>
+    <p>En alquiler vacacional, los gastos solo son deducibles en proporción a los días alquilados. Los días en que el inmueble está a tu disposición (aunque no lo uses) generan imputación de rentas.</p>
     <table>
-      <tr><th>Situación</th><th>Tributación</th></tr>
-      <tr><td>Alquilado como vivienda habitual</td><td>Rendimiento neto con reducción 50%</td></tr>
-      <tr><td>Alquilado como vacacional (sin servicios)</td><td>Rendimiento neto sin reducción</td></tr>
-      <tr><td>Alquilado con servicios hoteleros</td><td>Actividad económica + IVA 10%</td></tr>
-      <tr><td>Vacío / a disposición del propietario</td><td>Imputación de renta 1,1%-2% VC</td></tr>
+      <tr><th>Situación</th><th>Tributación en IRPF</th><th>IVA</th></tr>
+      <tr><td>Alquiler vivienda habitual</td><td>Rdto. neto con reducción 50%</td><td>Exento</td></tr>
+      <tr><td>Alquiler temporal (sin servicios)</td><td>Rdto. neto sin reducción</td><td>Exento</td></tr>
+      <tr><td>Alquiler turístico con servicios hoteleros</td><td>Actividad económica</td><td>10%</td></tr>
+      <tr><td>Vivienda vacía / a disposición</td><td>Imputación 1,1%-2% VC</td><td>—</td></tr>
     </table>
-    <div class="blog-cta-box"><p>¿Tienes un apartamento en Sanxenxo o en la costa gallega y quieres alquilarlo vacacionalmente? Te ayudamos a hacerlo con todas las garantías legales y fiscales.</p><a class="btn-gold" href="#contacto" onclick="closeBlog()">Consultarnos</a></div>
+    <div class="blog-cta-box"><p>¿Tienes apartamento en la costa gallega o en Pontevedra y quieres alquilarlo vacacionalmente? Te ayudamos con todos los trámites legales y fiscales.</p><a class="btn-gold" href="#contacto" onclick="closeBlog()">Consultarnos</a></div>
   `
 },
 {
-  cat:'ITP · AJD',
-  date:'22 febrero 2025',
-  title:'ITP y AJD en Galicia: cuánto pagas al comprar una vivienda',
+  cat:'ITP · AJD · Gastos',
+  date:'Actualizado marzo 2025',
+  title:'ITP y gastos al comprar vivienda en Galicia: cuánto pagas en 2025',
   content:`
-    <h2>Los impuestos al comprar una vivienda en Galicia</h2>
-    <p>Además del precio de la vivienda, al comprar un inmueble en Galicia debes pagar una serie de impuestos y gastos que pueden suponer entre un 10% y un 13% del precio de compra. Aquí te explicamos los más importantes.</p>
-    <h2>Impuesto de Transmisiones Patrimoniales (ITP) — Vivienda de segunda mano</h2>
-    <p>El ITP grava la compra de viviendas de segunda mano. En Galicia, los tipos aplicables en 2025 son:</p>
+    <h2>Resumen de impuestos y gastos al comprar en Galicia</h2>
+    <p>Al comprar una vivienda en Galicia debes prever un coste adicional de entre el <strong>9% y el 13% del precio</strong> de compra en concepto de impuestos y gastos. Aquí tienes el desglose completo actualizado a 2025.</p>
+    <h2>ITP 2025 — Vivienda de segunda mano</h2>
     <table>
       <tr><th>Supuesto</th><th>Tipo</th></tr>
-      <tr><td>Tipo general</td><td>10%</td></tr>
-      <tr><td>Vivienda habitual (valor hasta 150.000 €)</td><td>8%</td></tr>
-      <tr><td>Menores de 36 años (vivienda habitual, hasta 200.000 €)</td><td>6%</td></tr>
-      <tr><td>Familia numerosa (vivienda habitual)</td><td>4%</td></tr>
-      <tr><td>Vivienda protegida de régimen especial</td><td>4%</td></tr>
-      <tr><td>Discapacidad ≥ 65% (vivienda habitual)</td><td>4%</td></tr>
+      <tr><td>Tipo general</td><td><strong>8%</strong></td></tr>
+      <tr><td>Vivienda habitual (con límites patrimonio)</td><td><strong>7%</strong></td></tr>
+      <tr><td>Zona rural poco poblada</td><td><strong>4-6%</strong></td></tr>
+      <tr><td>Menores de 36 años / familia numerosa / discapacidad ≥ 65%</td><td><strong>3%</strong></td></tr>
+      <tr><td>Colectivos beneficiarios en zona rural poco poblada</td><td><strong>0%</strong></td></tr>
     </table>
-    <h2>IVA y AJD — Obra nueva</h2>
-    <p>Si compras vivienda nueva directamente al promotor, no pagas ITP sino IVA:</p>
+    <h2>IVA y AJD — Obra nueva (primera transmisión)</h2>
     <ul>
-      <li><strong>IVA: 10%</strong> sobre el precio de compra (tipo reducido para viviendas)</li>
-      <li><strong>AJD (Actos Jurídicos Documentados): 1,5%</strong> en Galicia sobre el precio escriturado</li>
+      <li><strong>IVA: 10%</strong> sobre el precio para viviendas en general</li>
+      <li><strong>IVA: 4%</strong> para Viviendas de Protección Oficial de régimen especial</li>
+      <li><strong>AJD: 1,5%</strong> en Galicia sobre el precio escriturado</li>
+      <li>Garajes adquiridos por separado (más de 2 plazas): <strong>IVA 21%</strong></li>
     </ul>
-    <div class="highlight-box"><strong>Ejemplo práctico:</strong> Compra de piso nuevo de 200.000 €. IVA: 20.000 €. AJD: 3.000 €. Total impuestos: 23.000 €.</div>
-    <h2>Otros gastos al comprar vivienda</h2>
+    <div class="highlight-box"><strong>¿Quién paga qué desde 2019?</strong> Tras la Ley de Crédito Inmobiliario (Ley 5/2019), el banco asume el AJD de la escritura de hipoteca, la notaría de la hipoteca y el registro de la hipoteca. El comprador solo paga el AJD de la escritura de compraventa, tasación y gestoría.</div>
+    <h2>Gastos adicionales orientativos</h2>
     <table>
-      <tr><th>Gasto</th><th>Importe aproximado</th></tr>
-      <tr><td>Notaría</td><td>600 – 1.500 €</td></tr>
-      <tr><td>Registro de la Propiedad</td><td>400 – 650 €</td></tr>
-      <tr><td>Tasación (si hay hipoteca)</td><td>250 – 500 €</td></tr>
-      <tr><td>Gestoría (si hay hipoteca)</td><td>300 – 500 €</td></tr>
+      <tr><th>Concepto</th><th>Importe orientativo</th><th>Quién paga</th></tr>
+      <tr><td>ITP o IVA+AJD</td><td>3%-10% del precio</td><td>Comprador</td></tr>
+      <tr><td>Notaría (escritura compraventa)</td><td>600–1.200 €</td><td>Comprador</td></tr>
+      <tr><td>Registro de la Propiedad</td><td>400–700 €</td><td>Comprador</td></tr>
+      <tr><td>Tasación (con hipoteca)</td><td>250–500 €</td><td>Comprador</td></tr>
+      <tr><td>Gestoría (con hipoteca)</td><td>300–500 €</td><td>Comprador</td></tr>
+      <tr><td>Notaría hipoteca + AJD hipoteca</td><td>—</td><td><strong>Banco</strong> (desde 2019)</td></tr>
     </table>
-    <h2>¿Quién paga qué tras la ley hipotecaria de 2019?</h2>
-    <p>Desde la aprobación de la Ley de Crédito Inmobiliario (Ley 5/2019), <strong>el banco asume el pago del AJD, notaría y registro</strong> cuando hay hipoteca. El comprador solo paga la tasación y los gastos de gestoría.</p>
-    <div class="blog-cta-box"><p>¿Necesitas ayuda para calcular los impuestos de tu compra? Nuestros agentes te orientan sin compromiso.</p><a class="btn-gold" href="#contacto" onclick="closeBlog()">Solicitar información</a></div>
+    <h2>Plazo de liquidación del ITP</h2>
+    <p>Un mes desde la firma de la escritura pública. Se presenta el <strong>modelo 600</strong> ante la Axencia Tributaria de Galicia (ATRIGA), de forma telemática desde la Oficina Virtual Tributaria o presencialmente en sus oficinas.</p>
+    <div class="blog-cta-box"><p>¿Necesitas ayuda para calcular los impuestos de tu operación? Nuestros agentes te orientan sin compromiso.</p><a class="btn-gold" href="#contacto" onclick="closeBlog()">Solicitar información</a></div>
   `
 },
 {
-  cat:'Obra nueva',
-  date:'5 marzo 2025',
-  title:'Comprar obra nueva en Galicia: IVA, AJD y deducciones autonómicas',
+  cat:'Obra nueva · Fiscal',
+  date:'Actualizado marzo 2025',
+  title:'Comprar obra nueva en Galicia: IVA al 10%, AJD 1,5% y deducciones 2025',
   content:`
-    <h2>Diferencias fiscales entre obra nueva y segunda mano</h2>
-    <p>La principal diferencia fiscal al comprar obra nueva frente a segunda mano es que en lugar de pagar ITP, pagas IVA. Esto tiene implicaciones importantes en el precio final y en las posibilidades de deducción.</p>
-    <h2>IVA en la compra de obra nueva</h2>
-    <p>El IVA aplicable a la vivienda nueva en 2025 es:</p>
-    <ul>
-      <li><strong>10%</strong> para viviendas en general (tipo reducido)</li>
-      <li><strong>4%</strong> para Viviendas de Protección Oficial de régimen especial o de promoción pública (tipo superreducido)</li>
-      <li><strong>21%</strong> para garajes adquiridos por separado que superen 2 plazas por comprador (tipo general)</li>
-    </ul>
+    <h2>¿Qué impuestos se pagan al comprar obra nueva en Galicia?</h2>
+    <p>La compra de vivienda nueva directamente al promotor tributa por <strong>IVA</strong> en lugar de ITP. Esto es importante porque el IVA no tiene los tipos reducidos por colectivos (jóvenes, familias numerosas) que sí existen en el ITP de segunda mano.</p>
+    <h2>IVA en obra nueva 2025</h2>
+    <table>
+      <tr><th>Tipo de inmueble</th><th>IVA aplicable</th></tr>
+      <tr><td>Vivienda en general</td><td><strong>10%</strong> (tipo reducido)</td></tr>
+      <tr><td>VPO de régimen especial o promoción pública</td><td><strong>4%</strong> (tipo superreducido)</td></tr>
+      <tr><td>Garaje (hasta 2 plazas por comprador junto a la vivienda)</td><td><strong>10%</strong></td></tr>
+      <tr><td>Garaje por separado (más de 2 plazas)</td><td><strong>21%</strong></td></tr>
+      <tr><td>Trastero adquirido junto a la vivienda</td><td><strong>10%</strong></td></tr>
+    </table>
     <h2>AJD en Galicia: 1,5%</h2>
-    <p>En la compra de obra nueva, además del IVA, hay que pagar el Impuesto de Actos Jurídicos Documentados por la escritura de compraventa. En Galicia el tipo es del <strong>1,5%</strong> sobre el valor escriturado.</p>
-    <div class="highlight-box"><strong>Recuerda:</strong> Desde 2019, si financias la compra con hipoteca, <strong>el banco paga el AJD de la escritura de hipoteca</strong>. Tú solo pagas el AJD de la escritura de compraventa.</div>
-    <h2>Deducciones autonómicas gallegas aplicables</h2>
-    <p>Aunque en obra nueva no se aplica el ITP reducido para jóvenes o familias numerosas, sí se pueden aplicar las <strong>deducciones en el IRPF autonómico</strong> por adquisición de vivienda habitual, que son independientes del tipo de impuesto pagado al comprar.</p>
-    <h2>Ventajas de la obra nueva</h2>
+    <p>La escritura de compraventa de obra nueva también está sujeta al <strong>Impuesto de Actos Jurídicos Documentados (AJD) al 1,5%</strong> sobre el valor escriturado. Este impuesto lo paga el comprador.</p>
+    <div class="highlight-box"><strong>Recuerda:</strong> Desde la Ley 5/2019 de Crédito Inmobiliario, el AJD de la <em>escritura de hipoteca</em> lo paga el banco. El comprador solo paga el AJD de la escritura de compraventa (1,5%).</div>
+    <h2>¿Puedo aplicar tipos reducidos de ITP si es obra nueva?</h2>
+    <p>No. La obra nueva tributa por IVA, no por ITP, por lo que los tipos reducidos del ITP para jóvenes, familias numerosas, etc., no son aplicables. Sin embargo, sí puedes aplicar las <strong>deducciones autonómicas gallegas en el IRPF</strong> si la vivienda va a ser tu residencia habitual.</p>
+    <h2>Ventajas de comprar obra nueva</h2>
     <ul>
-      <li>Garantías constructivas: 10 años para defectos estructurales, 3 para habitabilidad, 1 para terminaciones</li>
-      <li>Certificación energética A o B obligatoria (menores costes energéticos)</li>
-      <li>Adaptada a normativa de accesibilidad actual</li>
+      <li><strong>Garantías constructivas:</strong> 10 años (defectos estructurales), 3 años (habitabilidad), 1 año (terminaciones)</li>
+      <li><strong>Certificación energética A o B</strong> obligatoria — menor consumo energético</li>
+      <li>Adaptada a normativa de accesibilidad vigente</li>
       <li>Posibilidad de personalizar acabados durante la construcción</li>
+      <li>Sin gastos inmediatos de reformas</li>
     </ul>
-    <div class="blog-cta-box"><p>Descubre nuestras promociones de obra nueva en Pontevedra. Asesoramiento personalizado desde el primer día.</p><a class="btn-gold" href="#propiedades" onclick="closeBlog();goTab('promociones')">Ver promociones</a></div>
+    <div class="blog-cta-box"><p>Descubre nuestras promociones de obra nueva en Pontevedra y provincia. Asesoramiento desde el primer día.</p><a class="btn-gold" href="#propiedades" onclick="closeBlog();goTab('promociones')">Ver obra nueva</a></div>
   `
 },
 {
-  cat:'Plusvalía · Venta',
-  date:'18 marzo 2025',
-  title:'Plusvalía municipal al vender un inmueble: cómo calcularla en Pontevedra',
+  cat:'Venta · Plusvalía',
+  date:'Actualizado marzo 2025',
+  title:'Plusvalía municipal al vender en Pontevedra: cálculo y exenciones 2025',
   content:`
-    <h2>¿Qué es el Impuesto sobre el Incremento de Valor de los Terrenos (plusvalía)?</h2>
-    <p>La plusvalía municipal es un impuesto local que grava el incremento de valor de los terrenos de naturaleza urbana desde la adquisición hasta la transmisión. Lo paga quien vende (o el heredero, en caso de herencia).</p>
-    <h2>¿Cuándo no hay que pagar plusvalía?</h2>
-    <p>Tras la sentencia del Tribunal Constitucional de 2021, <strong>no se paga plusvalía si no ha habido incremento de valor</strong> real del terreno. Si vendiste con pérdidas respecto al precio de compra, puedes reclamar la devolución.</p>
-    <h2>Métodos de cálculo (desde 2021)</h2>
-    <p>Actualmente existen dos métodos de cálculo y el contribuyente puede elegir el más favorable:</p>
+    <h2>¿Qué es la plusvalía municipal?</h2>
+    <p>El Impuesto sobre el Incremento de Valor de los Terrenos de Naturaleza Urbana (IIVTNU), conocido como plusvalía municipal, grava el incremento de valor del suelo urbano desde la adquisición hasta la venta. Lo paga quien vende (o el heredero en caso de herencia).</p>
+    <h2>Cuándo NO se paga plusvalía</h2>
+    <p>Tras la sentencia del Tribunal Constitucional (octubre 2021) y la reforma posterior (Real Decreto-Ley 26/2021), <strong>no se paga plusvalía si no ha habido incremento real de valor</strong> del suelo. Si vendiste con pérdidas respecto al precio de compra (suelo), puedes acreditar la inexistencia de incremento y no tributar.</p>
+    <h2>Métodos de cálculo desde 2021</h2>
+    <p>Existen dos métodos y el contribuyente elige el más favorable:</p>
     <table>
-      <tr><th>Método</th><th>Cómo se calcula</th></tr>
-      <tr><td>Método objetivo</td><td>Valor catastral del suelo × coeficiente según años de tenencia</td></tr>
-      <tr><td>Método real</td><td>Diferencia entre precio de venta y precio de adquisición (solo la parte del suelo)</td></tr>
+      <tr><th>Método</th><th>Cómo funciona</th></tr>
+      <tr><td><strong>Método objetivo</strong></td><td>Valor catastral del suelo × coeficiente según años de tenencia (fijados anualmente por el Estado)</td></tr>
+      <tr><td><strong>Método real</strong></td><td>Diferencia entre precio de venta y precio de adquisición, multiplicado por el porcentaje del valor catastral que corresponde al suelo</td></tr>
     </table>
-    <h2>Coeficientes máximos en Pontevedra (2025)</h2>
-    <p>Los coeficientes máximos fijados por el Estado para el método objetivo son:</p>
+    <h2>Coeficientes máximos 2025 (método objetivo)</h2>
     <table>
-      <tr><th>Años de tenencia</th><th>Coeficiente máximo</th></tr>
-      <tr><td>Menos de 1 año</td><td>0,14</td></tr>
-      <tr><td>1 año</td><td>0,13</td></tr>
+      <tr><th>Período de tenencia</th><th>Coeficiente máximo</th></tr>
+      <tr><td>Menos de 1 año</td><td>0,15</td></tr>
+      <tr><td>1 año</td><td>0,14</td></tr>
       <tr><td>2 años</td><td>0,15</td></tr>
-      <tr><td>3-5 años</td><td>0,17</td></tr>
+      <tr><td>3 años</td><td>0,16</td></tr>
+      <tr><td>4 años</td><td>0,17</td></tr>
+      <tr><td>5 años</td><td>0,17</td></tr>
       <tr><td>6-10 años</td><td>0,16</td></tr>
-      <tr><td>11-20 años</td><td>0,12</td></tr>
+      <tr><td>11-20 años</td><td>0,13</td></tr>
       <tr><td>Más de 20 años</td><td>0,10</td></tr>
     </table>
-    <div class="highlight-box"><strong>Tipo impositivo en Pontevedra:</strong> El Ayuntamiento de Pontevedra aplica un tipo del 26% sobre la base imponible de la plusvalía. Cada municipio puede fijar el suyo entre el 15% y el 30%.</div>
-    <h2>Exenciones y bonificaciones</h2>
+    <div class="highlight-box"><strong>Tipo en Pontevedra:</strong> El Ayuntamiento de Pontevedra aplica su propio tipo impositivo sobre la base imponible (máximo legal: 30%). Consulta el tipo vigente en la ordenanza fiscal municipal del año en curso.</div>
+    <h2>Exenciones y bonificaciones principales</h2>
     <ul>
-      <li><strong>Dación en pago:</strong> Exenta si es la vivienda habitual del deudor y se transmite al banco para cancelar la hipoteca</li>
-      <li><strong>Herencia entre cónyuge e hijos:</strong> Muchos ayuntamientos, incluido Pontevedra, aplican bonificaciones de hasta el 95%</li>
-      <li><strong>Transmisiones sin incremento de valor:</strong> Exentas desde la reforma de 2021</li>
+      <li><strong>Dación en pago de vivienda habitual:</strong> exenta si es para cancelar hipoteca y el deudor no tiene otros bienes suficientes</li>
+      <li><strong>Herencias entre familiares directos:</strong> muchos ayuntamientos, incluido Pontevedra, aplican bonificaciones importantes (consultar ordenanza vigente)</li>
+      <li><strong>Transmisiones sin incremento de valor:</strong> exentas si se acredita que no hubo ganancia en el suelo</li>
     </ul>
-    <div class="blog-cta-box"><p>¿Vas a vender tu propiedad en Pontevedra? Nuestros agentes te ayudan a calcular todos los costes asociados y a obtener el mejor precio.</p><a class="btn-gold" href="#captacion-form" onclick="closeBlog();goTab('captacion')">Tasar mi propiedad</a></div>
+    <h2>Plazo para pagar</h2>
+    <p>En compraventas: <strong>30 días hábiles</strong> desde la fecha de transmisión. En herencias: <strong>6 meses</strong> desde el fallecimiento (prorrogable otros 6 meses). Se presenta en el Ayuntamiento de Pontevedra o de la localidad donde esté el inmueble.</p>
+    <div class="blog-cta-box"><p>¿Vas a vender tu propiedad en Pontevedra? Tasamos gratis y gestionamos toda la operación.</p><a class="btn-gold" href="#captacion-form" onclick="closeBlog();goTab('captacion')">Tasar mi propiedad</a></div>
   `
 }
 ];
