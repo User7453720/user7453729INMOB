@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://user7453729-inmob.vercel.app/sitemap.xml
+
+# Bloquear rutas de API para crawlers
+Disallow: /api/
