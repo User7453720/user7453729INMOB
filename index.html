@@ -156,7 +156,7 @@
   --serif:'Playfair Display',serif;
   --sans:'Lato',sans-serif;
 }
-html{scroll-behavior:smooth}
+html{scroll-behavior:smooth;overflow-x:hidden;max-width:100vw}
 body{font-family:var(--sans);background:var(--cream);color:var(--green2);font-size:15px;line-height:1.65;overflow-x:hidden}
 
 /* ── NAV ── */
@@ -172,7 +172,8 @@ nav{position:sticky;top:0;z-index:500;background:var(--green)}
 
 /* ── TABS ── */
 .main-tabs{background:var(--green2);border-top:1px solid rgba(255,255,255,.06);position:relative;z-index:400}
-.tabs-inner{max-width:1200px;margin:0 auto;padding:0 2rem;display:flex;align-items:stretch;overflow-x:visible;scrollbar-width:none;position:relative}
+.tabs-inner{max-width:1200px;margin:0 auto;padding:0 2rem;display:flex;align-items:stretch;overflow-x:auto;scrollbar-width:none;position:relative;-webkit-overflow-scrolling:touch}
+.tabs-inner::-webkit-scrollbar{display:none}
 .tabs-inner::-webkit-scrollbar{display:none}
 .tab{padding:0 1.2rem;height:46px;display:flex;align-items:center;gap:5px;font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;font-weight:700;color:rgba(255,255,255,.55);cursor:pointer;border-bottom:2.5px solid transparent;transition:all .2s;position:relative;user-select:none;white-space:nowrap;text-decoration:none}
 .tab:hover{color:var(--white)}
@@ -576,6 +577,11 @@ img[loading="lazy"].loaded{opacity:1}
 @media(max-width:900px){.search-fields{grid-template-columns:1fr 1fr;}.search-btn{grid-column:span 2}}
 @media(max-width:600px){.search-fields{grid-template-columns:1fr;}.search-btn{grid-column:span 1}}
 
+.search-extras{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:.75rem;padding-top:.75rem;border-top:.5px solid var(--line)}
+.se-check{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--green2);cursor:pointer;user-select:none;font-weight:600;letter-spacing:.03em}
+.se-check input[type=checkbox]{width:16px;height:16px;accent-color:var(--green);cursor:pointer}
+.se-check:hover{color:var(--green3)}
+
 /* ── HERO SEARCH (en slider inicio) ── */
 .hero-search{position:absolute;bottom:0;left:0;right:0;z-index:10;padding:0 2rem 2rem}
 .hero-search-inner{max-width:1200px;margin:0 auto;background:rgba(255,255,255,.97);border-top:3px solid var(--green3);padding:1.25rem 1.5rem}
@@ -716,8 +722,8 @@ img[loading="lazy"].loaded{opacity:1}
       </div>
     </div>
     <div class="slider-arrows">
-      <button class="slider-arrow" onclick="moveSlide(-1)" aria-label="Diapositiva anterior">onclick="moveSlide(-1)">&#8592;#8592;</button>
-      <button class="slider-arrow" onclick="moveSlide(1)" aria-label="Diapositiva siguiente">onclick="moveSlide(1)">&#8594;#8594;</button>
+      <button class="slider-arrow" onclick="moveSlide(-1)" aria-label="Diapositiva anterior">&#8592;</button>
+      <button class="slider-arrow" onclick="moveSlide(1)" aria-label="Diapositiva siguiente">&#8594;</button>
     </div>
     <div class="slider-dots" id="slider-dots"></div>
     <!-- Buscador en inicio -->
@@ -743,6 +749,18 @@ img[loading="lazy"].loaded{opacity:1}
               <option value="local">Local comercial</option>
               <option value="garaje">Garaje</option>
               <option value="terreno">Terreno</option>
+            </select>
+          </div>
+          <div class="sf-group">
+            <label>Precio máximo</label>
+            <select id="hs-precio" onchange="heroSearch()">
+              <option value="">Sin límite</option>
+              <option value="100000">Hasta 100.000 €</option>
+              <option value="200000">Hasta 200.000 €</option>
+              <option value="300000">Hasta 300.000 €</option>
+              <option value="500000">Hasta 500.000 €</option>
+              <option value="800">Hasta 800 €/mes</option>
+              <option value="1200">Hasta 1.200 €/mes</option>
             </select>
           </div>
           <div class="sf-group">
@@ -841,11 +859,19 @@ img[loading="lazy"].loaded{opacity:1}
         <div class="search-bar" role="search">
           <div class="search-bar-title">&#128269; Buscar propiedades</div>
           <div class="search-fields">
-            <div class="sf-group"><label>Tipo de inmueble</label><select onchange="searchPanel('compra',this.form||this.closest('.search-bar'))" id="sb-compra-tipo"><option value="">Todos</option><option value="piso">Vivienda / Piso</option><option value="chalet">Chalet / Casa</option><option value="local">Local comercial</option><option value="garaje">Garaje</option><option value="terreno">Terreno</option></select></div>
+            <div class="sf-group"><label>Tipo de inmueble</label><select id="sb-compra-tipo"><option value="">Todos</option><option value="piso">Vivienda / Piso</option><option value="chalet">Chalet / Casa</option><option value="local">Local comercial</option><option value="garaje">Garaje</option><option value="terreno">Terreno</option></select></div>
+            <div class="sf-group"><label>Habitaciones mín.</label><select id="sb-compra-habs"><option value="">Indiferente</option><option value="1">1+</option><option value="2">2+</option><option value="3">3+</option><option value="4">4+</option></select></div>
             <div class="sf-group"><label>Precio máximo</label><select id="sb-compra-precio"><option value="">Sin límite</option><option value="100000">Hasta 100.000 €</option><option value="150000">Hasta 150.000 €</option><option value="200000">Hasta 200.000 €</option><option value="300000">Hasta 300.000 €</option><option value="400000">Hasta 400.000 €</option></select></div>
             <div class="sf-group"><label>Zona o municipio</label><input type="text" id="sb-compra-zona" placeholder="Ej: Pontevedra, Poio..."></div>
             <div class="sf-group"><label>Referencia</label><input type="text" id="sb-compra-ref" placeholder="Ej: INM-001"></div>
             <button class="search-btn" onclick="searchPanel('compra')">&#128269; Buscar</button>
+          </div>
+          <div class="search-extras">
+            <label class="se-check"><input type="checkbox" id="sb-compra-terraza"> Terraza</label>
+            <label class="se-check"><input type="checkbox" id="sb-compra-garaje"> Garaje</label>
+            <label class="se-check"><input type="checkbox" id="sb-compra-ascensor"> Ascensor</label>
+            <label class="se-check"><input type="checkbox" id="sb-compra-piscina"> Piscina</label>
+            <label class="se-check"><input type="checkbox" id="sb-compra-jardin"> Jardín</label>
           </div>
           <div class="search-results-info" id="sb-compra-info"></div>
         </div>
@@ -914,11 +940,18 @@ img[loading="lazy"].loaded{opacity:1}
         <div class="search-bar" role="search">
           <div class="search-bar-title">&#128269; Buscar alquileres</div>
           <div class="search-fields">
-            <div class="sf-group"><label>Tipo de inmueble</label><select id="sb-alq-tipo"><option value="">Todos</option><option value="piso">Vivienda / Piso</option><option value="chalet">Chalet / Casa</option><option value="local">Local comercial</option><option value="garaje">Garaje</option></select></div>
-            <div class="sf-group"><label>Precio máximo</label><select id="sb-alq-precio"><option value="">Sin límite</option><option value="400">Hasta 400 €/mes</option><option value="600">Hasta 600 €/mes</option><option value="800">Hasta 800 €/mes</option><option value="1000">Hasta 1.000 €/mes</option><option value="1500">Hasta 1.500 €/mes</option></select></div>
-            <div class="sf-group"><label>Zona o municipio</label><input type="text" id="sb-alq-zona" placeholder="Ej: Pontevedra, Lérez..."></div>
-            <div class="sf-group"><label>Referencia</label><input type="text" id="sb-alq-ref" placeholder="Ej: ALQ-001"></div>
+            <div class="sf-group"><label>Tipo de inmueble</label><select id="sb-alquiler-general-tipo"><option value="">Todos</option><option value="piso">Vivienda / Piso</option><option value="chalet">Chalet / Casa</option><option value="local">Local comercial</option><option value="garaje">Garaje</option></select></div>
+            <div class="sf-group"><label>Habitaciones mín.</label><select id="sb-alquiler-general-habs"><option value="">Indiferente</option><option value="1">1+</option><option value="2">2+</option><option value="3">3+</option><option value="4">4+</option></select></div>
+            <div class="sf-group"><label>Precio máximo</label><select id="sb-alquiler-general-precio"><option value="">Sin límite</option><option value="400">Hasta 400 €/mes</option><option value="600">Hasta 600 €/mes</option><option value="800">Hasta 800 €/mes</option><option value="1000">Hasta 1.000 €/mes</option><option value="1500">Hasta 1.500 €/mes</option></select></div>
+            <div class="sf-group"><label>Zona o municipio</label><input type="text" id="sb-alquiler-general-zona" placeholder="Ej: Pontevedra, Lérez..."></div>
+            <div class="sf-group"><label>Referencia</label><input type="text" id="sb-alquiler-general-ref" placeholder="Ej: ALQ-001"></div>
             <button class="search-btn" onclick="searchPanel('alquiler-general')">&#128269; Buscar</button>
+          </div>
+          <div class="search-extras">
+            <label class="se-check"><input type="checkbox" id="sb-alquiler-general-terraza"> Terraza</label>
+            <label class="se-check"><input type="checkbox" id="sb-alquiler-general-garaje"> Garaje</label>
+            <label class="se-check"><input type="checkbox" id="sb-alquiler-general-ascensor"> Ascensor</label>
+            <label class="se-check"><input type="checkbox" id="sb-alquiler-general-amueblado"> Amueblado</label>
           </div>
           <div class="search-results-info" id="sb-alquiler-general-info"></div>
         </div>
@@ -946,11 +979,17 @@ img[loading="lazy"].loaded{opacity:1}
         <div class="search-bar" role="search">
           <div class="search-bar-title">&#128269; Buscar alojamiento para estudiantes</div>
           <div class="search-fields">
-            <div class="sf-group"><label>Tipo</label><select id="sb-est-tipo"><option value="">Todos</option><option value="piso">Piso completo</option><option value="habitacion">Habitación</option><option value="estudio">Estudio</option></select></div>
-            <div class="sf-group"><label>Precio máximo</label><select id="sb-est-precio"><option value="">Sin límite</option><option value="300">Hasta 300 €/mes</option><option value="450">Hasta 450 €/mes</option><option value="600">Hasta 600 €/mes</option><option value="800">Hasta 800 €/mes</option></select></div>
-            <div class="sf-group"><label>Zona</label><input type="text" id="sb-est-zona" placeholder="Ej: Campus, Centro..."></div>
-            <div class="sf-group"><label>Referencia</label><input type="text" id="sb-est-ref" placeholder="Ej: EST-001"></div>
+            <div class="sf-group"><label>Tipo</label><select id="sb-alquiler-est-tipo"><option value="">Todos</option><option value="piso">Piso completo</option><option value="habitacion">Habitación</option><option value="estudio">Estudio</option></select></div>
+            <div class="sf-group"><label>Habitaciones mín.</label><select id="sb-alquiler-est-habs"><option value="">Indiferente</option><option value="1">1+</option><option value="2">2+</option><option value="3">3+</option></select></div>
+            <div class="sf-group"><label>Precio máximo</label><select id="sb-alquiler-est-precio"><option value="">Sin límite</option><option value="300">Hasta 300 €/mes</option><option value="450">Hasta 450 €/mes</option><option value="600">Hasta 600 €/mes</option><option value="800">Hasta 800 €/mes</option></select></div>
+            <div class="sf-group"><label>Zona</label><input type="text" id="sb-alquiler-est-zona" placeholder="Ej: Campus, Centro..."></div>
+            <div class="sf-group"><label>Referencia</label><input type="text" id="sb-alquiler-est-ref" placeholder="Ej: EST-001"></div>
             <button class="search-btn" onclick="searchPanel('alquiler-est')">&#128269; Buscar</button>
+          </div>
+          <div class="search-extras">
+            <label class="se-check"><input type="checkbox" id="sb-alquiler-est-amueblado"> Amueblado</label>
+            <label class="se-check"><input type="checkbox" id="sb-alquiler-est-ascensor"> Ascensor</label>
+            <label class="se-check"><input type="checkbox" id="sb-alquiler-est-terraza"> Terraza</label>
           </div>
           <div class="search-results-info" id="sb-alquiler-est-info"></div>
         </div>
@@ -978,11 +1017,18 @@ img[loading="lazy"].loaded{opacity:1}
         <div class="search-bar" role="search">
           <div class="search-bar-title">&#128269; Buscar alojamiento vacacional</div>
           <div class="search-fields">
-            <div class="sf-group"><label>Tipo de inmueble</label><select id="sb-vac-tipo"><option value="">Todos</option><option value="piso">Apartamento</option><option value="chalet">Casa / Villa</option><option value="estudio">Estudio</option></select></div>
-            <div class="sf-group"><label>Precio máximo / noche</label><select id="sb-vac-precio"><option value="">Sin límite</option><option value="50">Hasta 50 €/noche</option><option value="80">Hasta 80 €/noche</option><option value="120">Hasta 120 €/noche</option><option value="200">Hasta 200 €/noche</option></select></div>
-            <div class="sf-group"><label>Zona</label><input type="text" id="sb-vac-zona" placeholder="Ej: Sanxenxo, Poio..."></div>
-            <div class="sf-group"><label>Referencia</label><input type="text" id="sb-vac-ref" placeholder="Ej: VAC-001"></div>
+            <div class="sf-group"><label>Tipo de inmueble</label><select id="sb-vacacional-tipo"><option value="">Todos</option><option value="piso">Apartamento</option><option value="chalet">Casa / Villa</option><option value="estudio">Estudio</option></select></div>
+            <div class="sf-group"><label>Habitaciones mín.</label><select id="sb-vacacional-habs"><option value="">Indiferente</option><option value="1">1+</option><option value="2">2+</option><option value="3">3+</option><option value="4">4+</option></select></div>
+            <div class="sf-group"><label>Precio máx./noche</label><select id="sb-vacacional-precio"><option value="">Sin límite</option><option value="50">Hasta 50 €/noche</option><option value="80">Hasta 80 €/noche</option><option value="120">Hasta 120 €/noche</option><option value="200">Hasta 200 €/noche</option></select></div>
+            <div class="sf-group"><label>Zona</label><input type="text" id="sb-vacacional-zona" placeholder="Ej: Sanxenxo, Poio..."></div>
+            <div class="sf-group"><label>Referencia</label><input type="text" id="sb-vacacional-ref" placeholder="Ej: VAC-001"></div>
             <button class="search-btn" onclick="searchPanel('vacacional')">&#128269; Buscar</button>
+          </div>
+          <div class="search-extras">
+            <label class="se-check"><input type="checkbox" id="sb-vacacional-piscina"> Piscina</label>
+            <label class="se-check"><input type="checkbox" id="sb-vacacional-terraza"> Terraza</label>
+            <label class="se-check"><input type="checkbox" id="sb-vacacional-garaje"> Garaje</label>
+            <label class="se-check"><input type="checkbox" id="sb-vacacional-jardin"> Jardín</label>
           </div>
           <div class="search-results-info" id="sb-vacacional-info"></div>
         </div>
@@ -1234,7 +1280,7 @@ img[loading="lazy"].loaded{opacity:1}
 <!-- ── BLOG MODAL ── -->
 <div class="blog-modal" id="blog-modal">
   <div class="blog-article" id="blog-article">
-    <div class="blog-article-close"><button onclick="closeBlog()" aria-label="Cerrar artículo">onclick="closeBlog()">&#10005;#10005;</button></div>
+    <div class="blog-article-close"><button onclick="closeBlog()" aria-label="Cerrar artículo">&#10005;</button></div>
     <div id="blog-article-content"></div>
   </div>
 </div>
@@ -1316,25 +1362,25 @@ img[loading="lazy"].loaded{opacity:1}
 
 <!-- ── FULLSCREEN OVERLAY ── -->
 <div id="fs-overlay" class="fs-overlay">
-  <button class="fs-close" onclick="closeFS()" aria-label="Cerrar pantalla completa">onclick="closeFS()" title="Cerrar">&#10005;#10005;</button>
+  <button class="fs-close" onclick="closeFS()" aria-label="Cerrar pantalla completa">&#10005;</button>
   <div class="fs-img-wrap" id="fs-img-wrap"></div>
   <div class="fs-dots" id="fs-dots"></div>
   <div class="fs-counter" id="fs-counter"></div>
-  <button class="fs-prev" onclick="fsMove(-1)" aria-label="Imagen anterior">onclick="fsMove(-1)">&#8592;#8592;</button>
-  <button class="fs-next" onclick="fsMove(1)" aria-label="Imagen siguiente">onclick="fsMove(1)">&#8594;#8594;</button>
+  <button class="fs-prev" onclick="fsMove(-1)" aria-label="Imagen anterior">&#8592;</button>
+  <button class="fs-next" onclick="fsMove(1)" aria-label="Imagen siguiente">&#8594;</button>
 </div>
 
 <!-- ── CINEMA OVERLAY ── -->
 <div class="cinema-overlay" id="cinema">
   <div class="cinema-header">
     <div class="cinema-header-title" id="cinema-title"></div>
-    <button class="cinema-close" onclick="closeCinema()" aria-label="Cerrar ficha">onclick="closeCinema()">&#10005;#10005;</button>
+    <button class="cinema-close" onclick="closeCinema()" aria-label="Cerrar ficha">&#10005;</button>
   </div>
   <div class="cinema-body">
     <div class="cinema-stage" id="cinema-stage">
       <div class="cinema-placeholder" id="cinema-placeholder"></div>
-      <button class="cinema-prev" onclick="cinemaPrev()" aria-label="Foto anterior">onclick="cinemaPrev()">&#8592;#8592;</button>
-      <button class="cinema-next" onclick="cinemaNext()" aria-label="Foto siguiente">onclick="cinemaNext()">&#8594;#8594;</button>
+      <button class="cinema-prev" onclick="cinemaPrev()" aria-label="Foto anterior">&#8592;</button>
+      <button class="cinema-next" onclick="cinemaNext()" aria-label="Foto siguiente">&#8594;</button>
     </div>
     <div class="cinema-dots-row" id="cinema-dots-row"></div>
     <div class="cinema-media-row" id="cinema-media-row"></div>
@@ -1680,46 +1726,52 @@ document.getElementById('fs-overlay').addEventListener('click',function(e){
 
 // ── BUSCADOR ──
 function heroSearch(){
-  var op    = document.getElementById('hs-op').value;
-  var tipo  = document.getElementById('hs-tipo').value;
-  var zona  = document.getElementById('hs-zona').value.toLowerCase().trim();
-  var ref   = document.getElementById('hs-ref').value.toLowerCase().trim();
+  var op      = document.getElementById('hs-op').value;
+  var tipo    = document.getElementById('hs-tipo').value;
+  var zona    = document.getElementById('hs-zona').value.toLowerCase().trim();
+  var ref     = document.getElementById('hs-ref').value.toLowerCase().trim();
+  var precio  = document.getElementById('hs-precio') ? document.getElementById('hs-precio').value : '';
 
-  // Si hay referencia, buscar en todas las pestañas
   if(ref){
     searchAllPanels(ref,'');
     return;
   }
 
-  // Navegar a la pestaña correcta
   var target = op || 'compra';
   goTab(target);
 
-  // Esperar a que el panel esté visible y aplicar filtro
   setTimeout(function(){
-    applySearchToPanel(target, tipo, zona, ref);
+    applySearchToPanel(target, tipo, zona, ref, precio, 0, []);
   }, 200);
 }
 
 function searchPanel(panelId){
-  var tipo  = (document.getElementById('sb-'+panelId+'-tipo')  || document.getElementById('sb-alq-tipo') || {value:''}).value;
-  var zona  = (document.getElementById('sb-'+panelId+'-zona')  || document.getElementById('sb-alq-zona') || {value:''}).value.toLowerCase().trim();
-  var ref   = (document.getElementById('sb-'+panelId+'-ref')   || document.getElementById('sb-alq-ref')  || {value:''}).value.toLowerCase().trim();
+  var tipoEl     = document.getElementById('sb-'+panelId+'-tipo');
+  var zonaEl     = document.getElementById('sb-'+panelId+'-zona');
+  var refEl      = document.getElementById('sb-'+panelId+'-ref');
+  var precioEl   = document.getElementById('sb-'+panelId+'-precio');
+  var habsEl     = document.getElementById('sb-'+panelId+'-habs');
 
-  // Selectors específicos por panel
-  var tipoEl   = document.getElementById('sb-'+panelId+'-tipo');
-  var zonaEl   = document.getElementById('sb-'+panelId+'-zona');
-  var refEl    = document.getElementById('sb-'+panelId+'-ref');
-  var precioEl = document.getElementById('sb-'+panelId+'-precio');
+  var tipo     = tipoEl     ? tipoEl.value : '';
+  var zona     = zonaEl     ? zonaEl.value.toLowerCase().trim() : '';
+  var ref      = refEl      ? refEl.value.toLowerCase().trim() : '';
+  var maxPrecio= precioEl   ? precioEl.value : '';
+  var minHabs  = habsEl     ? parseInt(habsEl.value)||0 : 0;
 
-  if(tipoEl)  tipo  = tipoEl.value;
-  if(zonaEl)  zona  = zonaEl.value.toLowerCase().trim();
-  if(refEl)   ref   = refEl.value.toLowerCase().trim();
+  // Características extra (checkboxes)
+  var extras = ['terraza','garaje','ascensor','piscina','jardin','amueblado'];
+  var activeExtras = extras.filter(function(e){
+    var el = document.getElementById('sb-'+panelId+'-'+e);
+    return el && el.checked;
+  });
 
-  applySearchToPanel(panelId, tipo, zona, ref, precioEl?precioEl.value:'');
+  applySearchToPanel(panelId, tipo, zona, ref, maxPrecio, minHabs, activeExtras);
 }
 
-function applySearchToPanel(panelId, tipo, zona, ref, maxPrecio){
+function applySearchToPanel(panelId, tipo, zona, ref, maxPrecio, minHabs, activeExtras){
+  minHabs = minHabs || 0;
+  activeExtras = activeExtras || [];
+
   var gridId = panelId === 'compra' ? 'grid-compra' : null;
   var grid = gridId ? document.getElementById(gridId) : document.querySelector('#panel-'+panelId+' .props-grid');
   if(!grid) return;
@@ -1730,30 +1782,41 @@ function applySearchToPanel(panelId, tipo, zona, ref, maxPrecio){
   cards.forEach(function(card){
     var cardTipo  = (card.dataset.type||'').toLowerCase();
     var cardPrice = parseInt(card.dataset.price)||0;
+    var cardHabs  = parseInt(card.dataset.habs||card.querySelector('.prop-feat strong') ? 0 : 0)||0;
     var cardText  = card.innerText.toLowerCase();
     var cardRef   = card.querySelector('.prop-ref') ? card.querySelector('.prop-ref').innerText.toLowerCase() : '';
 
-    var ok = true;
-    if(tipo   && cardTipo !== tipo)                     ok = false;
-    if(zona   && cardText.indexOf(zona) === -1)         ok = false;
-    if(ref    && cardRef.indexOf(ref)   === -1)         ok = false;
-    if(maxPrecio && cardPrice > parseInt(maxPrecio))    ok = false;
+    // Intentar obtener habitaciones del texto de la tarjeta
+    var habsMatch = cardText.match(/(\d+)\s*hab/);
+    if(habsMatch) cardHabs = parseInt(habsMatch[1]);
 
-    card.style.display = ok ? 'block' : 'none';
+    var ok = true;
+    if(tipo      && cardTipo !== tipo)                  ok = false;
+    if(zona      && cardText.indexOf(zona) === -1)      ok = false;
+    if(ref       && cardRef.indexOf(ref)   === -1)      ok = false;
+    if(maxPrecio && cardPrice > parseInt(maxPrecio))    ok = false;
+    if(minHabs   && cardHabs < minHabs)                 ok = false;
+
+    // Filtrar por características extra
+    activeExtras.forEach(function(extra){
+      if(cardText.indexOf(extra) === -1) ok = false;
+    });
+
+    card.style.display = ok ? '' : 'none';
     if(ok) shown++;
   });
 
+  var hasFilter = tipo||zona||ref||maxPrecio||minHabs||(activeExtras.length>0);
   var infoEl = document.getElementById('sb-'+panelId+'-info');
   if(infoEl){
-    if(tipo||zona||ref||maxPrecio){
+    if(hasFilter){
       infoEl.textContent = shown > 0
         ? shown + ' propiedad' + (shown>1?'es':'') + ' encontrada' + (shown>1?'s':'')
         : 'No se encontraron propiedades con esos criterios';
       infoEl.style.color = shown > 0 ? 'var(--green3)' : '#c0392b';
     } else {
       infoEl.textContent = '';
-      // Restaurar todas al quitar filtros
-      cards.forEach(function(c){c.style.display='block';});
+      cards.forEach(function(c){c.style.display='';});
     }
   }
 }
