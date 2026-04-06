@@ -5,11 +5,10 @@
 //   INMOVILLA_USER   → 5430_244_ext
 //   INMOVILLA_PASS   → tu contraseña
 //   INMOVILLA_AGENCY → 5430
-
+ 
 const INMOVILLA_URL = 'https://apiweb.inmovilla.com/apiweb/apiweb.php';
 const IDIOMA = 1;
-
-// Endpoint auxiliar para detectar la IP pública de Vercel
+ 
 async function getVercelIP() {
   try {
     const r = await fetch('https://api.ipify.org?format=json');
@@ -19,80 +18,85 @@ async function getVercelIP() {
     try {
       const r2 = await fetch('https://ifconfig.me/ip');
       return (await r2.text()).trim();
-    } catch {
-      return 'No se pudo detectar';
-    }
+    } catch { return 'No detectada'; }
   }
-} // 1 = español
-
+}
+ 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   if (req.method === 'OPTIONS') return res.status(200).end();
-
+ 
   const agency = process.env.INMOVILLA_AGENCY || '5430';
   const pass   = process.env.INMOVILLA_PASS;
-  const user   = process.env.INMOVILLA_USER || agency;
-
+ 
   if (!pass) {
     return res.status(500).json({ error: 'Variable INMOVILLA_PASS no configurada en Vercel' });
   }
-
+ 
+  // Construir parámetro igual que apiinmovilla.php
+  const texto  = `${agency};${pass};${IDIOMA};lostipos;paginacion;1;200;;precioinmo`;
+  const encoded = encodeURIComponent(texto);
+  const dominio = 'user7453729-inmob.vercel.app';
+  const body    = `param=${encoded}&elDominio=${dominio}&json=1&ia=`;
+ 
+  // Obtener IP de Vercel para incluirla en el log
+  const vercelIP = await getVercelIP();
+ 
+  // LOG formato compatible con apiinmovilla.log
+  const timestamp = new Date().toISOString().replace('T',' ').substring(0,19);
+  const logRequest  = `${timestamp} - parametros: ${body.replace(pass,'***')} - ip_vercel: ${vercelIP} - dominio: ${dominio}`;
+ 
+  console.log('[Inmovilla LOG REQUEST]', logRequest);
+ 
   try {
-    // Construir el parámetro exactamente como lo hace apiinmovilla.php:
-    // "{numagencia};{password};{idioma};lostipos;paginacion;{posinicial};{numelementos};{where};{orden}"
-    // Pedimos las primeras 200 propiedades disponibles
-    const texto = `${agency};${pass};${IDIOMA};lostipos;paginacion;1;200;;precioinmo`;
-    const encoded = encodeURIComponent(texto);
-
-    // El dominio que enviamos (simula el servidor cliente)
-    const dominio = 'user7453729-inmob.vercel.app';
-
-    const body = `param=${encoded}&elDominio=${dominio}&json=1`;
-
-    console.log('[Inmovilla] Llamando a apiweb.php con agencia:', agency);
-
     const response = await fetch(INMOVILLA_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
         'Accept': 'application/json, text/plain, */*',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'X-Forwarded-For': vercelIP
       },
-      body: body
+      body: body + vercelIP
     });
-
+ 
     const raw = await response.text();
-    console.log('[Inmovilla] Status:', response.status);
-    console.log('[Inmovilla] Respuesta (primeros 300 chars):', raw.substring(0, 300));
-
-    if (!response.ok) {
-      return res.status(502).json({
-        error: `Inmovilla respondió con estado ${response.status}`,
-        detail: raw.substring(0, 400)
+    const logResponse = `${timestamp} - respuesta: ${raw}`;
+    console.log('[Inmovilla LOG RESPONSE]', logResponse);
+ 
+    // Si ?log=1 en la URL, devolver el log completo para enviarlo a Inmovilla
+    if (req.query && req.query.log === '1') {
+      return res.status(200).json({
+        log_request:  logRequest,
+        log_response: logResponse,
+        url_llamada:  INMOVILLA_URL,
+        metodo:       'POST',
+        parametros_enviados: body.replace(pass, '***'),
+        ip_vercel:    vercelIP,
+        dominio:      dominio,
+        http_status:  response.status,
+        respuesta_completa: raw,
+        nota: 'Este es el equivalente al fichero apiinmovilla.log de PHP. Enviar a soporte@inmovilla.com'
       });
     }
-
+ 
     if (!raw || raw.trim().length === 0) {
-      const ip = await getVercelIP();
-      return res.status(502).json({ error: 'Respuesta vacía — IP no autorizada en Inmovilla', vercel_ip: ip });
+      return res.status(502).json({ error: 'Respuesta vacía', vercel_ip: vercelIP });
     }
-
-    // Intentar parsear como JSON
+ 
     let data;
     try {
       data = JSON.parse(raw);
     } catch {
-      // Si Inmovilla pide la IP, detectarla y devolverla
-      const ip = await getVercelIP();
       return res.status(200).json({
         debug: true,
         raw_preview: raw.substring(0, 200),
-        vercel_ip: ip,
-        message: 'Inmovilla solicita autorización de IP. Facilita esta IP a soporte@inmovilla.com: ' + ip
+        vercel_ip: vercelIP,
+        message: 'Inmovilla solicita autorización. IP: ' + vercelIP
       });
     }
-
+ 
     // Normalizar estructura — Inmovilla puede devolver el array directamente
     // o dentro de claves como 'paginacion', 'ofertas', 'inmuebles'
     let list = [];
@@ -113,26 +117,26 @@ export default async function handler(req, res) {
         }
       }
     }
-
+ 
     console.log('[Inmovilla] Propiedades encontradas:', list.length);
-
+ 
     const properties = list
       .filter(p => !p.nodisponible || p.nodisponible == 0)
       .map(p => mapProperty(p, agency));
-
+ 
     res.setHeader('Cache-Control', 's-maxage=1800, stale-while-revalidate');
     return res.status(200).json({
       properties,
       total: properties.length,
       updated: new Date().toISOString()
     });
-
+ 
   } catch (err) {
     console.error('[Inmovilla] Excepción:', err.message);
     return res.status(502).json({ error: 'Error conectando con Inmovilla', detail: err.message });
   }
 }
-
+ 
 function mapProperty(p, agency) {
   const typeMap = {
     1: 'sale', 2: 'rent', 3: 'vacation', 4: 'new_build',
@@ -142,11 +146,11 @@ function mapProperty(p, agency) {
     '1': 'piso', '2': 'piso', '3': 'chalet', '4': 'chalet',
     '5': 'local', '6': 'local', '7': 'chalet', '8': 'piso', '9': 'local'
   };
-
+ 
   const codOfer   = p.cod_ofer || p.codofer || p.id || '';
   const fotoletra = p.fotoletra || p.foto_letra || '';
   const numfotos  = parseInt(p.numfotos) || 0;
-
+ 
   // Construir URLs de fotos según formato oficial Inmovilla
   const images = [];
   if (numfotos > 0 && fotoletra && codOfer) {
@@ -162,11 +166,11 @@ function mapProperty(p, agency) {
         .forEach(f => { if (f.url) images.push(f.url); });
     } catch { /* ignorar */ }
   }
-
+ 
   const keyacci = p.keyacci || p.key_acci || 1;
   const keyTipo = String(p.key_tipo || p.keytipo || '1');
   const price   = parseFloat(p.precioinmo || p.precio || 0);
-
+ 
   return {
     id:               codOfer,
     reference:        p.ref || p.referencia || String(codOfer),
@@ -194,7 +198,7 @@ function mapProperty(p, agency) {
     floor_plan_url:   p.url_plano || p.plano || null,
   };
 }
-
+ 
 function buildTitle(p) {
   const tipos = {
     '1':'Piso','2':'Apartamento','3':'Casa','4':'Chalet',
@@ -204,11 +208,11 @@ function buildTitle(p) {
   const zona = p.zona || p.municipio || 'Pontevedra';
   return `${tipo} en ${zona}`;
 }
-
+ 
 function buildLocation(p) {
   return [p.municipio, p.zona].filter(Boolean).join(' · ') || 'Pontevedra';
 }
-
+ 
 function buildFeatures(p) {
   const f = [];
   if (p.terraza   == 1) f.push('Terraza');
@@ -226,3 +230,4 @@ function buildFeatures(p) {
   if (p.portero   == 1) f.push('Portero automático');
   return f;
 }
+ 
