@@ -1,10 +1,9 @@
 // Vercel Serverless Function — Proxy API Inmovilla con IP fija via Fixie
-// Archivo: /api/properties.js
-//
-// Variables de entorno en Vercel:
-//   INMOVILLA_AGENCY → 5430
-//   INMOVILLA_PASS   → tu contraseña
-//   FIXIE_URL        → http://fixie:mJDyuli9kcV9Uuq@ventoux.usefixie.com:80
+// Usa módulos nativos de Node.js — sin dependencias externas
+ 
+import https from 'https';
+import http from 'http';
+import { URL } from 'url';
  
 const INMOVILLA_URL = 'https://apiweb.inmovilla.com/apiweb/apiweb.php';
 const IDIOMA = 1;
@@ -22,40 +21,22 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Variable INMOVILLA_PASS no configurada en Vercel' });
   }
  
-  // Construir parámetro exactamente como apiinmovilla.php
   const texto   = `${agency};${pass};${IDIOMA};lostipos;paginacion;1;200;;precioinmo`;
   const encoded = encodeURIComponent(texto);
   const dominio = 'user7453729-inmob.vercel.app';
-  const body    = `param=${encoded}&elDominio=${dominio}&json=1`;
+  const postBody = `param=${encoded}&elDominio=${dominio}&json=1`;
  
   console.log('[Inmovilla] Llamando via Fixie proxy...');
  
   try {
-    // Usar undici con proxy SOCKS/HTTP de Fixie para IP fija
-    const { ProxyAgent } = await import('undici');
- 
-    const proxyAgent = new ProxyAgent(fixieUrl);
- 
-    const response = await fetch(INMOVILLA_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Accept': 'application/json, text/plain, */*',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-      },
-      body: body,
-      dispatcher: proxyAgent
-    });
- 
-    const raw = await response.text();
-    console.log('[Inmovilla] Status:', response.status);
+    const raw = await postViaProxy(INMOVILLA_URL, postBody, fixieUrl);
     console.log('[Inmovilla] Respuesta:', raw.substring(0, 200));
  
     if (raw.includes('NECESITAMOS RECIBIR LA IP')) {
       return res.status(502).json({
-        error: 'IP del proxy no autorizada en Inmovilla',
-        detail: 'Facilita las IPs de Fixie a soporte@inmovilla.com',
-        raw: raw
+        error: 'IP del proxy aún no autorizada en Inmovilla',
+        fixie_ips: '54.217.142.99 y 54.195.3.54',
+        detail: 'Espera a que Inmovilla confirme que añadió las IPs de Fixie'
       });
     }
  
@@ -67,14 +48,9 @@ export default async function handler(req, res) {
     try {
       data = JSON.parse(raw);
     } catch {
-      return res.status(200).json({
-        debug: true,
-        raw_preview: raw.substring(0, 300),
-        message: 'Respuesta no es JSON'
-      });
+      return res.status(200).json({ debug: true, raw_preview: raw.substring(0, 300) });
     }
  
-    // Normalizar estructura
     let list = [];
     if (Array.isArray(data)) {
       list = data;
@@ -100,11 +76,52 @@ export default async function handler(req, res) {
   }
 }
  
+// POST a través del proxy HTTP de Fixie usando módulos nativos de Node.js
+function postViaProxy(targetUrl, postData, proxyUrl) {
+  return new Promise((resolve, reject) => {
+    const target = new URL(targetUrl);
+    const proxy  = new URL(proxyUrl);
+ 
+    const auth = `${proxy.username}:${proxy.password}`;
+    const authB64 = Buffer.from(auth).toString('base64');
+ 
+    const options = {
+      host: proxy.hostname,
+      port: parseInt(proxy.port) || 80,
+      method: 'POST',
+      path: targetUrl, // Con proxy HTTP, path es la URL completa
+      headers: {
+        'Host': target.hostname,
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Length': Buffer.byteLength(postData),
+        'Accept': 'application/json, text/plain, */*',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+        'Proxy-Authorization': `Basic ${authB64}`
+      }
+    };
+ 
+    const req = http.request(options, (proxyRes) => {
+      let data = '';
+      proxyRes.on('data', chunk => data += chunk);
+      proxyRes.on('end', () => resolve(data));
+    });
+ 
+    req.on('error', reject);
+    req.setTimeout(15000, () => {
+      req.destroy();
+      reject(new Error('Timeout conectando al proxy'));
+    });
+ 
+    req.write(postData);
+    req.end();
+  });
+}
+ 
 function mapProperty(p, agency) {
-  const typeMap = { 1:'sale', 2:'rent', 3:'vacation', 4:'new_build', '1':'sale','2':'rent','3':'vacation','4':'new_build' };
+  const typeMap    = { 1:'sale',2:'rent',3:'vacation',4:'new_build','1':'sale','2':'rent','3':'vacation','4':'new_build' };
   const subtypeMap = { '1':'piso','2':'piso','3':'chalet','4':'chalet','5':'local','6':'local','7':'chalet','8':'piso','9':'local' };
  
-  const codOfer   = p.cod_ofer || p.codofer || p.id || '';
+  const codOfer  = p.cod_ofer || p.codofer || p.id || '';
   const fotoletra = p.fotoletra || p.foto_letra || '';
   const numfotos  = parseInt(p.numfotos) || 0;
  
@@ -113,12 +130,6 @@ function mapProperty(p, agency) {
     for (let i = 1; i <= Math.min(numfotos, 20); i++) {
       images.push(`https://fotos15.inmovilla.com/${agency}/${codOfer}/${fotoletra}-${i}.jpg`);
     }
-  }
-  if (images.length === 0 && p.fotos) {
-    try {
-      const fotosObj = typeof p.fotos === 'string' ? JSON.parse(p.fotos) : p.fotos;
-      Object.values(fotosObj).sort((a,b)=>(a.posicion||0)-(b.posicion||0)).forEach(f=>{ if(f.url) images.push(f.url); });
-    } catch {}
   }
  
   const keyacci = p.keyacci || p.key_acci || 1;
@@ -179,3 +190,4 @@ function buildFeatures(p) {
   if(p.portero==1)   f.push('Portero automático');
   return f;
 }
+ 
