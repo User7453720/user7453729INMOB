@@ -1,82 +1,113 @@
-// Vercel Serverless Function — Reenvío de formularios
-// Archivo: /api/contact.js
+// Vercel Serverless Function — Formulario de contacto
+// Usa Web3Forms (gratuito, sin verificación de dominio)
 //
-// Envía el formulario a DOS destinos:
-//   1. comercial@inmobiliariapedrosa.com  (email propio)
-//   2. i.inmobiliariapedrosa.5430.3@inmovilla.com  (CRM Inmovilla)
+// Variables de entorno en Vercel:
+//   WEB3FORMS_KEY   → tu clave de Web3Forms (ver instrucciones abajo)
+//   CONTACT_EMAIL_2 → i.inmobiliariapedrosa.5430.3@inmovilla.com
 //
-// Variables de entorno en Vercel (Settings → Environment Variables):
-//   CONTACT_EMAIL_1  → comercial@inmobiliariapedrosa.com
-//   CONTACT_EMAIL_2  → i.inmobiliariapedrosa.5430.3@inmovilla.com
-//   FORMSPREE_ID     → mwvrgvqd
-
+// Para obtener tu clave gratuita de Web3Forms:
+//   1. Ve a https://web3forms.com
+//   2. Escribe comercial@inmobiliariapedrosa.com
+//   3. Pulsa "Create Access Key"
+//   4. Copia la clave y añádela en Vercel como WEB3FORMS_KEY
+ 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+ 
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Método no permitido' });
-
+ 
   try {
-    const body = req.body || {};
-
-    // Enriquecer con metadata
-    const enriched = {
-      ...body,
-      _fecha: new Date().toLocaleString('es-ES', { timeZone: 'Europe/Madrid' }),
-      _origen: 'Web Inmobiliaria Pedrosa',
-      _url: 'https://user7453729-inmob.vercel.app'
+    let body = req.body || {};
+    if (typeof body === 'string') {
+      try { body = JSON.parse(body); } catch {
+        body = Object.fromEntries(new URLSearchParams(body));
+      }
+    }
+ 
+    const web3key   = process.env.WEB3FORMS_KEY;
+    const emailCRM  = process.env.CONTACT_EMAIL_2 || 'i.inmobiliariapedrosa.5430.3@inmovilla.com';
+ 
+    if (!web3key) {
+      // Si no hay clave configurada, intentar Formspree como fallback
+      return await sendViaFormspree(req, res, body, emailCRM);
+    }
+ 
+    const payload = {
+      access_key: web3key,
+      subject: `Nuevo contacto web: ${body.nombre || 'Sin nombre'} — ${body.interes || 'Consulta'}`,
+      from_name: 'Web Inmobiliaria Pedrosa',
+      replyto: body.email || '',
+      nombre:   body.nombre   || '',
+      telefono: body.telefono || '',
+      email:    body.email    || '',
+      interes:  body.interes  || '',
+      mensaje:  body.mensaje  || body.message || '',
+      cc:       emailCRM,
+      fecha:    new Date().toLocaleString('es-ES', { timeZone: 'Europe/Madrid' })
     };
-
-    const results = [];
-
-    // ── Envío 1: Formspree (reenvía a comercial@inmobiliariapedrosa.com) ──
-    const formspreeId = process.env.FORMSPREE_ID || 'mwvrgvqd';
-    try {
-      const r1 = await fetch(`https://formspree.io/f/${formspreeId}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify(enriched)
-      });
-      results.push({ destino: 'comercial', ok: r1.ok, status: r1.status });
-      console.log('[Contact] Formspree:', r1.status);
-    } catch (e) {
-      results.push({ destino: 'comercial', ok: false, error: e.message });
-    }
-
-    // ── Envío 2: Email interno Inmovilla via Formspree con email override ──
-    // Inmovilla acepta leads por email — enviamos una copia al CRM
-    const inmobillaEmail = process.env.CONTACT_EMAIL_2 || 'i.inmobiliariapedrosa.5430.3@inmovilla.com';
-    try {
-      // Usamos el mismo Formspree pero con _replyto al email de Inmovilla
-      // para que llegue como lead al CRM
-      const inmovilla_payload = {
-        ...enriched,
-        _replyto: enriched.email || '',
-        _subject: `Nuevo lead web: ${enriched.nombre || 'Sin nombre'} — ${enriched.interes || 'Consulta general'}`,
-        _cc: inmobillaEmail,
-      };
-      const r2 = await fetch(`https://formspree.io/f/${formspreeId}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify(inmovilla_payload)
-      });
-      results.push({ destino: 'inmovilla_crm', ok: r2.ok, status: r2.status });
-      console.log('[Contact] Inmovilla CRM:', r2.status);
-    } catch (e) {
-      results.push({ destino: 'inmovilla_crm', ok: false, error: e.message });
-    }
-
-    // Respuesta: éxito si al menos uno llegó correctamente
-    const anyOk = results.some(r => r.ok);
-    if (anyOk) {
-      return res.status(200).json({ ok: true, results });
+ 
+    console.log('[Contact] Enviando via Web3Forms');
+ 
+    const response = await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+ 
+    const data = await response.json();
+    console.log('[Contact] Web3Forms response:', response.status, JSON.stringify(data));
+ 
+    if (response.ok && data.success) {
+      return res.status(200).json({ ok: true, message: 'Mensaje enviado correctamente' });
     } else {
-      return res.status(500).json({ ok: false, results });
+      console.error('[Contact] Web3Forms error:', data);
+      return res.status(500).json({ ok: false, error: data.message || 'Error al enviar' });
     }
-
+ 
   } catch (err) {
-    console.error('[Contact] Error:', err.message);
-    return res.status(500).json({ error: err.message });
+    console.error('[Contact] Excepción:', err.message);
+    return res.status(500).json({ ok: false, error: err.message });
   }
 }
+ 
+async function sendViaFormspree(req, res, body, emailCRM) {
+  const formspreeId = process.env.FORMSPREE_ID || '6f4ea264-2063-40c0-b494-e14caf544e47';
+ 
+  const payload = {
+    nombre:   body.nombre   || '',
+    telefono: body.telefono || '',
+    email:    body.email    || '',
+    interes:  body.interes  || '',
+    mensaje:  body.mensaje  || '',
+    _subject: `Nuevo contacto: ${body.nombre || 'Sin nombre'}`,
+    _replyto: body.email || '',
+    _cc:      emailCRM
+  };
+ 
+  try {
+    const r = await fetch(`https://formspree.io/f/${formspreeId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Referer': 'https://user7453729-inmob.vercel.app'
+      },
+      body: JSON.stringify(payload)
+    });
+ 
+    const text = await r.text();
+    console.log('[Contact] Formspree fallback:', r.status, text.substring(0, 200));
+ 
+    if (r.ok) {
+      return res.status(200).json({ ok: true });
+    } else {
+      return res.status(500).json({ ok: false, detail: text.substring(0, 200) });
+    }
+  } catch (err) {
+    return res.status(500).json({ ok: false, error: err.message });
+  }
+}
+ 
