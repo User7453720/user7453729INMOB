@@ -1,7 +1,5 @@
-// Vercel Serverless Function — Proxy API Inmovilla con Fixie (HTTPS tunnel correcto)
-import http from 'http';
-import https from 'https';
-import { URL } from 'url';
+// Vercel Serverless Function — Proxy API Inmovilla con Fixie
+// Usa http_proxy environment variable que Node.js respeta nativamente
 
 const INMOVILLA_URL = 'https://apiweb.inmovilla.com/apiweb/apiweb.php';
 const IDIOMA = 1;
@@ -22,6 +20,12 @@ export default async function handler(req, res) {
 
   if (!pass) return res.status(500).json({ error: 'INMOVILLA_PASS no configurada' });
 
+  // Configurar proxy a nivel de proceso usando variables de entorno
+  // que el módulo https de Node.js respeta automáticamente
+  process.env.HTTPS_PROXY = fixieUrl;
+  process.env.HTTP_PROXY  = fixieUrl;
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
   const results = [];
 
   for (const dominio of DOMINIOS) {
@@ -30,7 +34,8 @@ export default async function handler(req, res) {
     const postBody = `param=${encoded}&elDominio=${dominio}&json=1`;
 
     try {
-      const raw = await postViaProxyTunnel(INMOVILLA_URL, postBody, fixieUrl);
+      // Usar node-fetch que respeta HTTPS_PROXY automáticamente
+      const raw = await fetchWithProxy(INMOVILLA_URL, postBody, fixieUrl);
       const preview = raw.substring(0, 150);
       const isOk = !raw.includes('NECESITAMOS') && raw.length > 20;
 
@@ -53,75 +58,24 @@ export default async function handler(req, res) {
   });
 }
 
-// HTTPS a través de proxy usando CONNECT tunnel (método correcto para SSL)
-function postViaProxyTunnel(targetUrl, postData, proxyUrl) {
-  return new Promise((resolve, reject) => {
-    const target = new URL(targetUrl);
-    const proxy  = new URL(proxyUrl);
-    const auth   = Buffer.from(`${proxy.username}:${proxy.password}`).toString('base64');
+// Fetch usando https-proxy-agent que maneja correctamente HTTPS a través de proxy
+async function fetchWithProxy(url, postData, proxyUrl) {
+  const { HttpsProxyAgent } = await import('https-proxy-agent');
+  const agent = new HttpsProxyAgent(proxyUrl);
 
-    // Paso 1: establecer tunnel CONNECT con el proxy
-    const connectReq = http.request({
-      host: proxy.hostname,
-      port: parseInt(proxy.port) || 80,
-      method: 'CONNECT',
-      path: `${target.hostname}:443`,
-      headers: {
-        'Host': `${target.hostname}:443`,
-        'Proxy-Authorization': `Basic ${auth}`
-      }
-    });
-
-    connectReq.setTimeout(10000, () => {
-      connectReq.destroy();
-      reject(new Error('Timeout en CONNECT'));
-    });
-
-    connectReq.on('connect', (connectRes, socket) => {
-      if (connectRes.statusCode !== 200) {
-        socket.destroy();
-        reject(new Error(`Proxy CONNECT falló: ${connectRes.statusCode}`));
-        return;
-      }
-
-      // Paso 2: hacer la petición HTTPS real a través del tunnel
-      const tlsSocket = require('tls').connect({
-        socket,
-        servername: target.hostname,
-        rejectUnauthorized: false
-      }, () => {
-        const postReq = [
-          `POST ${target.pathname} HTTP/1.1`,
-          `Host: ${target.hostname}`,
-          'Content-Type: application/x-www-form-urlencoded',
-          `Content-Length: ${Buffer.byteLength(postData)}`,
-          'Accept: application/json, text/plain, */*',
-          'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
-          'Connection: close',
-          '',
-          postData
-        ].join('\r\n');
-
-        tlsSocket.write(postReq);
-      });
-
-      let rawResponse = '';
-      tlsSocket.on('data', chunk => rawResponse += chunk.toString());
-      tlsSocket.on('end', () => {
-        // Extraer body de la respuesta HTTP
-        const bodyStart = rawResponse.indexOf('\r\n\r\n');
-        const body = bodyStart !== -1 ? rawResponse.substring(bodyStart + 4) : rawResponse;
-        // Manejar chunked encoding si es necesario
-        const cleanBody = body.replace(/^[0-9a-f]+\r\n/gim, '').replace(/\r\n0\r\n\r\n$/,'').trim();
-        resolve(cleanBody || body.trim());
-      });
-      tlsSocket.on('error', reject);
-      tlsSocket.setTimeout(10000, () => { tlsSocket.destroy(); reject(new Error('Timeout TLS')); });
-    });
-
-    connectReq.on('error', reject);
-    connectReq.end();
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Accept': 'application/json, text/plain, */*',
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+    },
+    body: postData,
+    agent: agent,
+    signal: AbortSignal.timeout(15000)
   });
+
+  return response.text();
 }
 
 async function serveProperties(res, raw, agency, dominioUsado) {
@@ -145,7 +99,12 @@ async function serveProperties(res, raw, agency, dominioUsado) {
     .map(p => mapProperty(p, agency));
 
   res.setHeader('Cache-Control', 's-maxage=1800, stale-while-revalidate');
-  return res.status(200).json({ properties, total: properties.length, updated: new Date().toISOString(), dominio_usado: dominioUsado });
+  return res.status(200).json({
+    properties,
+    total: properties.length,
+    updated: new Date().toISOString(),
+    dominio_usado: dominioUsado
+  });
 }
 
 function mapProperty(p, agency) {
