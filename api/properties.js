@@ -1,13 +1,12 @@
-// Vercel Serverless Function — Proxy API Inmovilla con Fixie
-// Usa http_proxy environment variable que Node.js respeta nativamente
+// Diagnóstico definitivo — qué IP ve realmente Inmovilla
+// Compara IP sin proxy vs IP con proxy usando el mismo servicio externo
+
+import http from 'http';
+import https from 'https';
+import { URL } from 'url';
 
 const INMOVILLA_URL = 'https://apiweb.inmovilla.com/apiweb/apiweb.php';
 const IDIOMA = 1;
-const DOMINIOS = [
-  'inmobiliariapedrosa.com',
-  'www.inmobiliariapedrosa.com',
-  'user7453729-inmob.vercel.app',
-];
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -20,125 +19,169 @@ export default async function handler(req, res) {
 
   if (!pass) return res.status(500).json({ error: 'INMOVILLA_PASS no configurada' });
 
-  // Configurar proxy a nivel de proceso usando variables de entorno
-  // que el módulo https de Node.js respeta automáticamente
-  process.env.HTTPS_PROXY = fixieUrl;
-  process.env.HTTP_PROXY  = fixieUrl;
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+  // 1. IP sin proxy (la que ve cualquier servidor sin proxy)
+  let ipSinProxy = 'desconocida';
+  try {
+    const r = await fetchDirect('https://api.ipify.org?format=json');
+    ipSinProxy = JSON.parse(r).ip;
+  } catch(e) { ipSinProxy = 'error: '+e.message; }
 
-  const results = [];
+  // 2. IP con proxy Fixie via tunnel CONNECT correcto
+  let ipConProxy = 'desconocida';
+  try {
+    const r = await fetchViaTunnel('https://api.ipify.org?format=json', '', fixieUrl, 'GET');
+    ipConProxy = JSON.parse(r).ip;
+  } catch(e) { ipConProxy = 'error: '+e.message; }
 
-  for (const dominio of DOMINIOS) {
-    const texto    = `${agency};${pass};${IDIOMA};lostipos;paginacion;1;200;;precioinmo`;
-    const encoded  = encodeURIComponent(texto);
-    const postBody = `param=${encoded}&elDominio=${dominio}&json=1`;
+  // 3. Probar Inmovilla con proxy
+  const texto    = `${agency};${pass};${IDIOMA};lostipos;paginacion;1;200;;precioinmo`;
+  const encoded  = encodeURIComponent(texto);
+  const postBody = `param=${encoded}&elDominio=inmobiliariapedrosa.com&json=1`;
 
-    try {
-      // Usar node-fetch que respeta HTTPS_PROXY automáticamente
-      const raw = await fetchWithProxy(INMOVILLA_URL, postBody, fixieUrl);
-      const preview = raw.substring(0, 150);
-      const isOk = !raw.includes('NECESITAMOS') && raw.length > 20;
+  let inmobillaResp = '';
+  try {
+    inmobillaResp = await fetchViaTunnel(INMOVILLA_URL, postBody, fixieUrl, 'POST');
+  } catch(e) { inmobillaResp = 'error: '+e.message; }
 
-      results.push({ dominio, ok: isOk, preview });
-      console.log(`[Inmovilla] dominio=${dominio} ok=${isOk} resp=${preview}`);
+  return res.status(200).json({
+    ip_sin_proxy: ipSinProxy,
+    ip_con_proxy: ipConProxy,
+    fixie_ips_esperadas: ['54.217.142.99', '54.195.3.54'],
+    proxy_correcto: ['54.217.142.99','54.195.3.54'].includes(ipConProxy),
+    inmovilla_respuesta: inmobillaResp.substring(0, 200),
+    inmovilla_ok: !inmobillaResp.includes('NECESITAMOS') && inmobillaResp.length > 10
+  });
+}
 
-      if (isOk) {
-        return await serveProperties(res, raw, agency, dominio);
+// Fetch directo sin proxy
+function fetchDirect(url) {
+  return new Promise((resolve, reject) => {
+    https.get(url, r => {
+      let d = '';
+      r.on('data', c => d += c);
+      r.on('end', () => resolve(d));
+    }).on('error', reject);
+  });
+}
+
+// Fetch a través de proxy usando CONNECT tunnel (único método correcto para HTTPS)
+function fetchViaTunnel(targetUrl, postData, proxyUrl, method) {
+  return new Promise((resolve, reject) => {
+    const target  = new URL(targetUrl);
+    const proxy   = new URL(proxyUrl);
+    const auth    = Buffer.from(`${proxy.username}:${proxy.password}`).toString('base64');
+    const port    = parseInt(proxy.port) || 80;
+
+    // Construir petición CONNECT
+    const connectStr = [
+      `CONNECT ${target.hostname}:443 HTTP/1.1`,
+      `Host: ${target.hostname}:443`,
+      `Proxy-Authorization: Basic ${auth}`,
+      `User-Agent: Mozilla/5.0`,
+      '',
+      ''
+    ].join('\r\n');
+
+    const socket = require('net').createConnection(port, proxy.hostname, () => {
+      socket.write(connectStr);
+    });
+
+    socket.setTimeout(15000, () => { socket.destroy(); reject(new Error('Timeout socket')); });
+    socket.on('error', reject);
+
+    let connectBuf = '';
+    socket.on('data', chunk => {
+      connectBuf += chunk.toString();
+
+      // Esperar respuesta del CONNECT
+      if (connectBuf.includes('\r\n\r\n')) {
+        const statusLine = connectBuf.split('\r\n')[0];
+        const statusCode = parseInt(statusLine.split(' ')[1]);
+
+        if (statusCode !== 200) {
+          socket.destroy();
+          reject(new Error(`CONNECT rechazado: ${statusLine}`));
+          return;
+        }
+
+        // Tunnel establecido — hacer TLS sobre el socket
+        socket.removeAllListeners('data');
+
+        const tlsSocket = require('tls').connect({
+          socket,
+          servername: target.hostname,
+          rejectUnauthorized: false
+        });
+
+        tlsSocket.on('secureConnect', () => {
+          // Construir petición HTTP
+          let httpReq;
+          if (method === 'POST') {
+            httpReq = [
+              `POST ${target.pathname} HTTP/1.1`,
+              `Host: ${target.hostname}`,
+              `Content-Type: application/x-www-form-urlencoded`,
+              `Content-Length: ${Buffer.byteLength(postData)}`,
+              `Accept: application/json, text/plain, */*`,
+              `User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)`,
+              `Connection: close`,
+              '',
+              postData
+            ].join('\r\n');
+          } else {
+            httpReq = [
+              `GET ${target.pathname}${target.search} HTTP/1.1`,
+              `Host: ${target.hostname}`,
+              `Accept: application/json`,
+              `User-Agent: Mozilla/5.0`,
+              `Connection: close`,
+              '',
+              ''
+            ].join('\r\n');
+          }
+
+          tlsSocket.write(httpReq);
+        });
+
+        let response = '';
+        tlsSocket.on('data', d => response += d.toString());
+        tlsSocket.on('end', () => {
+          // Extraer body HTTP
+          const sep = response.indexOf('\r\n\r\n');
+          if (sep === -1) { resolve(response); return; }
+
+          const headers = response.substring(0, sep);
+          let body = response.substring(sep + 4);
+
+          // Dechunkear si es chunked
+          if (headers.toLowerCase().includes('transfer-encoding: chunked')) {
+            body = dechunk(body);
+          }
+
+          resolve(body.trim());
+        });
+        tlsSocket.on('error', reject);
+        tlsSocket.setTimeout(15000, () => { tlsSocket.destroy(); reject(new Error('Timeout TLS')); });
       }
-    } catch (err) {
-      results.push({ dominio, ok: false, error: err.message });
-      console.log(`[Inmovilla] dominio=${dominio} ERROR: ${err.message}`);
-    }
-  }
-
-  return res.status(200).json({
-    status: 'ninguna_combinacion_funciono',
-    fixie_ips: '54.217.142.99 y 54.195.3.54',
-    resultados: results
+    });
   });
 }
 
-// Fetch usando https-proxy-agent que maneja correctamente HTTPS a través de proxy
-async function fetchWithProxy(url, postData, proxyUrl) {
-  const { HttpsProxyAgent } = await import('https-proxy-agent');
-  const agent = new HttpsProxyAgent(proxyUrl);
-
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      'Accept': 'application/json, text/plain, */*',
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-    },
-    body: postData,
-    agent: agent,
-    signal: AbortSignal.timeout(15000)
-  });
-
-  return response.text();
-}
-
-async function serveProperties(res, raw, agency, dominioUsado) {
-  let data;
-  try { data = JSON.parse(raw); } catch {
-    return res.status(200).json({ debug: true, raw_preview: raw.substring(0, 300), dominio_ok: dominioUsado });
+function dechunk(data) {
+  let result = '';
+  let pos = 0;
+  while (pos < data.length) {
+    const lineEnd = data.indexOf('\r\n', pos);
+    if (lineEnd === -1) break;
+    const size = parseInt(data.substring(pos, lineEnd), 16);
+    if (isNaN(size) || size === 0) break;
+    result += data.substring(lineEnd + 2, lineEnd + 2 + size);
+    pos = lineEnd + 2 + size + 2;
   }
-
-  let list = [];
-  if (Array.isArray(data)) {
-    list = data;
-  } else {
-    for (const key of ['paginacion','ofertas','inmuebles','properties','data']) {
-      if (data[key] && Array.isArray(data[key])) { list = data[key]; break; }
-      if (data[key] && typeof data[key] === 'object') { list = Object.values(data[key]); break; }
-    }
-  }
-
-  const properties = list
-    .filter(p => !p.nodisponible || p.nodisponible == 0)
-    .map(p => mapProperty(p, agency));
-
-  res.setHeader('Cache-Control', 's-maxage=1800, stale-while-revalidate');
-  return res.status(200).json({
-    properties,
-    total: properties.length,
-    updated: new Date().toISOString(),
-    dominio_usado: dominioUsado
-  });
+  return result || data;
 }
 
-function mapProperty(p, agency) {
-  const typeMap    = { 1:'sale',2:'rent',3:'vacation',4:'new_build','1':'sale','2':'rent','3':'vacation','4':'new_build' };
-  const subtypeMap = { '1':'piso','2':'piso','3':'chalet','4':'chalet','5':'local','6':'local','7':'chalet','8':'piso','9':'local' };
-  const codOfer   = p.cod_ofer||p.codofer||p.id||'';
-  const fotoletra = p.fotoletra||p.foto_letra||'';
-  const numfotos  = parseInt(p.numfotos)||0;
-  const images    = [];
-  if (numfotos>0&&fotoletra&&codOfer) {
-    for (let i=1;i<=Math.min(numfotos,20);i++) images.push(`https://fotos15.inmovilla.com/${agency}/${codOfer}/${fotoletra}-${i}.jpg`);
-  }
-  const keyacci = p.keyacci||p.key_acci||1;
-  const keyTipo = String(p.key_tipo||p.keytipo||'1');
-  const price   = parseFloat(p.precioinmo||p.precio||0);
-  return {
-    id:codOfer, reference:p.ref||String(codOfer), type:typeMap[keyacci]||'sale',
-    subtype:subtypeMap[keyTipo]||'piso', title:buildTitle(p), description:p.observaciones||p.descripcion||'',
-    price, price_night:parseFloat(p.precio_noche||0)||null, location:buildLocation(p),
-    address:[p.calle,p.numero,p.municipio].filter(Boolean).join(', '),
-    bedrooms:parseInt(p.habitaciones)||0, bathrooms:parseInt(p.banyos||p.banios)||0,
-    surface:parseInt(p.superficie||p.sup_cons)||0, floor:(p.planta!=null&&p.planta!=='')?`${p.planta}º`:'',
-    garage:p.garaje==1||p.parking==1, lift:p.ascensor==1, year:p.antiquedad||'',
-    exclusive:p.exclusiva==1, available:true, features:buildFeatures(p), images,
-    video_url:p.video||p.url_video||null, virtual_tour_url:p.url_tour||null, floor_plan_url:p.url_plano||null,
-  };
-}
-function buildTitle(p){const t={'1':'Piso','2':'Apartamento','3':'Casa','4':'Chalet','5':'Local','6':'Oficina','7':'Adosado','8':'Estudio','9':'Nave'};return `${t[String(p.key_tipo||'1')]||'Inmueble'} en ${p.zona||p.municipio||'Pontevedra'}`;}
-function buildLocation(p){return [p.municipio,p.zona].filter(Boolean).join(' · ')||'Pontevedra';}
-function buildFeatures(p){
-  const f=[];
-  if(p.terraza==1)f.push('Terraza');if(p.jardin==1)f.push('Jardín');if(p.piscina==1)f.push('Piscina');
-  if(p.garaje==1)f.push('Garaje');if(p.parking==1)f.push('Parking');if(p.ascensor==1)f.push('Ascensor');
-  if(p.trastero==1)f.push('Trastero');if(p.aire_con==1)f.push('Aire acondicionado');
-  if(p.amueblado==1)f.push('Amueblado');if(p.armarios==1)f.push('Armarios');if(p.alarma==1)f.push('Alarma');
-  return f;
-}
+function mapProperty(p, agency) { return p; }
+function buildTitle(p) { return ''; }
+function buildLocation(p) { return ''; }
+function buildFeatures(p) { return []; }
