@@ -54,8 +54,21 @@ export default async function handler(req, res) {
   // 4. Probar todos los dominios con Inmovilla
   const results = [];
   for (const dominio of DOMINIOS) {
+    // Construir parámetro exactamente como PHP rawurlencode
+    // PHP rawurlencode NO codifica: letras, números, _, ., -, ~
+    // JavaScript encodeURIComponent NO codifica: letras, números, _, ., !, ~, *, ', (, )
+    // La diferencia clave: PHP sí codifica ! pero JS no... pero rawurlencode de PHP
+    // es equivalente a encodeURIComponent en JS excepto que PHP codifica ! y JS no.
+    // Inmovilla usa PHP rawurlencode, así que debemos replicarlo exactamente:
+    const rawurlencode = (str) => encodeURIComponent(str)
+      .replace(/!/g, '%21')   // PHP sí codifica !
+      .replace(/'/g, '%27')   // PHP sí codifica '
+      .replace(/\(/g, '%28')  // PHP sí codifica (
+      .replace(/\)/g, '%29')  // PHP sí codifica )
+      .replace(/\*/g, '%2A'); // PHP sí codifica *
+
     const texto    = `${agency};${pass};${IDIOMA};lostipos;paginacion;1;200;;precioinmo`;
-    const encoded  = encodeURIComponent(texto);
+    const encoded  = rawurlencode(texto);
     const postBody = `param=${encoded}&elDominio=${dominio}&json=1`;
 
     try {
