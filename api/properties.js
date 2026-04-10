@@ -176,6 +176,9 @@ async function runFullDiagnostic(req, res, agency, pass, fixieUrl) {
 
 // ── COMBINACIONES DE PARÁMETROS ───────────────────────────────────────────
 function buildCombos(agency, pass, idioma) {
+  // El identificador completo para la API es el usuario completo (ej: 5430_244_ext)
+  // El número de agencia para las fotos es solo el número (ej: 5430)
+  const agencyNum = agency.split('_')[0]; // extrae solo el número: 5430
   const base = `${agency};${pass};${idioma};lostipos;paginacion;1;200;;precioinmo`;
 
   // PHP rawurlencode equivalente exacto
@@ -306,6 +309,7 @@ function dechunk(data) {
 }
 
 async function serveProperties(res, raw, agency) {
+  const agencyNum = agency.split('_')[0]; // solo el número para URLs de fotos
   let data;
   try { data = JSON.parse(raw); }
   catch { return res.status(200).json({ debug: true, raw_preview: raw.substring(0, 500) }); }
@@ -319,7 +323,7 @@ async function serveProperties(res, raw, agency) {
     }
   }
 
-  const properties = list.filter(p => !p.nodisponible||p.nodisponible==0).map(p => mapProperty(p, agency));
+  const properties = list.filter(p => !p.nodisponible||p.nodisponible==0).map(p => mapProperty(p, agencyNum));
   res.setHeader('Cache-Control', 's-maxage=1800, stale-while-revalidate');
   return res.status(200).json({ properties, total: properties.length, updated: new Date().toISOString() });
 }
