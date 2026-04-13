@@ -1,0 +1,10 @@
+{
+  "functions": {
+    "api/properties.js": {
+      "maxDuration": 60
+    },
+    "api/log.js": {
+      "maxDuration": 60
+    }
+  }
+}
