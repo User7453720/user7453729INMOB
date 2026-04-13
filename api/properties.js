@@ -44,8 +44,12 @@ export default async function handler(req, res) {
       const postBody = 'param='+phpRaw(texto)+'&elDominio=inmobiliariapedrosa.com&json=1&ia='+ip;
       try {
         const raw = await fetchViaTunnel(INMOVILLA_URL, postBody, fixieUrl, 'POST');
-        if (!raw.includes('NECESITAMOS') && raw.trim().startsWith('[')) return raw;
-      } catch(e) {}
+        const trimmed = raw.trim();
+        console.log(`[tryFetch] keyacci=${keyacci} intento=${i+1} ip=${ip} inicio="${trimmed.substring(0,60)}"`);
+        if (!trimmed.includes('NECESITAMOS') && trimmed.length > 50) return raw;
+      } catch(e) {
+        console.error(`[tryFetch] keyacci=${keyacci} intento=${i+1} error: ${e.message}`);
+      }
     }
     return null;
   }
