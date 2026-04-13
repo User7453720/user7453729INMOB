@@ -183,7 +183,8 @@ function buildCombos(agency, pass, idioma) {
 
   // PHP rawurlencode equivalente exacto
   const phpRaw = (s) => encodeURIComponent(s)
-    .replace(/!/g,'%21').replace(/'/g,'%27')
+    .replace(/%21/g,'!')  // PHP rawurlencode NO codifica !
+    .replace(/'/g,'%27')
     .replace(/\(/g,'%28').replace(/\)/g,'%29').replace(/\*/g,'%2A');
 
   return [
