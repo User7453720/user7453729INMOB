@@ -1635,6 +1635,8 @@ function activateTab(id){
 }
 function goTab(id){
   var pp=['compra','alquiler-general','alquiler-est','vacacional','promociones'];
+  // Guardar estado en el hash para que al recargar vuelva al mismo panel
+  history.replaceState(null,'','#'+id);
   if(id==='inicio'){showPage('inicio');activateTab('inicio');}
   else if(id==='captacion'){showPage('captacion');activateTab('captacion');}
   else if(id==='blog'){showPage('blog');activateTab('blog');window.scrollTo({top:0,behavior:'smooth'});}
@@ -1646,6 +1648,11 @@ function goTab(id){
   }
   return false;
 }
+// Restaurar panel al cargar según el hash
+(function(){
+  var hash=window.location.hash.replace('#','');
+  if(hash&&hash!=='inicio'){setTimeout(function(){goTab(hash);},300);}
+})();
 
 // ── FILTERS ──
 function filterG(grid,type,btn){
