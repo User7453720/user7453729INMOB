@@ -334,9 +334,15 @@ async function serveProperties(res, raw, agency) {
 
   const properties = list.filter(p => !p.nodisponible||p.nodisponible==0).map(p => mapProperty(p, agencyNum));
   res.setHeader('Cache-Control', 's-maxage=1800, stale-while-revalidate');
-  // Añadir muestra raw del primer inmueble para diagnóstico de campos
-  const raw_sample = list[0] ? Object.keys(list[0]).sort().reduce((acc,k)=>{ acc[k]=list[0][k]; return acc; },{}) : null;
-  return res.status(200).json({ properties, total: properties.length, updated: new Date().toISOString(), _raw_sample: raw_sample });
+  // Debug: mostrar estructura completa del raw
+  const _debug = {
+    total_list: list.length,
+    data_keys: Object.keys(data),
+    first_item_keys: list[0] ? Object.keys(list[0]) : [],
+    first_item: list[0] || null,
+    raw_preview: raw.substring(0, 800)
+  };
+  return res.status(200).json({ properties, total: properties.length, updated: new Date().toISOString(), _debug });
 }
 
 function mapProperty(p, agency) {
