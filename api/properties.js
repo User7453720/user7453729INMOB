@@ -334,7 +334,9 @@ async function serveProperties(res, raw, agency) {
 
   const properties = list.filter(p => !p.nodisponible||p.nodisponible==0).map(p => mapProperty(p, agencyNum));
   res.setHeader('Cache-Control', 's-maxage=1800, stale-while-revalidate');
-  return res.status(200).json({ properties, total: properties.length, updated: new Date().toISOString() });
+  // Añadir muestra raw del primer inmueble para diagnóstico de campos
+  const raw_sample = list[0] ? Object.keys(list[0]).sort().reduce((acc,k)=>{ acc[k]=list[0][k]; return acc; },{}) : null;
+  return res.status(200).json({ properties, total: properties.length, updated: new Date().toISOString(), _raw_sample: raw_sample });
 }
 
 function mapProperty(p, agency) {
@@ -345,7 +347,7 @@ function mapProperty(p, agency) {
   const imgs = [];
   if (nf>0&&fl&&cod) for(let i=1;i<=Math.min(nf,20);i++) imgs.push(`https://fotos15.apinmo.com/${agency}/${cod}/${fl}-${i}.jpg`);
 
-  const tipo = p.keyacci||p.key_acci||2;
+  const tipo = p.keyacci||p.key_acci||p.tipooper||p.tipo_oper||p.operacion||1;
   // Precio: precioinmo para venta, precioalq para alquiler
   const price = parseFloat(p.precioinmo)||parseFloat(p.precioalq)||parseFloat(p.precio)||0;
 
