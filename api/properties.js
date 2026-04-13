@@ -343,7 +343,7 @@ function mapProperty(p, agency) {
   const fl  = p.fotoletra||p.foto_letra||'';
   const nf  = parseInt(p.numfotos)||0;
   const imgs = [];
-  if (nf>0&&fl&&cod) for(let i=1;i<=Math.min(nf,20);i++) imgs.push(`https://fotos15.inmovilla.com/${agency}/${cod}/${fl}-${i}.jpg`);
+  if (nf>0&&fl&&cod) for(let i=1;i<=Math.min(nf,20);i++) imgs.push(`https://fotos15.apinmo.com/${agency}/${cod}/${fl}-${i}.jpg`);
 
   const tipo = p.keyacci||p.key_acci||2;
   // Precio: precioinmo para venta, precioalq para alquiler
