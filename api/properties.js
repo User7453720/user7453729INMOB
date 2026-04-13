@@ -28,30 +28,32 @@ export default async function handler(req, res) {
   }
 
   // ── PRODUCCIÓN ──────────────────────────────────────────────────────────
-  // Obtener IP del proxy para el parámetro &ia=
-  let ipProxy = '54.217.142.99';
-  try {
-    const r = await fetchViaTunnel('https://api.ipify.org', '?format=json', fixieUrl, 'GET');
-    ipProxy = JSON.parse(r).ip;
-  } catch(e) { /* usar fallback */ }
-
-  // PHP rawurlencode EXACTO
   const phpRaw = (s) => s.split('').map(c => {
     if (/[A-Za-z0-9_.\-~]/.test(c)) return c;
     return '%' + c.charCodeAt(0).toString(16).toUpperCase();
   }).join('');
 
   const texto = `${agency};${pass};${IDIOMA};lostipos;paginacion;1;200;;precioinmo`;
-  const postBody = `param=${phpRaw(texto)}&elDominio=inmobiliariapedrosa.com&json=1&ia=${ipProxy}`;
 
-  try {
-    const raw = await fetchViaTunnel(INMOVILLA_URL, postBody, fixieUrl, 'POST');
-    if (!raw.includes('NECESITAMOS') && raw.trim().length > 20) {
-      return await serveProperties(res, raw, agency);
+  // Reintentar hasta 5 veces — Fixie rota entre IPs y solo una está activa en Inmovilla
+  for (let intento = 0; intento < 5; intento++) {
+    let ipProxy = '54.217.142.99';
+    try {
+      const r = await fetchViaTunnel('https://api.ipify.org', '?format=json', fixieUrl, 'GET');
+      ipProxy = JSON.parse(r).ip;
+    } catch(e) { /* usar fallback */ }
+
+    const postBody = `param=${phpRaw(texto)}&elDominio=inmobiliariapedrosa.com&json=1&ia=${ipProxy}`;
+
+    try {
+      const raw = await fetchViaTunnel(INMOVILLA_URL, postBody, fixieUrl, 'POST');
+      if (!raw.includes('NECESITAMOS') && raw.trim().length > 20) {
+        return await serveProperties(res, raw, agency);
+      }
+      console.log(`[Inmovilla] Intento ${intento+1} fallido con IP ${ipProxy}: ${raw.substring(0,50)}`);
+    } catch(e) {
+      console.error(`[Inmovilla] Intento ${intento+1} error: ${e.message}`);
     }
-    console.error('[Inmovilla] Respuesta inesperada:', raw.substring(0, 100));
-  } catch(e) {
-    console.error('[Inmovilla] Error:', e.message);
   }
 
   return res.status(502).json({
