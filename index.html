@@ -2385,7 +2385,7 @@ var INMOVILLA_TYPE_MAP={'sale':'compra','rent':'alquiler-general','student':'alq
 function loadInmovillaProperties(){
   if(!INMOVILLA_ENABLED)return;
   document.querySelectorAll('.inmovilla-banner').forEach(function(b){
-    b.querySelector('strong').textContent='Cargando propiedades desde Inmovilla...';
+    b.querySelector('strong').textContent='Cargando propiedades...';
     b.querySelector('span').textContent='Conectando con el CRM...';
   });
   fetch('/api/properties')
@@ -2413,7 +2413,7 @@ function loadInmovillaProperties(){
       var hora=new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
       document.querySelectorAll('.inmovilla-banner').forEach(function(b){
         b.style.borderColor='var(--green3)';
-        b.querySelector('strong').textContent=total+' propiedades cargadas desde Inmovilla';
+        b.querySelector('strong').textContent=total+' propiedades disponibles';
         b.querySelector('span').textContent='Datos en tiempo real \u00b7 Actualizado a las '+hora;
       });
     })
@@ -2479,7 +2479,7 @@ function buildInmovillaCard(p,type){
     (p.bathrooms?'<div class="prop-feat"><strong>'+p.bathrooms+'</strong> ba\u00f1os</div>':'')+
     (p.surface?'<div class="prop-feat"><strong>'+p.surface+'</strong> m\u00b2</div>':'')+
     '</div>'+
-    '<div class="prop-ref">Ref. '+p.reference+' \u00b7 Inmovilla</div>'+
+    '<div class="prop-ref">Ref. '+p.reference+'</div>'+
     '</div>';
   return div;
 }
