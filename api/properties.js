@@ -339,34 +339,52 @@ async function serveProperties(res, raw, agency) {
 
 function mapProperty(p, agency) {
   const typeMap = {1:'sale',2:'rent',3:'vacation',4:'new_build','1':'sale','2':'rent','3':'vacation','4':'new_build'};
-  const subMap  = {'1':'piso','2':'piso','3':'chalet','4':'chalet','5':'local','6':'local','7':'chalet','8':'piso','9':'local'};
   const cod = p.cod_ofer||p.codofer||p.id||'';
   const fl  = p.fotoletra||p.foto_letra||'';
   const nf  = parseInt(p.numfotos)||0;
   const imgs = [];
   if (nf>0&&fl&&cod) for(let i=1;i<=Math.min(nf,20);i++) imgs.push(`https://fotos15.inmovilla.com/${agency}/${cod}/${fl}-${i}.jpg`);
+
+  const tipo = p.keyacci||p.key_acci||2;
+  // Precio: precioinmo para venta, precioalq para alquiler
+  const price = parseFloat(p.precioinmo)||parseFloat(p.precioalq)||parseFloat(p.precio)||0;
+
   return {
-    id:cod, reference:p.ref||String(cod), type:typeMap[p.keyacci||1]||'sale',
-    subtype:subMap[String(p.key_tipo||'1')]||'piso',
-    title:(()=>{const t={'1':'Piso','2':'Apartamento','3':'Casa','4':'Chalet','5':'Local','6':'Oficina','7':'Adosado','8':'Estudio','9':'Nave'};return `${t[String(p.key_tipo||'1')]||'Inmueble'} en ${p.zona||p.municipio||'Pontevedra'}`;})(),
-    description:p.observaciones||p.descripcion||'',
-    price:parseFloat(p.precioinmo||p.precio||0),
-    price_night:parseFloat(p.precio_noche||0)||null,
-    location:[p.municipio,p.zona].filter(Boolean).join(' · ')||'Pontevedra',
-    address:[p.calle,p.numero,p.municipio].filter(Boolean).join(', '),
-    bedrooms:parseInt(p.habitaciones)||0, bathrooms:parseInt(p.banyos||p.banios)||0,
-    surface:parseInt(p.superficie||p.sup_cons)||0,
-    floor:(p.planta!=null&&p.planta!=='')?`${p.planta}º`:'',
-    garage:p.garaje==1||p.parking==1, lift:p.ascensor==1,
-    exclusive:p.exclusiva==1, available:true,
-    features:(()=>{const f=[];
-      if(p.terraza==1)f.push('Terraza');if(p.jardin==1)f.push('Jardín');if(p.piscina==1)f.push('Piscina');
+    id: cod,
+    reference: p.ref||String(cod),
+    type: typeMap[tipo]||'rent',
+    subtype: (p.nbtipo||'Inmueble').toLowerCase().replace(/ /g,'-'),
+    title: `${p.nbtipo||'Inmueble'} en ${p.zona||p.ciudad||'Pontevedra'}`,
+    description: p.observaciones||p.descripcion||'',
+    price,
+    price_alquiler: parseFloat(p.precioalq)||null,
+    price_night: parseFloat(p.precio_noche||0)||null,
+    location: [p.ciudad, p.zona].filter(Boolean).join(' · ')||'Pontevedra',
+    address: [p.calle, p.numero, p.ciudad].filter(Boolean).join(', '),
+    bedrooms: parseInt(p.habitaciones)||0,
+    bathrooms: parseInt(p.banyos||p.banios||p.sumaseos)||0,
+    surface: parseInt(p.m_cons||p.superficie||p.sup_cons)||0,
+    floor: (p.planta!=null&&p.planta!=='')?`${p.planta}º`:'',
+    garage: p.garaje==1||p.parking==1||p.plaza_gara==1,
+    lift: p.ascensor==1,
+    exclusive: p.exclu==1||p.exclusiva==1,
+    featured: p.destacado==1||p.destestrella==1,
+    available: !p.nodisponible||p.nodisponible==0,
+    lat: parseFloat(p.latitud)||null,
+    lng: parseFloat(p.altitud)||null,
+    agent: p.nombreagente ? `${p.nombreagente} ${p.apellidosagente||''}`.trim() : null,
+    agent_phone: p.telefono1agente||null,
+    agent_email: p.emailagente||null,
+    features: (()=>{const f=[];
+      if(p.terraza==1)f.push('Terraza');if(p.jardin==1)f.push('Jardín');if(p.piscina_com==1||p.piscina_prop==1)f.push('Piscina');
       if(p.garaje==1)f.push('Garaje');if(p.parking==1)f.push('Parking');if(p.ascensor==1)f.push('Ascensor');
       if(p.trastero==1)f.push('Trastero');if(p.aire_con==1)f.push('Aire acondicionado');
-      if(p.amueblado==1)f.push('Amueblado');if(p.alarma==1)f.push('Alarma');return f;})(),
-    images:imgs,
-    video_url:p.video||p.url_video||null,
-    virtual_tour_url:p.url_tour||null,
-    floor_plan_url:p.url_plano||null,
+      if(p.muebles==1)f.push('Amueblado');if(p.alarma==1)f.push('Alarma');
+      if(p.calefaccion==1)f.push('Calefacción');if(p.primera_line==1)f.push('Primera línea');
+      return f;})(),
+    images: imgs,
+    video_url: p.video||p.url_video||null,
+    virtual_tour_url: p.url_tour||null,
+    floor_plan_url: p.url_plano||null,
   };
 }
