@@ -176,25 +176,17 @@ async function runFullDiagnostic(req, res, agency, pass, fixieUrl) {
 
 // ── COMBINACIONES DE PARÁMETROS ───────────────────────────────────────────
 function buildCombos(agency, pass, idioma) {
-  // El identificador completo para la API es el usuario completo (ej: 5430_244_ext)
-  // El número de agencia para las fotos es solo el número (ej: 5430)
-  const agencyNum = agency.split('_')[0]; // extrae solo el número: 5430
+  const agencyNum = agency.split('_')[0];
   const base = `${agency};${pass};${idioma};lostipos;paginacion;1;200;;precioinmo`;
 
-  // PHP rawurlencode equivalente exacto
-  const phpRaw = (s) => encodeURIComponent(s)
-    .replace(/%21/g,'!')  // PHP rawurlencode NO codifica !
-    .replace(/'/g,'%27')
-    .replace(/\(/g,'%28').replace(/\)/g,'%29').replace(/\*/g,'%2A');
+  // PHP rawurlencode EXACTO: solo deja sin codificar A-Z a-z 0-9 _ . - ~
+  const phpRaw = (s) => s.split('').map(c => {
+    if (/[A-Za-z0-9_.\-~]/.test(c)) return c;
+    return '%' + c.charCodeAt(0).toString(16).toUpperCase();
+  }).join('');
 
   return [
-    { label: 'php_rawurlencode',     body: `param=${phpRaw(base)}` },
-    { label: 'js_encodeURIComponent', body: `param=${encodeURIComponent(base)}` },
-    { label: 'texto_plano',          body: `param=${base}` },
-    { label: 'minimal_encode',       body: `param=${base.replace(/&/g,'%26').replace(/ /g,'%20')}` },
-    // Sin paginacion — solo tipos
-    { label: 'solo_tipos_phpraw',    body: `param=${phpRaw(`${agency};${pass};${idioma};lostipos`)}` },
-    { label: 'solo_tipos_plano',     body: `param=${agency};${pass};${idioma};lostipos` },
+    { label: 'php_rawurlencode', body: `param=${phpRaw(base)}` },
   ];
 }
 
