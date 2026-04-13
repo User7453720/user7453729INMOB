@@ -1,52 +1,51 @@
 // /api/log.js — Genera el log exacto que pide Inmovilla
 // Abre: https://user7453729-inmob.vercel.app/api/log
- 
+
 import net from 'net';
 import tls from 'tls';
 import https from 'https';
 import { URL } from 'url';
- 
+
 const INMOVILLA_URL = 'https://apiweb.inmovilla.com/apiweb/apiweb.php';
- 
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
- 
+
   const agency   = process.env.INMOVILLA_AGENCY || '5430';
   const pass     = process.env.INMOVILLA_PASS;
   const fixieUrl = process.env.FIXIE_URL || 'http://fixie:mJDyuli9kcV9Uuq@ventoux.usefixie.com:80';
- 
+
   if (!pass) return res.status(500).json({ error: 'INMOVILLA_PASS no configurada' });
- 
+
   // Obtener IP del proxy (la que ve Inmovilla)
   let ipProxy = 'desconocida';
   try {
     const r = await fetchViaTunnel('https://api.ipify.org', '?format=json', fixieUrl, 'GET');
     ipProxy = JSON.parse(r).ip;
   } catch(e) { ipProxy = 'error: ' + e.message; }
- 
+
   // Construir parámetro EXACTAMENTE como lo hace apiinmovilla.php
   // PHP: $texto = "$numagencia;$password;$idioma;lostipos;paginacion;1;200;;precioinmo"
   // PHP: $texto = rawurlencode($texto)
   // PHP: $parametros = "param=$texto&elDominio=$_SERVER[SERVER_NAME]"
   // PHP: $campospost = $parametros . "&ia=" . getClientIP()
- 
-  // PHP rawurlencode NO codifica: letras, números, _, ., -, ~, !
-  const phpRawurlencode = (s) => encodeURIComponent(s)
-    .replace(/%21/g,'!')  // PHP rawurlencode NO codifica !
-    .replace(/%27/g,"'")
-    .replace(/%28/g,'(')
-    .replace(/%29/g,')')
-    .replace(/%2A/g,'*');
- 
+
+  // PHP rawurlencode EXACTO: solo deja sin codificar A-Z a-z 0-9 _ . - ~
+  // El ! SÍ se codifica como %21 en PHP rawurlencode
+  const phpRawurlencode = (s) => s.split('').map(c => {
+    if (/[A-Za-z0-9_.\-~]/.test(c)) return c;
+    return '%' + c.charCodeAt(0).toString(16).toUpperCase();
+  }).join('');
+
   const texto     = `${agency};${pass};1;lostipos;paginacion;1;200;;precioinmo`;
   const encoded   = phpRawurlencode(texto);
   const dominio   = 'inmobiliariapedrosa.com';
   const parametros = `param=${encoded}&elDominio=${dominio}&json=1`;
   const campospost = `${parametros}&ia=${ipProxy}`; // exactamente como PHP añade la IP
- 
+
   const timestamp = new Date().toLocaleString('es-ES', { timeZone: 'Europe/Madrid' });
   const id_petition = Math.floor(Math.random() * 900000 + 100000) + '_' + Math.floor(Date.now()/1000);
- 
+
   // Llamar a Inmovilla
   let respuesta = '';
   let error = null;
@@ -56,12 +55,12 @@ export default async function handler(req, res) {
     error = e.message;
     respuesta = 'ERROR: ' + e.message;
   }
- 
+
   // Generar log EXACTAMENTE en el formato de apiinmovilla.log de PHP
   const logLinea1 = `${timestamp} - id_petition: ${id_petition} - parametros: ${campospost}`;
   const logLinea2 = `${timestamp} - id_petition: ${id_petition} - respuesta: ${respuesta}`;
   const logCompleto = logLinea1 + '\n' + logLinea2;
- 
+
   // Devolver tanto el log como info adicional para el email
   return res.status(200).json({
     '=== CONTENIDO DEL FICHERO apiinmovilla.log ===': logCompleto,
@@ -79,7 +78,7 @@ export default async function handler(req, res) {
     }
   });
 }
- 
+
 function fetchDirect(url) {
   return new Promise((resolve, reject) => {
     https.get(url, r => {
@@ -89,13 +88,13 @@ function fetchDirect(url) {
     }).on('error', reject);
   });
 }
- 
+
 function fetchViaTunnel(targetUrl, pathOrBody, proxyUrl, method) {
   return new Promise((resolve, reject) => {
     const target  = new URL(targetUrl);
     const proxy   = new URL(proxyUrl);
     const auth    = Buffer.from(`${proxy.username}:${proxy.password}`).toString('base64');
- 
+
     const socket = net.createConnection(parseInt(proxy.port)||80, proxy.hostname, () => {
       socket.write([
         `CONNECT ${target.hostname}:443 HTTP/1.1`,
@@ -105,27 +104,27 @@ function fetchViaTunnel(targetUrl, pathOrBody, proxyUrl, method) {
         '', ''
       ].join('\r\n'));
     });
- 
+
     socket.setTimeout(20000, () => { socket.destroy(); reject(new Error('Timeout socket')); });
     socket.on('error', reject);
- 
+
     let buf = '', ready = false;
     socket.on('data', chunk => {
       if (ready) return;
       buf += chunk.toString();
       if (!buf.includes('\r\n\r\n')) return;
       ready = true;
- 
+
       const status = parseInt(buf.split('\r\n')[0].split(' ')[1]);
       if (status !== 200) { socket.destroy(); reject(new Error(`CONNECT: ${status}`)); return; }
- 
+
       socket.removeAllListeners('data');
       socket.removeAllListeners('error');
- 
+
       const tlsSocket = tls.connect({ socket, servername: target.hostname, rejectUnauthorized: false });
       tlsSocket.setTimeout(20000, () => { tlsSocket.destroy(); reject(new Error('Timeout TLS')); });
       tlsSocket.on('error', reject);
- 
+
       tlsSocket.on('secureConnect', () => {
         let httpReq;
         if (method === 'POST') {
@@ -151,7 +150,7 @@ function fetchViaTunnel(targetUrl, pathOrBody, proxyUrl, method) {
         }
         tlsSocket.write(httpReq);
       });
- 
+
       let resp = '';
       tlsSocket.on('data', d => resp += d.toString());
       tlsSocket.on('end', () => {
