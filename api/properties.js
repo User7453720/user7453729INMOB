@@ -27,53 +27,40 @@ export default async function handler(req, res) {
     return await runFullDiagnostic(req, res, agency, pass, fixieUrl);
   }
 
-  // Producción: peticiones paralelas para venta y alquiler
-  const phpRaw = (s) => s.split('').map(c => {
-    if (/[A-Za-z0-9_.\-~]/.test(c)) return c;
-    return '%' + c.charCodeAt(0).toString(16).toUpperCase();
+  // ── PRODUCCIÓN ─────────────────────────────────────────────────────────
+  const phpRaw = (s) => s.split('').map(ch => {
+    if (/[A-Za-z0-9_.\-~]/.test(ch)) return ch;
+    return '%' + ch.charCodeAt(0).toString(16).toUpperCase();
   }).join('');
 
-  // Hacer hasta 5 intentos para pillar la IP buena
-  async function fetchInmovilla(keyacci, pagina = 1) {
-    for (let intento = 0; intento < 5; intento++) {
-      let ipProxy = '54.217.142.99';
+  async function tryFetch(keyacci) {
+    for (let i = 0; i < 4; i++) {
+      let ip = '54.195.3.54';
       try {
         const r = await fetchViaTunnel('https://api.ipify.org', '?format=json', fixieUrl, 'GET');
-        ipProxy = JSON.parse(r).ip;
+        ip = JSON.parse(r).ip;
       } catch(e) {}
-
-      // keyacci: 1=venta, 2=alquiler — se pasa dentro del param
-      const texto = `${agency};${pass};${IDIOMA};lostipos;paginacion;${pagina};200;${keyacci};precioinmo`;
-      const postBody = `param=${phpRaw(texto)}&elDominio=inmobiliariapedrosa.com&json=1&ia=${ipProxy}`;
-
+      const texto = agency+';'+pass+';'+IDIOMA+';lostipos;paginacion;1;200;'+keyacci+';precioinmo';
+      const postBody = 'param='+phpRaw(texto)+'&elDominio=inmobiliariapedrosa.com&json=1&ia='+ip;
       try {
         const raw = await fetchViaTunnel(INMOVILLA_URL, postBody, fixieUrl, 'POST');
-        if (!raw.includes('NECESITAMOS') && raw.trim().length > 20) {
-          return raw;
-        }
-        console.log(`[Inmovilla] keyacci=${keyacci} intento ${intento+1} fallido con IP ${ipProxy}`);
-      } catch(e) {
-        console.error(`[Inmovilla] keyacci=${keyacci} intento ${intento+1} error: ${e.message}`);
-      }
+        if (!raw.includes('NECESITAMOS') && raw.trim().startsWith('[')) return raw;
+      } catch(e) {}
     }
     return null;
   }
 
-  // Peticiones paralelas para venta (1) y alquiler (2)
-  const [rawVenta, rawAlquiler] = await Promise.all([
-    fetchInmovilla(1),
-    fetchInmovilla(2)
-  ]);
+  const rawVenta    = await tryFetch(1);
+  const rawAlquiler = await tryFetch(2);
 
   if (!rawVenta && !rawAlquiler) {
-    return res.status(502).json({
-      error: 'No se pudo conectar con Inmovilla',
-      hint: 'Abre /api/properties?diag=1 para diagnóstico completo'
-    });
+    return res.status(502).json({ error: 'No se pudo conectar con Inmovilla', hint: '/api/properties?diag=1' });
   }
 
   return await serveProperties(res, rawVenta, rawAlquiler, agency);
 }
+
+
 
 // ── DIAGNÓSTICO EXHAUSTIVO ────────────────────────────────────────────────
 async function runFullDiagnostic(req, res, agency, pass, fixieUrl) {
