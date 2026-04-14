@@ -160,7 +160,8 @@ html{scroll-behavior:smooth;overflow-x:hidden;max-width:100vw}
 body{font-family:var(--sans);background:var(--cream);color:var(--green2);font-size:15px;line-height:1.65;overflow-x:hidden}
 
 /* ── NAV ── */
-nav{position:sticky;top:0;z-index:500;background:var(--green)}
+nav{position:relative;top:0;z-index:500;background:var(--green)}
+header[role="banner"]{position:sticky;top:0;z-index:600}
 .nav-top{max-width:1200px;margin:0 auto;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:66px}
 .logo{font-family:var(--serif);font-size:22px;font-weight:400;color:var(--white);text-decoration:none;letter-spacing:.02em}
 .logo span{color:var(--gold)}
