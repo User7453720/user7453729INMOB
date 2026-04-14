@@ -5,6 +5,9 @@
     },
     "api/log.js": {
       "maxDuration": 60
+    },
+    "api/test_tipos.js": {
+      "maxDuration": 60
     }
   }
 }
