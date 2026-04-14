@@ -231,7 +231,17 @@ nav{position:sticky;top:0;z-index:500;background:var(--green)}
 .s-lbl{font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:rgba(30,61,26,.65);margin-top:3px}
 
 /* ── SECTIONS ── */
+/* ── PROPERTY PLACEHOLDERS ── */
+.prop-placeholder{background:var(--white);border:.5px solid var(--line);overflow:hidden}
+.pp-img{width:100%;height:200px;background:linear-gradient(90deg,#e8e3db 25%,#f0ece4 50%,#e8e3db 75%);background-size:200% 100%;animation:pp-shimmer 1.5s infinite}
+.pp-line{height:14px;border-radius:2px;margin:1rem 1rem .5rem;background:linear-gradient(90deg,#e8e3db 25%,#f0ece4 50%,#e8e3db 75%);background-size:200% 100%;animation:pp-shimmer 1.5s infinite}
+.pp-line-title{width:70%}
+.pp-line-sub{width:50%;height:11px;margin-top:.25rem}
+.pp-line-price{width:40%;height:18px;margin-top:.75rem;margin-bottom:1rem}
+@keyframes pp-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
 .section{padding:5rem 2rem}
+#propiedades{padding-top:1.5rem}
 .section-inner{max-width:1200px;margin:0 auto}
 .sec-label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--green3);margin-bottom:.5rem}
 .sec-title{font-family:var(--serif);font-size:clamp(28px,3.5vw,44px);font-weight:400;line-height:1.1;color:var(--green2);margin-bottom:.4rem}
@@ -975,8 +985,23 @@ img[loading="lazy"].loaded{opacity:1}
           </div>
           <div class="search-results-info" id="sb-compra-info"></div>
         </div>
+        <div class="prop-filters">
+          <button class="pf active" onclick="filterG('compra','all',this)">Todos</button>
+          <button class="pf" onclick="filterG('compra','piso',this)">Pisos</button>
+          <button class="pf" onclick="filterG('compra','chalet',this)">Chalets</button>
+          <button class="pf" onclick="filterG('compra','local',this)">Locales</button>
+          <select class="psort" onchange="sortG('compra',this.value)"><option value="">Ordenar</option><option value="asc">Precio ↑</option><option value="desc">Precio ↓</option></select>
+        </div>
+        <div class="props-grid" id="grid-compra">
+          <div class="prop-placeholder"><div class="pp-img"></div><div class="pp-line pp-line-title"></div><div class="pp-line pp-line-sub"></div><div class="pp-line pp-line-price"></div></div>
+          <div class="prop-placeholder"><div class="pp-img"></div><div class="pp-line pp-line-title"></div><div class="pp-line pp-line-sub"></div><div class="pp-line pp-line-price"></div></div>
+          <div class="prop-placeholder"><div class="pp-img"></div><div class="pp-line pp-line-title"></div><div class="pp-line pp-line-sub"></div><div class="pp-line pp-line-price"></div></div>
+          <div class="prop-placeholder"><div class="pp-img"></div><div class="pp-line pp-line-title"></div><div class="pp-line pp-line-sub"></div><div class="pp-line pp-line-price"></div></div>
+          <div class="prop-placeholder"><div class="pp-img"></div><div class="pp-line pp-line-title"></div><div class="pp-line pp-line-sub"></div><div class="pp-line pp-line-price"></div></div>
+          <div class="prop-placeholder"><div class="pp-img"></div><div class="pp-line pp-line-title"></div><div class="pp-line pp-line-sub"></div><div class="pp-line pp-line-price"></div></div>
+        </div>
         <!-- Alerta de búsqueda -->
-        <div class="alert-box" id="alert-compra">
+        <div class="alert-box" id="alert-compra" style="margin-top:2.5rem">
           <div class="alert-box-title">&#128276; Crear alerta de búsqueda</div>
           <div class="alert-box-sub">Te avisamos cuando aparezca una propiedad que coincida con tus criterios</div>
           <div class="alert-fields">
@@ -989,19 +1014,9 @@ img[loading="lazy"].loaded{opacity:1}
           <div class="alert-success" id="alert-compra-ok">&#10003; ¡Alerta creada! Te avisaremos cuando tengamos propiedades que encajen.</div>
         </div>
         <!-- Banner vende tu propiedad -->
-        <div class="sell-banner">
+        <div class="sell-banner" style="margin-top:1.5rem">
           <div><div class="sell-banner-title">&#127968; ¿Tienes una propiedad para vender?</div><div class="sell-banner-text">Tasación gratuita y gestión completa de la venta. Sin compromiso.</div></div>
           <a class="sell-banner-btn" href="#" onclick="openSellForm('venta');return false">Quiero vender mi propiedad</a>
-        </div>
-        <div class="prop-filters">
-          <button class="pf active" onclick="filterG('compra','all',this)">Todos</button>
-          <button class="pf" onclick="filterG('compra','piso',this)">Pisos</button>
-          <button class="pf" onclick="filterG('compra','chalet',this)">Chalets</button>
-          <button class="pf" onclick="filterG('compra','local',this)">Locales</button>
-          <select class="psort" onchange="sortG('compra',this.value)"><option value="">Ordenar</option><option value="asc">Precio ↑</option><option value="desc">Precio ↓</option></select>
-        </div>
-        <div class="props-grid" id="grid-compra">
-          <div class="props-loading" style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--gray2);font-family:Lato,sans-serif">Cargando propiedades...</div>
         </div>
       </div>
 
@@ -2305,8 +2320,8 @@ function loadInmovillaProperties(){
     'vacacional':document.querySelector('#panel-vacacional .props-grid'),
     'promociones':document.querySelector('#panel-promociones .props-grid')
   };
-  var msgCargando='<div style="padding:2rem;text-align:center;color:var(--gray2);font-family:Lato,sans-serif">Cargando propiedades...</div>';
-  Object.values(grids).forEach(function(g){if(g)g.innerHTML=msgCargando;});
+  var msgCargando='';
+  Object.values(grids).forEach(function(g){if(g && !g.querySelector('.prop-placeholder') && !g.querySelector('.prop-card'))g.innerHTML=msgCargando;});
 
   fetch('/api/properties')
     .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
@@ -2333,8 +2348,12 @@ function loadInmovillaProperties(){
     })
     .catch(function(err){
       console.error('[API]',err);
-      var msgError='<div style="padding:2rem;text-align:center;color:var(--gray2);font-family:Lato,sans-serif">No se pudieron cargar las propiedades.<br>Llámanos al <a href=\'tel:+34986866618\' style=\'color:var(--green)\'>986 866 618</a></div>';
-      Object.values(grids).forEach(function(g){if(g)g.innerHTML=msgError;});
+      // Solo mostrar error en grids que siguen con placeholders (no cargaron nada)
+      Object.values(grids).forEach(function(g){
+        if(g && g.querySelector('.prop-placeholder')){
+          g.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--gray2);font-family:Lato,sans-serif">No se pudieron cargar las propiedades.<br>Llámanos al <a href=\'tel:+34986866618\' style=\'color:var(--green)\'>986 866 618</a></div>';
+        }
+      });
     });
 }
 
