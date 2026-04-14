@@ -574,8 +574,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 }
 
 /* ── LAZY IMAGES ── */
-img[loading="lazy"]{opacity:0;transition:opacity .3s}
-img[loading="lazy"].loaded{opacity:1}
+img[loading="lazy"]{opacity:1}
 
 /* ── LOGO ── */
 .logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--white)}
@@ -1575,7 +1574,15 @@ function activateTab(id){
 function cardGalleryGo(gallery,idx){
   var imgs=gallery.querySelectorAll('img');
   var dots=gallery.querySelectorAll('.cg-dot');
-  imgs.forEach(function(img,i){img.style.display=i===idx?'block':'none';});
+  imgs.forEach(function(img,i){
+    if(i===idx){
+      if(img.getAttribute('loading')==='lazy'){img.setAttribute('loading','eager');}
+      img.style.opacity='1';
+      img.style.display='block';
+    } else {
+      img.style.display='none';
+    }
+  });
   dots.forEach(function(d,i){d.classList.toggle('active',i===idx);});
   gallery.dataset.idx=idx;
 }
@@ -2368,7 +2375,7 @@ function buildInmovillaCard(p,type){
   if(imgs.length>0){
     imgHtml='<div class="card-gallery" data-idx="0" data-total="'+imgs.length+'">';
     imgs.forEach(function(src,i){
-      imgHtml+='<img src="'+src+'" alt="'+p.title+' foto '+(i+1)+'" style="display:'+(i===0?'block':'none')+'" loading="'+(i===0?'eager':'lazy')+'" onerror="this.style.display=\'none\'">';
+      imgHtml+='<img src="'+src+'" alt="'+p.title+' foto '+(i+1)+'" style="display:'+(i===0?'block':'none')+';opacity:1" loading="eager" onerror="this.style.display=\'none\'">';
     });
     if(imgs.length>1){
       imgHtml+='<button class="cgb cgb-prev" onclick="event.stopPropagation();cardGalleryPrev(this)" aria-label="Anterior">&#8249;</button>';
