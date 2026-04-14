@@ -1,11 +1,11 @@
 // Vercel Serverless Function — API Inmovilla
 import net from 'net';
 import tls from 'tls';
-import https from 'https';
 import { URL } from 'url';
 
 const INMOVILLA_URL = 'https://apiweb.inmovilla.com/apiweb/apiweb.php';
 const IDIOMA = 1;
+const GOOD_IP = '54.195.3.54';
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -18,53 +18,64 @@ export default async function handler(req, res) {
 
   if (!pass) return res.status(500).json({ error: 'INMOVILLA_PASS no configurada' });
 
-  // Diagnóstico
   if (req.query && req.query.diag === '1') {
     return await runDiag(res, agency, pass, fixieUrl);
   }
 
-  // phpRawurlencode exacto
   const phpRaw = (s) => s.split('').map(c => {
     if (/[A-Za-z0-9_.\-~]/.test(c)) return c;
     return '%' + c.charCodeAt(0).toString(16).toUpperCase();
   }).join('');
 
-  // Intentar obtener propiedades — 6 intentos
-  for (let i = 0; i < 6; i++) {
-    let ip = '54.195.3.54';
+  // Buscar la IP buena (hasta 12 intentos)
+  let ip = null;
+  for (let i = 0; i < 12; i++) {
     try {
       const r = await fetchViaTunnel('https://api.ipify.org', '?format=json', fixieUrl, 'GET');
-      ip = JSON.parse(r).ip;
-    } catch(e) {}
+      const candidate = JSON.parse(r).ip;
+      console.log(`[ip intento ${i+1}] candidata: ${candidate}`);
+      if (candidate === GOOD_IP) { ip = candidate; break; }
+    } catch(e) {
+      console.error(`[ip intento ${i+1}] error: ${e.message}`);
+    }
+  }
 
-    const texto = `${agency};${pass};${IDIOMA};lostipos;paginacion;1;200;;precioinmo`;
-    const body = `param=${phpRaw(texto)}&elDominio=inmobiliariapedrosa.com&json=1&ia=${ip}`;
+  if (!ip) {
+    return res.status(502).json({
+      error: 'IP de Fixie no válida tras 12 intentos',
+      hint: 'Inmovilla solo acepta 54.195.3.54 — la otra IP aún no está autorizada. Contacta soporte@inmovilla.com'
+    });
+  }
 
+  // Llamar a Inmovilla con la IP buena (3 intentos)
+  const texto = `${agency};${pass};${IDIOMA};lostipos;paginacion;1;200;;precioinmo`;
+  const body  = `param=${phpRaw(texto)}&elDominio=inmobiliariapedrosa.com&json=1&ia=${ip}`;
+
+  for (let i = 0; i < 3; i++) {
     try {
       const raw = await fetchViaTunnel(INMOVILLA_URL, body, fixieUrl, 'POST');
-      console.log(`[intento ${i+1}] ip=${ip} inicio="${raw.substring(0,80)}"`);
+      console.log(`[inmovilla intento ${i+1}] inicio="${raw.substring(0, 80)}"`);
       if (!raw.includes('NECESITAMOS') && raw.trim().length > 100) {
         return await serveProperties(res, raw, agency);
       }
     } catch(e) {
-      console.error(`[intento ${i+1}] error: ${e.message}`);
+      console.error(`[inmovilla intento ${i+1}] error: ${e.message}`);
     }
   }
 
-  return res.status(502).json({ error: 'No se pudo conectar', hint: '/api/properties?diag=1' });
+  return res.status(502).json({ error: 'No se pudo obtener propiedades', hint: '/api/properties?diag=1' });
 }
 
 async function serveProperties(res, raw, agency) {
   const agencyNum = agency.split('_')[0];
   let data;
-  try { data = JSON.parse(raw); } catch { return res.status(200).json({ error: 'JSON invalido', raw: raw.substring(0,200) }); }
+  try { data = JSON.parse(raw); } catch { return res.status(200).json({ error: 'JSON invalido', raw: raw.substring(0, 200) }); }
 
-  // Extraer lista de inmuebles — Inmovilla devuelve array donde [0] es paginacion
   let list = [];
   if (Array.isArray(data)) {
-    list = data.filter(item => item && typeof item === 'object' && (item.cod_ofer !== undefined || item.ref !== undefined));
+    list = data.filter(item => item && typeof item === 'object' && item.cod_ofer !== undefined);
   } else {
-    for (const k of ['ofertas','inmuebles','data','properties']) {
+    for (const k of ['ofertas', 'inmuebles', 'data', 'properties']) {
       if (data[k] && Array.isArray(data[k])) { list = data[k]; break; }
     }
   }
@@ -143,7 +154,13 @@ async function runDiag(res, agency, pass, fixieUrl) {
   const body = `param=${phpRaw(texto)}&elDominio=inmobiliariapedrosa.com&json=1&ia=${ip}`;
   let raw = 'error';
   try { raw = await fetchViaTunnel(INMOVILLA_URL, body, fixieUrl, 'POST'); } catch(e) { raw = e.message; }
-  return res.status(200).json({ ip, param_enviado: body.substring(0, 200), respuesta_inicio: raw.substring(0, 300), ok: !raw.includes('NECESITAMOS') && raw.length > 100 });
+  const ipOk = ip === GOOD_IP;
+  return res.status(200).json({
+    ip, ip_valida: ipOk ? '✅ correcta' : `❌ no autorizada (la buena es ${GOOD_IP})`,
+    param_enviado: body.substring(0, 200),
+    respuesta_inicio: raw.substring(0, 300),
+    ok: !raw.includes('NECESITAMOS') && raw.length > 100
+  });
 }
 
 function fetchViaTunnel(targetUrl, pathOrBody, proxyUrl, method) {
