@@ -22,6 +22,7 @@ export default async function handler(req, res) {
     return await runDiag(res, agency, pass, fixieUrl);
   }
 
+  // phpRawurlencode exacto igual que PHP
   const phpRaw = (s) => s.split('').map(c => {
     if (/[A-Za-z0-9_.\-~]/.test(c)) return c;
     return '%' + c.charCodeAt(0).toString(16).toUpperCase();
@@ -43,7 +44,7 @@ export default async function handler(req, res) {
   if (!ip) {
     return res.status(502).json({
       error: 'IP de Fixie no válida tras 12 intentos',
-      hint: 'Inmovilla solo acepta 54.195.3.54 — la otra IP aún no está autorizada. Contacta soporte@inmovilla.com'
+      hint: 'Inmovilla solo acepta 54.195.3.54 — la otra IP aún no está autorizada'
     });
   }
 
@@ -58,6 +59,7 @@ export default async function handler(req, res) {
       if (!raw.includes('NECESITAMOS') && raw.trim().length > 100) {
         return await serveProperties(res, raw, agency);
       }
+      console.log(`[inmovilla intento ${i+1}] rechazado: ${raw.substring(0, 80)}`);
     } catch(e) {
       console.error(`[inmovilla intento ${i+1}] error: ${e.message}`);
     }
@@ -69,7 +71,9 @@ export default async function handler(req, res) {
 async function serveProperties(res, raw, agency) {
   const agencyNum = agency.split('_')[0];
   let data;
-  try { data = JSON.parse(raw); } catch { return res.status(200).json({ error: 'JSON invalido', raw: raw.substring(0, 200) }); }
+  try { data = JSON.parse(raw); } catch {
+    return res.status(200).json({ error: 'JSON invalido', raw: raw.substring(0, 200) });
+  }
 
   let list = [];
   if (Array.isArray(data)) {
@@ -149,51 +153,93 @@ function mapProperty(p, agency) {
 async function runDiag(res, agency, pass, fixieUrl) {
   const phpRaw = (s) => s.split('').map(c => /[A-Za-z0-9_.\-~]/.test(c) ? c : '%' + c.charCodeAt(0).toString(16).toUpperCase()).join('');
   let ip = 'error';
-  try { const r = await fetchViaTunnel('https://api.ipify.org', '?format=json', fixieUrl, 'GET'); ip = JSON.parse(r).ip; } catch(e) { ip = e.message; }
+  try {
+    const r = await fetchViaTunnel('https://api.ipify.org', '?format=json', fixieUrl, 'GET');
+    ip = JSON.parse(r).ip;
+  } catch(e) { ip = e.message; }
   const texto = `${agency};${pass};${IDIOMA};lostipos;paginacion;1;200;;precioinmo`;
   const body = `param=${phpRaw(texto)}&elDominio=inmobiliariapedrosa.com&json=1&ia=${ip}`;
   let raw = 'error';
   try { raw = await fetchViaTunnel(INMOVILLA_URL, body, fixieUrl, 'POST'); } catch(e) { raw = e.message; }
   const ipOk = ip === GOOD_IP;
   return res.status(200).json({
-    ip, ip_valida: ipOk ? '✅ correcta' : `❌ no autorizada (la buena es ${GOOD_IP})`,
+    ip,
+    ip_valida: ipOk ? '✅ correcta' : `❌ no autorizada (la buena es ${GOOD_IP})`,
     param_enviado: body.substring(0, 200),
     respuesta_inicio: raw.substring(0, 300),
     ok: !raw.includes('NECESITAMOS') && raw.length > 100
   });
 }
 
+// fetchViaTunnel con headers HTTP idénticos a los que Inmovilla espera
 function fetchViaTunnel(targetUrl, pathOrBody, proxyUrl, method) {
   return new Promise((resolve, reject) => {
     const target = new URL(targetUrl);
     const proxy  = new URL(proxyUrl);
     const auth   = Buffer.from(`${proxy.username}:${proxy.password}`).toString('base64');
+
     const socket = net.createConnection(parseInt(proxy.port) || 80, proxy.hostname, () => {
-      socket.write([`CONNECT ${target.hostname}:443 HTTP/1.1`, `Host: ${target.hostname}:443`, `Proxy-Authorization: Basic ${auth}`, `User-Agent: Mozilla/5.0`, '', ''].join('\r\n'));
+      socket.write([
+        `CONNECT ${target.hostname}:443 HTTP/1.1`,
+        `Host: ${target.hostname}:443`,
+        `Proxy-Authorization: Basic ${auth}`,
+        `User-Agent: Mozilla/5.0`,
+        '', ''
+      ].join('\r\n'));
     });
+
     socket.setTimeout(25000, () => { socket.destroy(); reject(new Error('Timeout socket')); });
     socket.on('error', reject);
+
     let buf = ''; let ready = false;
     socket.on('data', chunk => {
       if (ready) return;
       buf += chunk.toString();
       if (!buf.includes('\r\n\r\n')) return;
       ready = true;
+
       const status = parseInt(buf.split('\r\n')[0].split(' ')[1]);
       if (status !== 200) { socket.destroy(); reject(new Error(`CONNECT ${status}`)); return; }
-      socket.removeAllListeners('data'); socket.removeAllListeners('error');
+
+      socket.removeAllListeners('data');
+      socket.removeAllListeners('error');
+
       const tlsSocket = tls.connect({ socket, servername: target.hostname, rejectUnauthorized: false });
       tlsSocket.setTimeout(25000, () => { tlsSocket.destroy(); reject(new Error('Timeout TLS')); });
       tlsSocket.on('error', reject);
+
       tlsSocket.on('secureConnect', () => {
         let req;
         if (method === 'POST') {
-          req = [`POST ${target.pathname} HTTP/1.1`, `Host: ${target.hostname}`, `Content-Type: application/x-www-form-urlencoded`, `Content-Length: ${Buffer.byteLength(pathOrBody)}`, `Accept: application/json, text/plain, */*`, `User-Agent: Mozilla/5.0`, `Connection: close`, '', pathOrBody].join('\r\n');
+          // Headers exactos que espera Inmovilla (igual que su cliente PHP original)
+          req = [
+            `POST ${target.pathname} HTTP/1.1`,
+            `Host: ${target.hostname}`,
+            `Content-Type: application/x-www-form-urlencoded`,
+            `Content-Length: ${Buffer.byteLength(pathOrBody)}`,
+            `Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5`,
+            `Cache-Control: max-age=0`,
+            `Connection: keep-alive`,
+            `Keep-Alive: 300`,
+            `Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7`,
+            `Accept-Language: en-us,en;q=0.5`,
+            `Pragma: `,
+            `User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.3) Gecko/20070309 Firefox/2.0.0.3`,
+            '', pathOrBody
+          ].join('\r\n');
         } else {
-          req = [`GET ${target.pathname}${pathOrBody || ''} HTTP/1.1`, `Host: ${target.hostname}`, `Accept: application/json`, `User-Agent: Mozilla/5.0`, `Connection: close`, '', ''].join('\r\n');
+          req = [
+            `GET ${target.pathname}${pathOrBody || ''} HTTP/1.1`,
+            `Host: ${target.hostname}`,
+            `Accept: application/json`,
+            `User-Agent: Mozilla/5.0`,
+            `Connection: close`,
+            '', ''
+          ].join('\r\n');
         }
         tlsSocket.write(req);
       });
+
       let resp = '';
       tlsSocket.on('data', d => resp += d.toString());
       tlsSocket.on('end', () => {
