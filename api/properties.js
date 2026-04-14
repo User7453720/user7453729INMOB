@@ -51,7 +51,8 @@ export default async function handler(req, res) {
   // Llamar a Inmovilla: keyacci=1 (venta) y keyacci=2 (alquiler)
   const allProperties = [];
   for (const keyacci of [1, 2]) {
-    const texto = `${agency};${pass};${IDIOMA};lostipos;paginacion;1;200;${keyacci};precioinmo`;
+    const TIPOS = '3399,2799,2899,4399,2999,399,499,199,3699,6899,7599,2399,3899,4099,4199,5099,9099,1699,2699';
+    const texto = `${agency};${pass};${IDIOMA};${TIPOS};paginacion;1;200;${keyacci};precioinmo`;
     const body  = `param=${phpRaw(texto)}&elDominio=inmobiliariapedrosa.com&json=1&ia=${ip}`;
     for (let i = 0; i < 3; i++) {
       try {
@@ -75,7 +76,7 @@ export default async function handler(req, res) {
   const properties = allProperties
     .filter(p => p && (!p.nodisponible || p.nodisponible == 0))
     .map(p => mapProperty(p, agencyNum));
-  res.setHeader('Cache-Control', 's-maxage=30, stale-while-revalidate');
+  res.setHeader('Cache-Control', 's-maxage=30, stale-while-revalidate=60');
   return res.status(200).json({ properties, total: properties.length, updated: new Date().toISOString() });
 }
 
