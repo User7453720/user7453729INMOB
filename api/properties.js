@@ -1,7 +1,4 @@
-// Vercel Serverless Function — API Inmovilla con diagnóstico exhaustivo
-// GET /api/properties        → propiedades reales (producción)
-// GET /api/properties?diag=1 → diagnóstico completo de todas las combinaciones
-
+// Vercel Serverless Function — API Inmovilla
 import net from 'net';
 import tls from 'tls';
 import https from 'https';
@@ -15,285 +12,171 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const agency   = process.env.INMOVILLA_AGENCY || '5430';
+  const agency   = process.env.INMOVILLA_AGENCY || '5430_244_ext';
   const pass     = process.env.INMOVILLA_PASS;
   const fixieUrl = process.env.FIXIE_URL || 'http://fixie:mJDyuli9kcV9Uuq@ventoux.usefixie.com:80';
-  const diagMode = req.query && req.query.diag === '1';
 
-  if (!pass) return res.status(500).json({ error: 'INMOVILLA_PASS no configurada en Vercel' });
+  if (!pass) return res.status(500).json({ error: 'INMOVILLA_PASS no configurada' });
 
-  // ── DIAGNÓSTICO COMPLETO ──────────────────────────────────────────────
-  if (diagMode) {
-    return await runFullDiagnostic(req, res, agency, pass, fixieUrl);
+  // Diagnóstico
+  if (req.query && req.query.diag === '1') {
+    return await runDiag(res, agency, pass, fixieUrl);
   }
 
-  // ── PRODUCCIÓN ─────────────────────────────────────────────────────────
-  const phpRaw = (s) => s.split('').map(ch => {
-    if (/[A-Za-z0-9_.\-~]/.test(ch)) return ch;
-    return '%' + ch.charCodeAt(0).toString(16).toUpperCase();
-  }).join('');
-
-  async function tryFetch(keyacci) {
-    for (let i = 0; i < 4; i++) {
-      let ip = '54.195.3.54';
-      try {
-        const r = await fetchViaTunnel('https://api.ipify.org', '?format=json', fixieUrl, 'GET');
-        ip = JSON.parse(r).ip;
-      } catch(e) {}
-      const texto = agency+';'+pass+';'+IDIOMA+';lostipos;paginacion;1;200;'+keyacci+';precioinmo';
-      const postBody = 'param='+phpRaw(texto)+'&elDominio=inmobiliariapedrosa.com&json=1&ia='+ip;
-      try {
-        const raw = await fetchViaTunnel(INMOVILLA_URL, postBody, fixieUrl, 'POST');
-        const trimmed = raw.trim();
-        console.log(`[tryFetch] keyacci=${keyacci} intento=${i+1} ip=${ip} inicio="${trimmed.substring(0,60)}"`);
-        if (!trimmed.includes('NECESITAMOS') && trimmed.length > 50) return raw;
-      } catch(e) {
-        console.error(`[tryFetch] keyacci=${keyacci} intento=${i+1} error: ${e.message}`);
-      }
-    }
-    return null;
-  }
-
-  const rawVenta    = await tryFetch(1);
-  const rawAlquiler = await tryFetch(2);
-
-  if (!rawVenta && !rawAlquiler) {
-    return res.status(502).json({ error: 'No se pudo conectar con Inmovilla', hint: '/api/properties?diag=1' });
-  }
-
-  return await serveProperties(res, rawVenta, rawAlquiler, agency);
-}
-
-
-
-// ── DIAGNÓSTICO EXHAUSTIVO ────────────────────────────────────────────────
-async function runFullDiagnostic(req, res, agency, pass, fixieUrl) {
-  const report = {
-    timestamp: new Date().toISOString(),
-    seccion_1_red: {},
-    seccion_2_proxy: {},
-    seccion_3_inmovilla: {},
-    seccion_4_combinaciones: [],
-    conclusion: '',
-    solucion: ''
-  };
-
-  // ── SECCIÓN 1: Red ────────────────────────────────────────────────────
-  // 1a. IP sin proxy
-  try {
-    const r = await fetchDirect('https://api.ipify.org?format=json');
-    report.seccion_1_red.ip_vercel = JSON.parse(r).ip;
-  } catch(e) {
-    report.seccion_1_red.ip_vercel = 'ERROR: ' + e.message;
-  }
-
-  // 1b. IP con proxy
-  try {
-    const r = await fetchViaTunnel('https://api.ipify.org', '?format=json', fixieUrl, 'GET');
-    report.seccion_1_red.ip_con_proxy = JSON.parse(r).ip;
-  } catch(e) {
-    report.seccion_1_red.ip_con_proxy = 'ERROR: ' + e.message;
-  }
-
-  const fixieIPs = ['54.217.142.99', '54.195.3.54'];
-  report.seccion_1_red.proxy_funcionando = fixieIPs.includes(report.seccion_1_red.ip_con_proxy);
-  report.seccion_1_red.ips_fixie_esperadas = fixieIPs;
-
-  // 1c. Conectividad directa a Inmovilla sin proxy
-  try {
-    const r = await fetchDirect('https://apiweb.inmovilla.com/apiweb/apiweb.php');
-    report.seccion_1_red.inmovilla_accesible_sin_proxy = true;
-    report.seccion_1_red.inmovilla_respuesta_directa = r.substring(0, 100);
-  } catch(e) {
-    report.seccion_1_red.inmovilla_accesible_sin_proxy = false;
-    report.seccion_1_red.inmovilla_error_directo = e.message;
-  }
-
-  // ── SECCIÓN 2: Proxy ──────────────────────────────────────────────────
-  report.seccion_2_proxy.fixie_url_configurada = fixieUrl.replace(/:[^:@]+@/, ':***@');
-  report.seccion_2_proxy.proxy_ok = report.seccion_1_red.proxy_funcionando;
-
-  // 2b. Latencia del proxy
-  const t0 = Date.now();
-  try {
-    await fetchViaTunnel('https://api.ipify.org', '?format=json', fixieUrl, 'GET');
-    report.seccion_2_proxy.latencia_ms = Date.now() - t0;
-  } catch(e) {
-    report.seccion_2_proxy.latencia_ms = 'ERROR';
-  }
-
-  // ── SECCIÓN 3: Inmovilla via proxy ────────────────────────────────────
-  // Petición básica GET a Inmovilla a través del proxy
-  try {
-    const r = await fetchViaTunnel('https://apiweb.inmovilla.com/apiweb/apiweb.php', '', fixieUrl, 'GET');
-    report.seccion_3_inmovilla.respuesta_get_vacia = r.substring(0, 150);
-  } catch(e) {
-    report.seccion_3_inmovilla.respuesta_get_vacia = 'ERROR: ' + e.message;
-  }
-
-  // ── SECCIÓN 4: Todas las combinaciones ───────────────────────────────
-  const combos = buildCombos(agency, pass, IDIOMA);
-  const dominios = [
-    'inmobiliariapedrosa.com',
-    'www.inmobiliariapedrosa.com',
-    'user7453729-inmob.vercel.app',
-    'inmobiliariapedrosa.es',
-    agency + '.inmovilla.com',
-    ''
-  ];
-
-  for (const combo of combos) {
-    for (const dominio of dominios) {
-      const body = dominio
-        ? `${combo.body}&elDominio=${dominio}&json=1`
-        : `${combo.body}&json=1`;
-
-      const resultado = { combo: combo.label, dominio: dominio || '(sin dominio)', ok: false };
-
-      try {
-        const t1 = Date.now();
-        const raw = await fetchViaTunnel(INMOVILLA_URL, body, fixieUrl, 'POST');
-        resultado.ms = Date.now() - t1;
-        resultado.preview = raw.substring(0, 120);
-        resultado.ok = !raw.includes('NECESITAMOS') && !raw.includes('error') && raw.trim().length > 20;
-        resultado.es_json = raw.trim().startsWith('[') || raw.trim().startsWith('{');
-
-        if (resultado.ok) {
-          resultado.exito = true;
-          report.seccion_4_combinaciones.push(resultado);
-          // Devolver inmediatamente con la combinación ganadora
-          report.conclusion = '✅ COMBINACIÓN EXITOSA ENCONTRADA';
-          report.solucion = `Usar combo="${combo.label}" con dominio="${dominio || '(sin dominio)'}"`;
-          report.combo_ganador = { label: combo.label, dominio, body_template: combo.label };
-          return res.status(200).json(report);
-        }
-      } catch(e) {
-        resultado.error = e.message.substring(0, 100);
-        resultado.ms = Date.now() - (t1 || Date.now());
-      }
-
-      report.seccion_4_combinaciones.push(resultado);
-    }
-  }
-
-  // ── CONCLUSIÓN ────────────────────────────────────────────────────────
-  if (!report.seccion_1_red.proxy_funcionando) {
-    report.conclusion = '❌ EL PROXY FIXIE NO ESTÁ FUNCIONANDO';
-    report.solucion = 'Verificar credenciales de Fixie en variable FIXIE_URL de Vercel';
-  } else {
-    const todasIgual = report.seccion_4_combinaciones.every(r => r.preview && r.preview.includes('NECESITAMOS'));
-    if (todasIgual) {
-      report.conclusion = '❌ TODAS LAS COMBINACIONES RECIBEN "NECESITAMOS RECIBIR LA IP"';
-      report.solucion = 'Las IPs de Fixie están en el panel de Inmovilla pero no activas. Contactar soporte de Inmovilla con este diagnóstico completo y pedir que verifiquen que las IPs 54.217.142.99 y 54.195.3.54 están ACTIVAS para el usuario 5430_244_ext.';
-    } else {
-      report.conclusion = '⚠️ RESPUESTAS VARIADAS — revisar seccion_4_combinaciones';
-      report.solucion = 'Hay combinaciones con respuestas diferentes. Revisar el detalle.';
-    }
-  }
-
-  return res.status(200).json(report);
-}
-
-// ── COMBINACIONES DE PARÁMETROS ───────────────────────────────────────────
-function buildCombos(agency, pass, idioma) {
-  const agencyNum = agency.split('_')[0];
-  const base = `${agency};${pass};${idioma};lostipos;paginacion;1;200;;precioinmo`;
-
-  // PHP rawurlencode EXACTO: solo deja sin codificar A-Z a-z 0-9 _ . - ~
+  // phpRawurlencode exacto
   const phpRaw = (s) => s.split('').map(c => {
     if (/[A-Za-z0-9_.\-~]/.test(c)) return c;
     return '%' + c.charCodeAt(0).toString(16).toUpperCase();
   }).join('');
 
-  return [
-    { label: 'php_rawurlencode', body: `param=${phpRaw(base)}` },
-  ];
+  // Intentar obtener propiedades — 6 intentos
+  for (let i = 0; i < 6; i++) {
+    let ip = '54.195.3.54';
+    try {
+      const r = await fetchViaTunnel('https://api.ipify.org', '?format=json', fixieUrl, 'GET');
+      ip = JSON.parse(r).ip;
+    } catch(e) {}
+
+    const texto = `${agency};${pass};${IDIOMA};lostipos;paginacion;1;200;;precioinmo`;
+    const body = `param=${phpRaw(texto)}&elDominio=inmobiliariapedrosa.com&json=1&ia=${ip}`;
+
+    try {
+      const raw = await fetchViaTunnel(INMOVILLA_URL, body, fixieUrl, 'POST');
+      console.log(`[intento ${i+1}] ip=${ip} inicio="${raw.substring(0,80)}"`);
+      if (!raw.includes('NECESITAMOS') && raw.trim().length > 100) {
+        return await serveProperties(res, raw, agency);
+      }
+    } catch(e) {
+      console.error(`[intento ${i+1}] error: ${e.message}`);
+    }
+  }
+
+  return res.status(502).json({ error: 'No se pudo conectar', hint: '/api/properties?diag=1' });
 }
 
-// ── FETCH DIRECTO (sin proxy) ─────────────────────────────────────────────
-function fetchDirect(url) {
-  return new Promise((resolve, reject) => {
-    const u = new URL(url);
-    const options = { hostname: u.hostname, path: u.pathname + u.search, method: 'GET' };
-    https.get(options, r => {
-      let d = '';
-      r.on('data', c => d += c);
-      r.on('end', () => resolve(d));
-    }).on('error', reject);
-  });
+async function serveProperties(res, raw, agency) {
+  const agencyNum = agency.split('_')[0];
+  let data;
+  try { data = JSON.parse(raw); } catch { return res.status(200).json({ error: 'JSON invalido', raw: raw.substring(0,200) }); }
+
+  // Extraer lista de inmuebles — Inmovilla devuelve array donde [0] es paginacion
+  let list = [];
+  if (Array.isArray(data)) {
+    list = data.filter(item => item && typeof item === 'object' && (item.cod_ofer !== undefined || item.ref !== undefined));
+  } else {
+    for (const k of ['ofertas','inmuebles','data','properties']) {
+      if (data[k] && Array.isArray(data[k])) { list = data[k]; break; }
+    }
+  }
+
+  const properties = list
+    .filter(p => p && (!p.nodisponible || p.nodisponible == 0))
+    .map(p => mapProperty(p, agencyNum));
+
+  res.setHeader('Cache-Control', 's-maxage=1800, stale-while-revalidate');
+  return res.status(200).json({ properties, total: properties.length, updated: new Date().toISOString() });
 }
 
-// ── FETCH VIA PROXY TUNNEL (CONNECT) ─────────────────────────────────────
+function mapProperty(p, agency) {
+  const typeMap = { 1:'sale', 2:'rent', 3:'vacation', 4:'new_build', '1':'sale', '2':'rent', '3':'vacation', '4':'new_build' };
+  const cod = p.cod_ofer || p.codofer || p.id || '';
+  const fl  = p.fotoletra || p.foto_letra || '';
+  const nf  = parseInt(p.numfotos) || 0;
+  const imgs = [];
+  if (nf > 0 && fl && cod) {
+    for (let i = 1; i <= Math.min(nf, 20); i++) imgs.push(`https://fotos15.apinmo.com/${agency}/${cod}/${fl}-${i}.jpg`);
+  }
+
+  const tipo = p.keyacci || p.key_acci || 2;
+  const type = typeMap[tipo] || 'rent';
+
+  const nbtipo = (p.nbtipo || '').toLowerCase();
+  let subtype = 'piso';
+  if (nbtipo.includes('local')) subtype = 'local';
+  else if (nbtipo.includes('oficina')) subtype = 'oficina';
+  else if (nbtipo.includes('nave')) subtype = 'nave';
+  else if (nbtipo.includes('chalet') || nbtipo.includes('casa')) subtype = 'chalet';
+  else if (nbtipo.includes('atico') || nbtipo.includes('ático')) subtype = 'atico';
+  else if (nbtipo.includes('apartamento')) subtype = 'apartamento';
+  else if (nbtipo.includes('adosado')) subtype = 'adosado';
+  else if (nbtipo.includes('terreno') || nbtipo.includes('solar')) subtype = 'terreno';
+
+  const price = parseFloat(p.precioinmo || p.precioalq || p.precio || 0);
+
+  return {
+    id: cod, reference: p.ref || String(cod), type, subtype,
+    title: p.nbtipo ? `${p.nbtipo} en ${p.zona || p.ciudad || 'Pontevedra'}` : `Inmueble en ${p.zona || p.ciudad || 'Pontevedra'}`,
+    description: p.observaciones || p.descripcion || '',
+    price, price_alquiler: parseFloat(p.precioalq) || null, price_night: parseFloat(p.precio_noche || 0) || null,
+    location: [p.ciudad, p.zona].filter(Boolean).join(' · ') || 'Pontevedra',
+    address: [p.calle, p.numero, p.ciudad].filter(Boolean).join(', '),
+    bedrooms: parseInt(p.habitaciones) || 0,
+    bathrooms: parseInt(p.banyos || p.banios || p.sumaseos) || 0,
+    surface: parseInt(p.m_cons || p.superficie || p.sup_cons) || 0,
+    floor: (p.planta != null && p.planta !== '') ? `${p.planta}º` : '',
+    garage: p.garaje == 1 || p.parking == 1, lift: p.ascensor == 1,
+    exclusive: p.exclu == 1 || p.exclusiva == 1, featured: p.destacado == 1,
+    available: !p.nodisponible || p.nodisponible == 0,
+    lat: parseFloat(p.latitud) || null, lng: parseFloat(p.altitud) || null,
+    agent: p.nombreagente ? `${p.nombreagente} ${p.apellidosagente || ''}`.trim() : null,
+    agent_phone: p.telefono1agente || null, agent_email: p.emailagente || null,
+    features: (() => {
+      const f = [];
+      if (p.terraza == 1) f.push('Terraza'); if (p.jardin == 1) f.push('Jardín');
+      if (p.piscina_com == 1 || p.piscina_prop == 1) f.push('Piscina');
+      if (p.garaje == 1) f.push('Garaje'); if (p.parking == 1) f.push('Parking');
+      if (p.ascensor == 1) f.push('Ascensor'); if (p.trastero == 1) f.push('Trastero');
+      if (p.aire_con == 1) f.push('Aire acondicionado'); if (p.muebles == 1) f.push('Amueblado');
+      if (p.calefaccion == 1) f.push('Calefacción');
+      return f;
+    })(),
+    images: imgs, video_url: p.video || p.url_video || null,
+    virtual_tour_url: p.url_tour || null, floor_plan_url: p.url_plano || null,
+  };
+}
+
+async function runDiag(res, agency, pass, fixieUrl) {
+  const phpRaw = (s) => s.split('').map(c => /[A-Za-z0-9_.\-~]/.test(c) ? c : '%' + c.charCodeAt(0).toString(16).toUpperCase()).join('');
+  let ip = 'error';
+  try { const r = await fetchViaTunnel('https://api.ipify.org', '?format=json', fixieUrl, 'GET'); ip = JSON.parse(r).ip; } catch(e) { ip = e.message; }
+  const texto = `${agency};${pass};${IDIOMA};lostipos;paginacion;1;200;;precioinmo`;
+  const body = `param=${phpRaw(texto)}&elDominio=inmobiliariapedrosa.com&json=1&ia=${ip}`;
+  let raw = 'error';
+  try { raw = await fetchViaTunnel(INMOVILLA_URL, body, fixieUrl, 'POST'); } catch(e) { raw = e.message; }
+  return res.status(200).json({ ip, param_enviado: body.substring(0, 200), respuesta_inicio: raw.substring(0, 300), ok: !raw.includes('NECESITAMOS') && raw.length > 100 });
+}
+
 function fetchViaTunnel(targetUrl, pathOrBody, proxyUrl, method) {
   return new Promise((resolve, reject) => {
-    const target  = new URL(targetUrl);
-    const proxy   = new URL(proxyUrl);
-    const auth    = Buffer.from(`${proxy.username}:${proxy.password}`).toString('base64');
-
-    const socket = net.createConnection(parseInt(proxy.port)||80, proxy.hostname, () => {
-      socket.write([
-        `CONNECT ${target.hostname}:443 HTTP/1.1`,
-        `Host: ${target.hostname}:443`,
-        `Proxy-Authorization: Basic ${auth}`,
-        `User-Agent: Mozilla/5.0`,
-        '', ''
-      ].join('\r\n'));
+    const target = new URL(targetUrl);
+    const proxy  = new URL(proxyUrl);
+    const auth   = Buffer.from(`${proxy.username}:${proxy.password}`).toString('base64');
+    const socket = net.createConnection(parseInt(proxy.port) || 80, proxy.hostname, () => {
+      socket.write([`CONNECT ${target.hostname}:443 HTTP/1.1`, `Host: ${target.hostname}:443`, `Proxy-Authorization: Basic ${auth}`, `User-Agent: Mozilla/5.0`, '', ''].join('\r\n'));
     });
-
-    socket.setTimeout(20000, () => { socket.destroy(); reject(new Error('Timeout socket')); });
+    socket.setTimeout(25000, () => { socket.destroy(); reject(new Error('Timeout socket')); });
     socket.on('error', reject);
-
-    let connectBuf = '';
-    let ready = false;
-
+    let buf = ''; let ready = false;
     socket.on('data', chunk => {
       if (ready) return;
-      connectBuf += chunk.toString();
-      if (!connectBuf.includes('\r\n\r\n')) return;
+      buf += chunk.toString();
+      if (!buf.includes('\r\n\r\n')) return;
       ready = true;
-
-      const status = parseInt(connectBuf.split('\r\n')[0].split(' ')[1]);
-      if (status !== 200) {
-        socket.destroy();
-        reject(new Error(`CONNECT rechazado: ${status} ${connectBuf.split('\r\n')[0]}`));
-        return;
-      }
-
-      socket.removeAllListeners('data');
-      socket.removeAllListeners('error');
-
+      const status = parseInt(buf.split('\r\n')[0].split(' ')[1]);
+      if (status !== 200) { socket.destroy(); reject(new Error(`CONNECT ${status}`)); return; }
+      socket.removeAllListeners('data'); socket.removeAllListeners('error');
       const tlsSocket = tls.connect({ socket, servername: target.hostname, rejectUnauthorized: false });
-      tlsSocket.setTimeout(20000, () => { tlsSocket.destroy(); reject(new Error('Timeout TLS')); });
+      tlsSocket.setTimeout(25000, () => { tlsSocket.destroy(); reject(new Error('Timeout TLS')); });
       tlsSocket.on('error', reject);
-
       tlsSocket.on('secureConnect', () => {
         let req;
         if (method === 'POST') {
-          const postData = pathOrBody;
-          req = [
-            `POST ${target.pathname} HTTP/1.1`,
-            `Host: ${target.hostname}`,
-            `Content-Type: application/x-www-form-urlencoded`,
-            `Content-Length: ${Buffer.byteLength(postData)}`,
-            `Accept: application/json, text/plain, */*`,
-            `User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)`,
-            `Connection: close`,
-            '', postData
-          ].join('\r\n');
+          req = [`POST ${target.pathname} HTTP/1.1`, `Host: ${target.hostname}`, `Content-Type: application/x-www-form-urlencoded`, `Content-Length: ${Buffer.byteLength(pathOrBody)}`, `Accept: application/json, text/plain, */*`, `User-Agent: Mozilla/5.0`, `Connection: close`, '', pathOrBody].join('\r\n');
         } else {
-          const qs = pathOrBody || '';
-          req = [
-            `GET ${target.pathname}${qs} HTTP/1.1`,
-            `Host: ${target.hostname}`,
-            `Accept: application/json`,
-            `User-Agent: Mozilla/5.0`,
-            `Connection: close`,
-            '', ''
-          ].join('\r\n');
+          req = [`GET ${target.pathname}${pathOrBody || ''} HTTP/1.1`, `Host: ${target.hostname}`, `Accept: application/json`, `User-Agent: Mozilla/5.0`, `Connection: close`, '', ''].join('\r\n');
         }
         tlsSocket.write(req);
       });
-
       let resp = '';
       tlsSocket.on('data', d => resp += d.toString());
       tlsSocket.on('end', () => {
@@ -319,120 +202,4 @@ function dechunk(data) {
     pos = le + 2 + size + 2;
   }
   return result || data;
-}
-
-async function serveProperties(res, rawVenta, rawAlquiler, agency) {
-  const agencyNum = agency.split('_')[0];
-
-  function parseInmovillaResponse(raw, tipoForzado) {
-    if (!raw) return [];
-    let data;
-    try { data = JSON.parse(raw); } catch { return []; }
-
-    // Inmovilla devuelve un array donde [0] es paginación y el resto son inmuebles
-    // O puede ser un objeto con campo 'ofertas' o similar
-    let list = [];
-    if (Array.isArray(data)) {
-      // El primer elemento suele ser {elementos, posicion, total} — lo saltamos
-      list = data.filter(item => item && typeof item === 'object' && item.cod_ofer !== undefined);
-    } else {
-      // Buscar en campos conocidos
-      for (const k of ['ofertas', 'inmuebles', 'data']) {
-        if (data[k] && Array.isArray(data[k])) { list = data[k]; break; }
-      }
-      // Si no, iterar todos los campos buscando arrays de inmuebles
-      if (!list.length) {
-        for (const k of Object.keys(data)) {
-          if (Array.isArray(data[k]) && data[k].length > 0 && data[k][0] && data[k][0].cod_ofer !== undefined) {
-            list = data[k]; break;
-          }
-        }
-      }
-    }
-
-    return list
-      .filter(p => p && (!p.nodisponible || p.nodisponible == 0))
-      .map(p => mapProperty(p, agencyNum, tipoForzado));
-  }
-
-  const propVenta = parseInmovillaResponse(rawVenta, 'sale');
-  const propAlquiler = parseInmovillaResponse(rawAlquiler, 'rent');
-  const properties = [...propVenta, ...propAlquiler];
-
-  res.setHeader('Cache-Control', 's-maxage=1800, stale-while-revalidate');
-  return res.status(200).json({
-    properties,
-    total: properties.length,
-    venta: propVenta.length,
-    alquiler: propAlquiler.length,
-    updated: new Date().toISOString()
-  });
-}
-
-function mapProperty(p, agency, tipoForzado) {
-  const cod = p.cod_ofer||p.codofer||p.id||'';
-  const fl  = p.fotoletra||p.foto_letra||'';
-  const nf  = parseInt(p.numfotos)||0;
-  const imgs = [];
-  if (nf>0&&fl&&cod) for(let i=1;i<=Math.min(nf,20);i++) imgs.push(`https://fotos15.apinmo.com/${agency}/${cod}/${fl}-${i}.jpg`);
-
-  // Tipo de operación: forzado por la petición (sale/rent)
-  const type = tipoForzado || 'sale';
-
-  // Subtipo basado en nbtipo (texto real de Inmovilla)
-  const nbtipo = (p.nbtipo||'').toLowerCase();
-  let subtype = 'piso';
-  if (nbtipo.includes('local')) subtype = 'local';
-  else if (nbtipo.includes('oficina')) subtype = 'oficina';
-  else if (nbtipo.includes('nave')) subtype = 'nave';
-  else if (nbtipo.includes('chalet') || nbtipo.includes('casa') || nbtipo.includes('unifamiliar')) subtype = 'chalet';
-  else if (nbtipo.includes('ático') || nbtipo.includes('atico')) subtype = 'atico';
-  else if (nbtipo.includes('apartamento')) subtype = 'apartamento';
-  else if (nbtipo.includes('estudio')) subtype = 'estudio';
-  else if (nbtipo.includes('adosado')) subtype = 'adosado';
-  else if (nbtipo.includes('piso') || nbtipo.includes('piso')) subtype = 'piso';
-  else if (nbtipo.includes('terreno') || nbtipo.includes('solar')) subtype = 'terreno';
-  else if (nbtipo.includes('garaje') || nbtipo.includes('plaza')) subtype = 'garaje';
-
-  const titulo = p.nbtipo ? `${p.nbtipo} en ${p.zona||p.ciudad||'Pontevedra'}` : `Inmueble en ${p.zona||p.ciudad||'Pontevedra'}`;
-  const price = parseFloat(p.precioinmo||p.precioalq||p.precio||0);
-
-  return {
-    id: cod,
-    reference: p.ref||String(cod),
-    type,
-    subtype,
-    title: titulo,
-    description: p.observaciones||p.descripcion||'',
-    price,
-    price_alquiler: parseFloat(p.precioalq)||null,
-    price_night: parseFloat(p.precio_noche||0)||null,
-    location: [p.ciudad, p.zona].filter(Boolean).join(' · ') || 'Pontevedra',
-    address: [p.calle, p.numero, p.ciudad].filter(Boolean).join(', '),
-    bedrooms: parseInt(p.habitaciones)||0,
-    bathrooms: parseInt(p.banyos||p.banios||p.sumaseos)||0,
-    surface: parseInt(p.m_cons||p.superficie||p.sup_cons)||0,
-    floor: (p.planta!=null&&p.planta!=='')?`${p.planta}º`:'',
-    garage: p.garaje==1||p.parking==1||p.plaza_gara==1,
-    lift: p.ascensor==1,
-    exclusive: p.exclu==1||p.exclusiva==1,
-    featured: p.destacado==1||p.destestrella==1,
-    available: !p.nodisponible||p.nodisponible==0,
-    lat: parseFloat(p.latitud)||null,
-    lng: parseFloat(p.altitud)||null,
-    agent: p.nombreagente ? `${p.nombreagente} ${p.apellidosagente||''}`.trim() : null,
-    agent_phone: p.telefono1agente||null,
-    agent_email: p.emailagente||null,
-    features: (()=>{const f=[];
-      if(p.terraza==1)f.push('Terraza');if(p.jardin==1)f.push('Jardín');if(p.piscina_com==1||p.piscina_prop==1)f.push('Piscina');
-      if(p.garaje==1)f.push('Garaje');if(p.parking==1)f.push('Parking');if(p.ascensor==1)f.push('Ascensor');
-      if(p.trastero==1)f.push('Trastero');if(p.aire_con==1)f.push('Aire acondicionado');
-      if(p.muebles==1)f.push('Amueblado');if(p.alarma==1)f.push('Alarma');
-      if(p.calefaccion==1)f.push('Calefacción');if(p.primera_line==1)f.push('Primera línea');
-      return f;})(),
-    images: imgs,
-    video_url: p.video||p.url_video||null,
-    virtual_tour_url: p.url_tour||null,
-    floor_plan_url: p.url_plano||null,
-  };
 }
