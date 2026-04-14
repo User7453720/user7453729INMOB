@@ -76,7 +76,10 @@ async function serveProperties(res, raw, agency) {
   }
 
   let list = [];
-  if (Array.isArray(data)) {
+  // Inmovilla devuelve {"paginacion":[{posicion,elementos,total},{cod_ofer,...},...]}
+  if (data && data.paginacion && Array.isArray(data.paginacion)) {
+    list = data.paginacion.filter(item => item && item.cod_ofer !== undefined);
+  } else if (Array.isArray(data)) {
     list = data.filter(item => item && typeof item === 'object' && item.cod_ofer !== undefined);
   } else {
     for (const k of ['ofertas', 'inmuebles', 'data', 'properties']) {
