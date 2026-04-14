@@ -75,7 +75,7 @@ export default async function handler(req, res) {
   const properties = allProperties
     .filter(p => p && (!p.nodisponible || p.nodisponible == 0))
     .map(p => mapProperty(p, agencyNum));
-  res.setHeader('Cache-Control', 's-maxage=1800, stale-while-revalidate');
+  res.setHeader('Cache-Control', 's-maxage=30, stale-while-revalidate');
   return res.status(200).json({ properties, total: properties.length, updated: new Date().toISOString() });
 }
 
