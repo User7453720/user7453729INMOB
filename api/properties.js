@@ -48,51 +48,50 @@ export default async function handler(req, res) {
     });
   }
 
-  // Llamar a Inmovilla con la IP buena (3 intentos)
-  const texto = `${agency};${pass};${IDIOMA};lostipos;paginacion;1;200;;precioinmo`;
-  const body  = `param=${phpRaw(texto)}&elDominio=inmobiliariapedrosa.com&json=1&ia=${ip}`;
-
-  for (let i = 0; i < 3; i++) {
-    try {
-      const raw = await fetchViaTunnel(INMOVILLA_URL, body, fixieUrl, 'POST');
-      console.log(`[inmovilla intento ${i+1}] inicio="${raw.substring(0, 80)}"`);
-      if (!raw.includes('NECESITAMOS') && raw.trim().length > 100) {
-        return await serveProperties(res, raw, agency);
+  // Llamar a Inmovilla: keyacci=1 (venta) y keyacci=2 (alquiler)
+  const allProperties = [];
+  for (const keyacci of [1, 2]) {
+    const texto = `${agency};${pass};${IDIOMA};lostipos;paginacion;1;200;${keyacci};precioinmo`;
+    const body  = `param=${phpRaw(texto)}&elDominio=inmobiliariapedrosa.com&json=1&ia=${ip}`;
+    for (let i = 0; i < 3; i++) {
+      try {
+        const raw = await fetchViaTunnel(INMOVILLA_URL, body, fixieUrl, 'POST');
+        console.log(`[keyacci=${keyacci} intento ${i+1}] inicio="${raw.substring(0, 60)}"`);
+        if (!raw.includes('NECESITAMOS') && raw.trim().length > 100) {
+          const parsed = parseProperties(raw);
+          allProperties.push(...parsed);
+          break;
+        }
+      } catch(e) {
+        console.error(`[keyacci=${keyacci} intento ${i+1}] error: ${e.message}`);
       }
-      console.log(`[inmovilla intento ${i+1}] rechazado: ${raw.substring(0, 80)}`);
-    } catch(e) {
-      console.error(`[inmovilla intento ${i+1}] error: ${e.message}`);
     }
   }
 
-  return res.status(502).json({ error: 'No se pudo obtener propiedades', hint: '/api/properties?diag=1' });
-}
-
-async function serveProperties(res, raw, agency) {
+  if (allProperties.length === 0) {
+    return res.status(502).json({ error: 'No se pudo obtener propiedades', hint: '/api/properties?diag=1' });
+  }
   const agencyNum = agency.split('_')[0];
-  let data;
-  try { data = JSON.parse(raw); } catch {
-    return res.status(200).json({ error: 'JSON invalido', raw: raw.substring(0, 200) });
-  }
-
-  let list = [];
-  // Inmovilla devuelve {"paginacion":[{posicion,elementos,total},{cod_ofer,...},...]}
-  if (data && data.paginacion && Array.isArray(data.paginacion)) {
-    list = data.paginacion.filter(item => item && item.cod_ofer !== undefined);
-  } else if (Array.isArray(data)) {
-    list = data.filter(item => item && typeof item === 'object' && item.cod_ofer !== undefined);
-  } else {
-    for (const k of ['ofertas', 'inmuebles', 'data', 'properties']) {
-      if (data[k] && Array.isArray(data[k])) { list = data[k]; break; }
-    }
-  }
-
-  const properties = list
+  const properties = allProperties
     .filter(p => p && (!p.nodisponible || p.nodisponible == 0))
     .map(p => mapProperty(p, agencyNum));
-
   res.setHeader('Cache-Control', 's-maxage=1800, stale-while-revalidate');
   return res.status(200).json({ properties, total: properties.length, updated: new Date().toISOString() });
+}
+
+function parseProperties(raw) {
+  let data;
+  try { data = JSON.parse(raw); } catch { return []; }
+  if (data && data.paginacion && Array.isArray(data.paginacion)) {
+    return data.paginacion.filter(item => item && item.cod_ofer !== undefined);
+  } else if (Array.isArray(data)) {
+    return data.filter(item => item && typeof item === 'object' && item.cod_ofer !== undefined);
+  } else {
+    for (const k of ['ofertas', 'inmuebles', 'data', 'properties']) {
+      if (data[k] && Array.isArray(data[k])) return data[k];
+    }
+  }
+  return [];
 }
 
 function mapProperty(p, agency) {
