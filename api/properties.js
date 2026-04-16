@@ -7,10 +7,47 @@ const INMOVILLA_URL = 'https://apiweb.inmovilla.com/apiweb/apiweb.php';
 const IDIOMA = 1;
 const GOOD_IP = '54.195.3.54';
 
-// Subtypes a EXCLUIR de la web (locales, naves, restaurantes, almacenes)
-const SUBTYPES_EXCLUIR = new Set([
-  'local', 'nave', 'almacen', 'almacén', 'restaurante', 'industria'
+// key_tipo a EXCLUIR — comercial/industrial, no residencial
+// Fuente: https://procesos.apinmo.com/api/v1/doc/
+const TIPOS_EXCLUIR = new Set([
+  1199, // Despacho
+  1299, // Local comercial
+  1399, // Oficina
+  1499, // Albergue
+  1599, // Almacén
+  1799, // Fábrica
+  1899, // Hostal
+  1999, // Hotel
+  2099, // Nave industrial
+  2199, // Amarre
+  2299, // Bodega
+  2499, // Lagar
+  4499, // Negocio
+  5399, // Kiosko
+  6799, // Camping
+  7699, // Barraca
+  7799, // Bar
+  7899, // Restaurante
+  7999, // Cafetería
+  8299, // Discoteca
+  9599, // Complejo turístico
+  9899, // Pub
+  10099,// Merendero
+  10199,// Gasolinera
+  10399,// Campo de golf
+  11499,// Almazara
+  11599,// Hotel rural
+  11999,// Centro comercial
+  20699,// Residencia
 ]);
+
+// keyacci — según doc oficial
+const TYPE_MAP = {
+  1: 'sale', 13: 'sale', 14: 'sale',
+  2: 'rent', 15: 'rent', 16: 'rent', 20: 'rent',
+  3: 'transfer', 4: 'sale', 5: 'sale',
+  9: 'vacation',
+};
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -27,7 +64,6 @@ export default async function handler(req, res) {
     return await runDiag(res, agency, pass, fixieUrl);
   }
 
-  // phpRawurlencode exacto igual que PHP rawurlencode
   const phpRaw = (s) => s.split('').map(c => {
     if (/[A-Za-z0-9_.\-~]/.test(c)) return c;
     return '%' + c.charCodeAt(0).toString(16).toUpperCase();
@@ -65,11 +101,11 @@ export default async function handler(req, res) {
         console.log(`[keyacci=${keyacci} intento ${i+1}] inicio="${raw.substring(0, 80)}"`);
         if (!raw.includes('NECESITAMOS') && raw.trim().length > 100) {
           const parsed = parseProperties(raw);
-          console.log(`[keyacci=${keyacci}] propiedades parseadas: ${parsed.length}`);
+          console.log(`[keyacci=${keyacci}] parseadas: ${parsed.length}`);
           rawList.push(...parsed);
           ok = true;
         } else {
-          console.warn(`[keyacci=${keyacci} intento ${i+1}] respuesta inválida: ${raw.substring(0, 100)}`);
+          console.warn(`[keyacci=${keyacci} intento ${i+1}] inválida: ${raw.substring(0, 100)}`);
         }
       } catch(e) {
         console.error(`[keyacci=${keyacci} intento ${i+1}] error: ${e.message}`);
@@ -81,26 +117,25 @@ export default async function handler(req, res) {
     return res.status(502).json({ error: 'No se pudo obtener propiedades', hint: '/api/properties?diag=1' });
   }
 
-  const agencyNum = agency.split('_')[0];
+  const agencyNum = agency.split('_')[0]; // "5430"
 
-  // DEDUPLICAR por cod_ofer antes de mapear
+  // DEDUPLICAR por cod_ofer
   const seen = new Set();
   const unique = rawList.filter(p => {
     const id = p.cod_ofer || p.codofer || p.id;
-    if (!id || seen.has(id)) return false;
-    seen.add(id);
+    if (!id || seen.has(String(id))) return false;
+    seen.add(String(id));
     return true;
   });
 
   console.log(`[total] rawList=${rawList.length}, unique=${unique.length}`);
 
-  // Mapear y filtrar
   const properties = unique
     .filter(p => p && (!p.nodisponible || p.nodisponible == 0))
-    .map(p => mapProperty(p, agencyNum))
-    .filter(p => !SUBTYPES_EXCLUIR.has(p.subtype));
+    .filter(p => !TIPOS_EXCLUIR.has(Number(p.key_tipo)))
+    .map(p => mapProperty(p, agencyNum));
 
-  console.log(`[total] tras filtro subtype: ${properties.length}`);
+  console.log(`[total] tras filtros: ${properties.length}`);
 
   res.setHeader('Cache-Control', 's-maxage=30, stale-while-revalidate=60');
   return res.status(200).json({
@@ -113,8 +148,7 @@ export default async function handler(req, res) {
 function parseProperties(raw) {
   let data;
   try { data = JSON.parse(raw); } catch { return []; }
-  if (data && data.paginacion && Array.isArray(data.paginacion)) {
-    // El primer elemento es metadata (posicion/elementos/total), el resto son propiedades
+  if (data?.paginacion && Array.isArray(data.paginacion)) {
     return data.paginacion.filter(item => item && item.cod_ofer !== undefined);
   } else if (Array.isArray(data)) {
     return data.filter(item => item && typeof item === 'object' && item.cod_ofer !== undefined);
@@ -127,37 +161,20 @@ function parseProperties(raw) {
 }
 
 function mapProperty(p, agency) {
-  const typeMap = { 1:'sale', 2:'rent', 3:'vacation', 4:'new_build', '1':'sale', '2':'rent', '3':'vacation', '4':'new_build' };
   const cod = p.cod_ofer || p.codofer || p.id || '';
   const fl  = p.fotoletra || p.foto_letra || '';
   const nf  = parseInt(p.numfotos) || 0;
   const imgs = [];
   if (nf > 0 && fl && cod) {
-    for (let i = 1; i <= Math.min(nf, 20); i++) imgs.push(`https://fotos15.apinmo.com/${agency}/${cod}/${fl}-${i}.jpg`);
+    for (let i = 1; i <= Math.min(nf, 20); i++) {
+      imgs.push(`https://fotos15.apinmo.com/${agency}/${cod}/${fl}-${i}.jpg`);
+    }
   }
 
-  const tipoAcci = p.keyacci || p.key_acci || 2;
-  const type = typeMap[tipoAcci] || 'rent';
-
-  const nbtipo = (p.nbtipo || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-  let subtype = 'piso';
-  if      (nbtipo.includes('local'))                            subtype = 'local';
-  else if (nbtipo.includes('nave'))                             subtype = 'nave';
-  else if (nbtipo.includes('almacen'))                         subtype = 'almacen';
-  else if (nbtipo.includes('restaurante'))                     subtype = 'restaurante';
-  else if (nbtipo.includes('industria'))                       subtype = 'industria';
-  else if (nbtipo.includes('oficina'))                         subtype = 'oficina';
-  else if (nbtipo.includes('chalet') || nbtipo.includes('casa')) subtype = 'chalet';
-  else if (nbtipo.includes('atico'))                           subtype = 'atico';
-  else if (nbtipo.includes('duplex') || nbtipo.includes('duplex')) subtype = 'duplex';
-  else if (nbtipo.includes('apartamento'))                     subtype = 'apartamento';
-  else if (nbtipo.includes('adosado'))                         subtype = 'adosado';
-  else if (nbtipo.includes('finca'))                           subtype = 'finca';
-  else if (nbtipo.includes('terreno') || nbtipo.includes('solar') || nbtipo.includes('parcela')) subtype = 'terreno';
-  else if (nbtipo.includes('garaje') || nbtipo.includes('parking')) subtype = 'garaje';
-  else if (nbtipo.includes('trastero'))                        subtype = 'trastero';
-  else if (nbtipo.includes('edificio'))                        subtype = 'edificio';
-
+  const tipoAcci = Number(p.keyacci || p.key_acci || 2);
+  const type = TYPE_MAP[tipoAcci] || 'rent';
+  const keyTipo = Number(p.key_tipo || 0);
+  const subtype = getSubtype(keyTipo, p.nbtipo || '');
   const price = parseFloat(p.precioinmo || p.precioalq || p.precio || 0);
 
   return {
@@ -165,8 +182,11 @@ function mapProperty(p, agency) {
     reference: p.ref || String(cod),
     type,
     subtype,
-    nbtipo_raw: p.nbtipo || '', // debug: ver el tipo original de Inmovilla
-    title: p.nbtipo ? `${p.nbtipo} en ${p.zona || p.ciudad || 'Pontevedra'}` : `Inmueble en ${p.zona || p.ciudad || 'Pontevedra'}`,
+    key_tipo: keyTipo,
+    nbtipo: p.nbtipo || '',
+    title: p.nbtipo
+      ? `${p.nbtipo} en ${p.zona || p.ciudad || 'Pontevedra'}`
+      : `Inmueble en ${p.zona || p.ciudad || 'Pontevedra'}`,
     description: p.observaciones || p.descripcion || '',
     price,
     price_alquiler: parseFloat(p.precioalq) || null,
@@ -187,20 +207,7 @@ function mapProperty(p, agency) {
     agent: p.nombreagente ? `${p.nombreagente} ${p.apellidosagente || ''}`.trim() : null,
     agent_phone: p.telefono1agente || null,
     agent_email: p.emailagente || null,
-    features: (() => {
-      const f = [];
-      if (p.terraza == 1) f.push('Terraza');
-      if (p.jardin == 1) f.push('Jardín');
-      if (p.piscina_com == 1 || p.piscina_prop == 1) f.push('Piscina');
-      if (p.garaje == 1) f.push('Garaje');
-      if (p.parking == 1) f.push('Parking');
-      if (p.ascensor == 1) f.push('Ascensor');
-      if (p.trastero == 1) f.push('Trastero');
-      if (p.aire_con == 1) f.push('Aire acondicionado');
-      if (p.muebles == 1) f.push('Amueblado');
-      if (p.calefaccion == 1) f.push('Calefacción');
-      return f;
-    })(),
+    features: buildFeatures(p),
     images: imgs,
     video_url: p.video || p.url_video || null,
     virtual_tour_url: p.url_tour || null,
@@ -208,41 +215,99 @@ function mapProperty(p, agency) {
   };
 }
 
+function getSubtype(keyTipo, nbtipo) {
+  const map = {
+    199:  'adosado',    299:  'bungalow',   399:  'casa',
+    499:  'chalet',     999:  'adosado',    1099: 'chalet',
+    2399: 'garaje',     2599: 'garaje',     2699: 'trastero',
+    2799: 'apartamento',2899: 'atico',      2999: 'duplex',
+    3099: 'estudio',    3199: 'habitacion', 3299: 'loft',
+    3399: 'piso',       3499: 'planta_baja',3599: 'triplex',
+    3699: 'finca',      3799: 'terreno',    3899: 'solar',
+    3999: 'terreno',    4099: 'terreno',    4199: 'terreno',
+    4399: 'atico',      4599: 'casa',       4699: 'atico',
+    4799: 'atico',      4999: 'chalet',     5099: 'terreno',
+    5299: 'sotano',     5499: 'bungalow',   5699: 'chalet',
+    5799: 'casa',       5999: 'casa',       6099: 'casa',
+    6299: 'casa',       6499: 'chalet',     6699: 'pazo',
+    6899: 'casa',       7099: 'casa',       7599: 'casa',
+    8699: 'finca',      8799: 'terreno',    8899: 'finca',
+    8999: 'finca',      9099: 'terreno',    9699: 'piso',
+    10999:'terreno',    11099:'finca',      11199:'finca',
+    11299:'finca',      11399:'finca',      11699:'casa',
+    11899:'finca',      20099:'chalet',     20199:'finca',
+    20299:'casa',       20399:'finca',      20899:'solar',
+    20999:'atico',      21099:'duplex',     21199:'casa',
+    21399:'chalet',
+  };
+  if (map[keyTipo]) return map[keyTipo];
+  // Fallback por texto
+  const nb = (nbtipo || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  if (nb.includes('piso'))        return 'piso';
+  if (nb.includes('apartamento')) return 'apartamento';
+  if (nb.includes('atico'))       return 'atico';
+  if (nb.includes('chalet'))      return 'chalet';
+  if (nb.includes('casa'))        return 'casa';
+  if (nb.includes('duplex'))      return 'duplex';
+  if (nb.includes('adosado'))     return 'adosado';
+  if (nb.includes('terreno') || nb.includes('solar') || nb.includes('parcela')) return 'terreno';
+  if (nb.includes('garaje'))      return 'garaje';
+  return 'otro';
+}
+
+function buildFeatures(p) {
+  const f = [];
+  if (p.terraza == 1)                            f.push('Terraza');
+  if (p.jardin == 1)                             f.push('Jardín');
+  if (p.piscina_com == 1 || p.piscina_prop == 1) f.push('Piscina');
+  if (p.garaje == 1)                             f.push('Garaje');
+  if (p.parking == 1)                            f.push('Parking');
+  if (p.ascensor == 1)                           f.push('Ascensor');
+  if (p.trastero == 1)                           f.push('Trastero');
+  if (p.aire_con == 1)                           f.push('Aire acondicionado');
+  if (p.muebles == 1)                            f.push('Amueblado');
+  if (p.calefaccion == 1)                        f.push('Calefacción');
+  if (p.electro == 1)                            f.push('Electrodomésticos');
+  if (p.todoext == 1)                            f.push('Todo exterior');
+  return f;
+}
+
 async function runDiag(res, agency, pass, fixieUrl) {
-  const phpRaw = (s) => s.split('').map(c => /[A-Za-z0-9_.\-~]/.test(c) ? c : '%' + c.charCodeAt(0).toString(16).toUpperCase()).join('');
+  const phpRaw = (s) => s.split('').map(c =>
+    /[A-Za-z0-9_.\-~]/.test(c) ? c : '%' + c.charCodeAt(0).toString(16).toUpperCase()
+  ).join('');
+
   let ip = 'error';
   try {
     const r = await fetchViaTunnel('https://api.ipify.org', '?format=json', fixieUrl, 'GET');
     ip = JSON.parse(r).ip;
   } catch(e) { ip = e.message; }
 
-  // Petición de diagnóstico sin keyacci para ver estructura raw
   const texto = `${agency};${pass};${IDIOMA};lostipos;paginacion;1;5;1;precioinmo`;
   const body  = `param=${phpRaw(texto)}&elDominio=inmobiliariapedrosa.com&json=1&ia=${ip}`;
   let raw = 'error';
   try { raw = await fetchViaTunnel(INMOVILLA_URL, body, fixieUrl, 'POST'); } catch(e) { raw = e.message; }
 
-  // Intentar parsear y mostrar campos del primer inmueble
-  let firstItem = null;
+  let items = [];
   try {
     const d = JSON.parse(raw);
-    const items = d?.paginacion?.filter(i => i?.cod_ofer) || [];
-    firstItem = items[0] || null;
+    items = (d?.paginacion || []).filter(i => i?.cod_ofer);
   } catch {}
 
-  const ipOk = ip === GOOD_IP;
+  const firstItem = items[0] || null;
   return res.status(200).json({
     ip,
-    ip_valida: ipOk ? '✅ correcta' : `❌ no autorizada (la buena es ${GOOD_IP})`,
+    ip_valida: ip === GOOD_IP ? '✅ correcta' : `❌ no autorizada (la buena es ${GOOD_IP})`,
     param_enviado: body.substring(0, 200),
-    respuesta_inicio: raw.substring(0, 500),
+    respuesta_inicio: raw.substring(0, 400),
+    total_items_raw: items.length,
     primer_inmueble_campos: firstItem ? Object.keys(firstItem) : null,
     primer_inmueble: firstItem,
     ok: !raw.includes('NECESITAMOS') && raw.length > 100
   });
 }
 
-// fetchViaTunnel con headers HTTP idénticos a los que Inmovilla espera
+// ── fetchViaTunnel ─────────────────────────────────────────────────────────────
 function fetchViaTunnel(targetUrl, pathOrBody, proxyUrl, method) {
   return new Promise((resolve, reject) => {
     const target = new URL(targetUrl);
