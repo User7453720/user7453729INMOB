@@ -1188,7 +1188,7 @@ img[loading="lazy"]{opacity:1}
       <div class="captacion-form-section">
         <h3>Solicita tu tasación gratuita</h3>
         <p>Sin compromiso. Un agente te contactará en menos de 2 horas.</p>
-        <form id="captacion-form-el" action="/api/contact" method="POST">
+        <form id="captacion-form-el" action="https://api.web3forms.com/submit" method="POST"><input type="hidden" name="access_key" value="PONaquituclaveaqui"><input type="hidden" name="subject" value="Solicitud de tasacion - Inmobiliaria Pedrosa"><input type="hidden" name="from_name" value="Web Inmobiliaria Pedrosa"><input type="hidden" name="redirect" value="false"><input type="checkbox" name="botcheck" style="display:none">
           <input type="hidden" name="tipo" value="Captación / Solicitud de tasación">
           <div class="form-row-2">
             <div class="form-group"><label>Nombre</label><input type="text" name="nombre" placeholder="Tu nombre" required></div>
@@ -1361,7 +1361,12 @@ img[loading="lazy"]{opacity:1}
       </div>
     </div>
     <div class="contact-form-box">
-      <form id="contact-form" action="/api/contact" method="POST">
+      <form id="contact-form" action="https://api.web3forms.com/submit" method="POST">
+        <input type="hidden" name="access_key" value="PONaquituclaveaqui">
+        <input type="hidden" name="subject" value="Nuevo contacto web - Inmobiliaria Pedrosa">
+        <input type="hidden" name="from_name" value="Web Inmobiliaria Pedrosa">
+        <input type="hidden" name="redirect" value="false">
+        <input type="checkbox" name="botcheck" style="display:none">
         <div class="form-row-2">
           <div class="form-group"><label>Nombre</label><input type="text" name="nombre" placeholder="Tu nombre" required></div>
           <div class="form-group"><label>Teléfono</label><input type="tel" name="telefono" placeholder="+34 600 000 000"></div>
@@ -1913,54 +1918,44 @@ function searchPanel(panelId){
 }
 
 function applySearchToPanel(panelId, tipo, zona, ref, maxPrecio, minHabs, activeExtras){
-  minHabs = minHabs || 0;
+  minHabs = parseInt(minHabs) || 0;
   activeExtras = activeExtras || [];
+  var hasFilter = tipo||zona||ref||maxPrecio||minHabs||(activeExtras.length>0);
 
-  var gridId = panelId === 'compra' ? 'grid-compra' : null;
-  var grid = gridId ? document.getElementById(gridId) : document.querySelector('#panel-'+panelId+' .props-grid');
-  if(!grid) return;
-
-  var cards = Array.from(grid.querySelectorAll('.prop-card'));
-  var shown = 0;
+  var cards=PANEL_CARDS[panelId]||[];
+  var shown=0;
 
   cards.forEach(function(card){
-    var cardTipo  = (card.dataset.type||'').toLowerCase();
-    var cardPrice = parseInt(card.dataset.price)||0;
-    var cardHabs  = parseInt(card.dataset.habs||card.querySelector('.prop-feat strong') ? 0 : 0)||0;
-    var cardText  = card.innerText.toLowerCase();
-    var cardRef   = card.querySelector('.prop-ref') ? card.querySelector('.prop-ref').innerText.toLowerCase() : '';
-
-    // Intentar obtener habitaciones del texto de la tarjeta
-    var habsMatch = cardText.match(/(\d+)\s*hab/);
-    if(habsMatch) cardHabs = parseInt(habsMatch[1]);
-
-    var ok = true;
-    if(tipo      && cardTipo !== tipo)                  ok = false;
-    if(zona      && cardText.indexOf(zona) === -1)      ok = false;
-    if(ref       && cardRef.indexOf(ref)   === -1)      ok = false;
-    if(maxPrecio && cardPrice > parseInt(maxPrecio))    ok = false;
-    if(minHabs   && cardHabs < minHabs)                 ok = false;
-
-    // Filtrar por características extra
+    var ok=true;
+    if(tipo      && card.dataset.type !== tipo)                      ok=false;
+    if(zona      && card.dataset.zona.indexOf(zona.toLowerCase())===-1) ok=false;
+    if(ref       && card.dataset.ref.indexOf(ref.toLowerCase())===-1)   ok=false;
+    if(maxPrecio && parseInt(card.dataset.price)>parseInt(maxPrecio))    ok=false;
+    if(minHabs   && parseInt(card.dataset.habs)<minHabs)                ok=false;
     activeExtras.forEach(function(extra){
-      if(cardText.indexOf(extra) === -1) ok = false;
+      if(card.dataset.features.indexOf(extra)===-1) ok=false;
     });
-
-    card.style.display = ok ? '' : 'none';
+    card.dataset.hidden=ok?'0':'1';
     if(ok) shown++;
   });
 
-  var hasFilter = tipo||zona||ref||maxPrecio||minHabs||(activeExtras.length>0);
-  var infoEl = document.getElementById('sb-'+panelId+'-info');
+  // Resetear paginación y re-renderizar
+  PANEL_PAGE[panelId]=1;
+  var gridId=panelId==='compra'?'grid-compra':null;
+  var grid=gridId?document.getElementById(gridId):document.querySelector('#panel-'+panelId+' .props-grid');
+  renderPanelPage(panelId,grid,1);
+
+  var infoEl=document.getElementById('sb-'+panelId+'-info');
   if(infoEl){
+    infoEl.dataset.fromSearch=hasFilter?'1':'';
     if(hasFilter){
-      infoEl.textContent = shown > 0
-        ? shown + ' propiedad' + (shown>1?'es':'') + ' encontrada' + (shown>1?'s':'')
-        : 'No se encontraron propiedades con esos criterios';
-      infoEl.style.color = shown > 0 ? 'var(--green3)' : '#c0392b';
+      infoEl.textContent=shown>0
+        ?shown+' propiedad'+(shown>1?'es':'')+' encontrada'+(shown>1?'s':'')
+        :'No se encontraron propiedades con esos criterios';
+      infoEl.style.color=shown>0?'var(--green3)':'#c0392b';
     } else {
-      infoEl.textContent = '';
-      cards.forEach(function(c){c.style.display='';});
+      infoEl.textContent=cards.length+' propiedades';
+      infoEl.style.color='var(--green3)';
     }
   }
 }
@@ -2315,13 +2310,15 @@ document.addEventListener('keydown',function(e){
 });
 
 // ── INMOVILLA ACTIVADO ──
-// Token y agencia configurados en Vercel Environment Variables
-// La web llama a /api/properties (proxy seguro en Vercel)
 var INMOVILLA_ENABLED=true;
 var INMOVILLA_TYPE_MAP={'sale':'compra','rent':'alquiler-general','student':'alquiler-est','vacation':'vacacional','new_build':'promociones'};
+var PAGE_SIZE=12; // propiedades por página
+// Almacén de todas las cards por panel (para paginación y filtros)
+var PANEL_CARDS={};
+var PANEL_PAGE={};
+
 function loadInmovillaProperties(){
   if(!INMOVILLA_ENABLED)return;
-  // Limpiar grids SIEMPRE al inicio para no mostrar propiedades de ejemplo
   var grids={
     'compra':document.getElementById('grid-compra'),
     'alquiler-general':document.querySelector('#panel-alquiler-general .props-grid'),
@@ -2329,8 +2326,6 @@ function loadInmovillaProperties(){
     'vacacional':document.querySelector('#panel-vacacional .props-grid'),
     'promociones':document.querySelector('#panel-promociones .props-grid')
   };
-  var msgCargando='';
-  Object.values(grids).forEach(function(g){if(g && !g.querySelector('.prop-placeholder') && !g.querySelector('.prop-card'))g.innerHTML=msgCargando;});
 
   fetch('/api/properties')
     .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
@@ -2338,16 +2333,23 @@ function loadInmovillaProperties(){
       var props=data.properties||data;
       Object.values(grids).forEach(function(g){if(g)g.innerHTML='';});
       if(!Array.isArray(props)||props.length===0)throw new Error('Sin propiedades');
+
+      // Agrupar cards por panel
+      Object.keys(grids).forEach(function(k){PANEL_CARDS[k]=[];PANEL_PAGE[k]=1;});
       var total=0;
       props.forEach(function(p){
-        if(p.available===false)return;
-        if(!p.id)return;
+        if(p.available===false||!p.id)return;
         var type=INMOVILLA_TYPE_MAP[p.type]||'compra';
-        var grid=grids[type];
-        if(!grid)return;
-        grid.appendChild(buildInmovillaCard(p,type));
+        if(!grids[type])return;
+        PANEL_CARDS[type].push(buildInmovillaCard(p,type));
         total++;
       });
+
+      // Renderizar primera página de cada panel
+      Object.keys(grids).forEach(function(panelId){
+        renderPanelPage(panelId,grids[panelId],1);
+      });
+
       var hora=new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
       document.querySelectorAll('.inmovilla-banner').forEach(function(b){
         b.style.borderColor='var(--green3)';
@@ -2357,19 +2359,52 @@ function loadInmovillaProperties(){
     })
     .catch(function(err){
       console.error('[API]',err);
-      // Solo mostrar error en grids que siguen con placeholders (no cargaron nada)
       Object.values(grids).forEach(function(g){
-        if(g && g.querySelector('.prop-placeholder')){
+        if(g&&(!g.querySelector('.prop-card'))){
           g.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--gray2);font-family:Lato,sans-serif">No se pudieron cargar las propiedades.<br>Llámanos al <a href=\'tel:+34986866618\' style=\'color:var(--green)\'>986 866 618</a></div>';
         }
       });
     });
 }
 
+function renderPanelPage(panelId,grid,page){
+  if(!grid)return;
+  var cards=PANEL_CARDS[panelId]||[];
+  // Filtrar las visibles (las que no tienen display:none por filtro activo)
+  var visible=cards.filter(function(c){return c.dataset.hidden!=='1';});
+  var start=(page-1)*PAGE_SIZE;
+  var end=page*PAGE_SIZE;
+  // Limpiar y añadir las de esta página
+  grid.innerHTML='';
+  visible.slice(0,end).forEach(function(c){grid.appendChild(c);});
+  // Botón "Ver más"
+  var btnId='vermas-'+panelId;
+  var oldBtn=document.getElementById(btnId);
+  if(oldBtn)oldBtn.remove();
+  if(visible.length>end){
+    var btn=document.createElement('button');
+    btn.id=btnId;
+    btn.className='btn-green';
+    btn.style.cssText='grid-column:1/-1;margin:1rem auto;width:auto;padding:12px 40px;display:block';
+    btn.textContent='Ver más propiedades ('+(visible.length-end)+' restantes)';
+    btn.onclick=function(){
+      PANEL_PAGE[panelId]=(PANEL_PAGE[panelId]||1)+1;
+      renderPanelPage(panelId,grid,PANEL_PAGE[panelId]);
+    };
+    grid.appendChild(btn);
+  }
+  // Contador de resultados
+  var infoEl=document.getElementById('sb-'+panelId+'-info');
+  if(infoEl&&!infoEl.dataset.fromSearch){
+    infoEl.textContent=visible.length>0?visible.length+' propiedades':'No hay propiedades en este apartado';
+    infoEl.style.color=visible.length>0?'var(--green3)':'var(--gray2)';
+  }
+  PANEL_PAGE[panelId]=page;
+}
+
 function buildInmovillaCard(p,type){
   var tagLabels={compra:'Venta','alquiler-general':'Alquiler','alquiler-est':'Estudiantes',vacacional:'Vacacional',promociones:'Obra nueva'};
   var tagClasses={compra:'tag-venta','alquiler-general':'tag-alquiler','alquiler-est':'tag-est',vacacional:'tag-vacacional',promociones:'tag-nueva'};
-  // Galería navegable en la miniatura
   var imgs=p.images&&p.images.length?p.images:[];
   var imgHtml='';
   if(imgs.length>0){
@@ -2399,8 +2434,15 @@ function buildInmovillaCard(p,type){
   var cinemaData={title:p.title,price:priceStr,loc:p.location||p.address||'',beds:p.bedrooms||0,baths:p.bathrooms||0,sqm:p.surface||0,floor:p.floor||'',garage:p.garage,lift:p.lift,year:p.year||'',ref:p.reference,desc:p.description||'',features:p.features||[],video:p.video_url||false,tour:p.virtual_tour_url||false,plano:p.floor_plan_url||false,images:p.images||[]};
   var div=document.createElement('div');
   div.className='prop-card';
+  // data-* fiables: todos vienen de la API, no del DOM
   div.dataset.type=p.subtype||'piso';
   div.dataset.price=p.price||0;
+  div.dataset.habs=p.bedrooms||0;
+  div.dataset.surface=p.surface||0;
+  div.dataset.zona=(p.location||p.address||'').toLowerCase();
+  div.dataset.ref=(p.reference||'').toLowerCase();
+  div.dataset.features=(p.features||[]).join(',').toLowerCase();
+  div.dataset.hidden='0';
   div.dataset.cinema=JSON.stringify(cinemaData);
   div.setAttribute('onclick','openCinema(JSON.parse(this.dataset.cinema))');
   div.innerHTML=
