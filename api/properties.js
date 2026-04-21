@@ -1,47 +1,26 @@
 // Vercel Serverless Function — API Inmovilla
+// Usa un proxy HTTP con IP fija (Webshare u otro)
+// Variables de entorno necesarias en Vercel:
+//   INMOVILLA_AGENCY  = 5430_244_ext
+//   INMOVILLA_PASS    = B57nyC!u5
+//   PROXY_URL         = http://usuario:password@proxy.webshare.io:80
+//   PROXY_IP          = 1.2.3.4  ← IP fija del proxy (la que autorizas en Inmovilla)
+
 import net from 'net';
 import tls from 'tls';
 import { URL } from 'url';
 
 const INMOVILLA_URL = 'https://apiweb.inmovilla.com/apiweb/apiweb.php';
 const IDIOMA = 1;
-const GOOD_IP = '54.195.3.54';
 
-// key_tipo a EXCLUIR — comercial/industrial, no residencial
-// Fuente: https://procesos.apinmo.com/api/v1/doc/
+// key_tipo a EXCLUIR — comercial/industrial
 const TIPOS_EXCLUIR = new Set([
-  1199, // Despacho
-  1299, // Local comercial
-  1399, // Oficina
-  1499, // Albergue
-  1599, // Almacén
-  1799, // Fábrica
-  1899, // Hostal
-  1999, // Hotel
-  2099, // Nave industrial
-  2199, // Amarre
-  2299, // Bodega
-  2499, // Lagar
-  4499, // Negocio
-  5399, // Kiosko
-  6799, // Camping
-  7699, // Barraca
-  7799, // Bar
-  7899, // Restaurante
-  7999, // Cafetería
-  8299, // Discoteca
-  9599, // Complejo turístico
-  9899, // Pub
-  10099,// Merendero
-  10199,// Gasolinera
-  10399,// Campo de golf
-  11499,// Almazara
-  11599,// Hotel rural
-  11999,// Centro comercial
-  20699,// Residencia
+  1199, 1299, 1399, 1499, 1599, 1799, 1899, 1999,
+  2099, 2199, 2299, 2499, 4499, 5399, 6799, 7699,
+  7799, 7899, 7999, 8299, 9599, 9899, 10099, 10199,
+  10399, 11499, 11599, 11999, 20699,
 ]);
 
-// keyacci — según doc oficial
 const TYPE_MAP = {
   1: 'sale', 13: 'sale', 14: 'sale',
   2: 'rent', 15: 'rent', 16: 'rent', 20: 'rent',
@@ -56,12 +35,16 @@ export default async function handler(req, res) {
 
   const agency   = process.env.INMOVILLA_AGENCY || '5430_244_ext';
   const pass     = process.env.INMOVILLA_PASS;
-  const fixieUrl = process.env.FIXIE_URL || 'http://fixie:mJDyuli9kcV9Uuq@ventoux.usefixie.com:80';
+  const proxyUrl = process.env.PROXY_URL;
+  const proxyIp  = process.env.PROXY_IP;
 
-  if (!pass) return res.status(500).json({ error: 'INMOVILLA_PASS no configurada' });
+  if (!pass)     return res.status(500).json({ error: 'INMOVILLA_PASS no configurada' });
+  if (!proxyUrl) return res.status(500).json({ error: 'PROXY_URL no configurada' });
+  if (!proxyIp)  return res.status(500).json({ error: 'PROXY_IP no configurada' });
 
-  if (req.query && req.query.diag === '1') {
-    return await runDiag(res, agency, pass, fixieUrl);
+  // Modo diagnóstico
+  if (req.query?.diag === '1') {
+    return await runDiag(res, agency, pass, proxyUrl, proxyIp);
   }
 
   const phpRaw = (s) => s.split('').map(c => {
@@ -69,35 +52,30 @@ export default async function handler(req, res) {
     return '%' + c.charCodeAt(0).toString(16).toUpperCase();
   }).join('');
 
-  // Buscar la IP buena (hasta 12 intentos)
-  let ip = null;
-  for (let i = 0; i < 12; i++) {
-    try {
-      const r = await fetchViaTunnel('https://api.ipify.org', '?format=json', fixieUrl, 'GET');
-      const candidate = JSON.parse(r).ip;
-      console.log(`[ip intento ${i+1}] candidata: ${candidate}`);
-      if (candidate === GOOD_IP) { ip = candidate; break; }
-    } catch(e) {
-      console.error(`[ip intento ${i+1}] error: ${e.message}`);
-    }
+  // Verificar que la IP del proxy es la correcta
+  let currentIp = null;
+  try {
+    const r = await fetchViaProxy('https://api.ipify.org', '?format=json', proxyUrl, 'GET');
+    currentIp = JSON.parse(r).ip;
+    console.log(`[proxy] IP actual: ${currentIp}, esperada: ${proxyIp}`);
+  } catch(e) {
+    console.error(`[proxy] No se pudo verificar IP: ${e.message}`);
   }
 
-  if (!ip) {
-    return res.status(502).json({
-      error: 'IP de Fixie no válida tras 12 intentos',
-      hint: 'Inmovilla solo acepta 54.195.3.54 — la otra IP aún no está autorizada'
-    });
+  if (currentIp && currentIp !== proxyIp) {
+    console.warn(`[proxy] IP incorrecta: ${currentIp} (se esperaba ${proxyIp})`);
+    // No abortamos — intentamos igualmente, puede que Inmovilla acepte
   }
 
   // Llamar a Inmovilla: keyacci=1 (venta) y keyacci=2 (alquiler)
   const rawList = [];
   for (const keyacci of [1, 2]) {
     const texto = `${agency};${pass};${IDIOMA};lostipos;paginacion;1;200;${keyacci};precioinmo`;
-    const body  = `param=${phpRaw(texto)}&elDominio=inmobiliariapedrosa.com&json=1&ia=${ip}`;
+    const body  = `param=${phpRaw(texto)}&elDominio=inmobiliariapedrosa.com&json=1&ia=${proxyIp}`;
     let ok = false;
     for (let i = 0; i < 3 && !ok; i++) {
       try {
-        const raw = await fetchViaTunnel(INMOVILLA_URL, body, fixieUrl, 'POST');
+        const raw = await fetchViaProxy(INMOVILLA_URL, body, proxyUrl, 'POST');
         console.log(`[keyacci=${keyacci} intento ${i+1}] inicio="${raw.substring(0, 80)}"`);
         if (!raw.includes('NECESITAMOS') && raw.trim().length > 100) {
           const parsed = parseProperties(raw);
@@ -105,7 +83,7 @@ export default async function handler(req, res) {
           rawList.push(...parsed);
           ok = true;
         } else {
-          console.warn(`[keyacci=${keyacci} intento ${i+1}] inválida: ${raw.substring(0, 100)}`);
+          console.warn(`[keyacci=${keyacci} intento ${i+1}] inválida: ${raw.substring(0, 120)}`);
         }
       } catch(e) {
         console.error(`[keyacci=${keyacci} intento ${i+1}] error: ${e.message}`);
@@ -114,12 +92,16 @@ export default async function handler(req, res) {
   }
 
   if (rawList.length === 0) {
-    return res.status(502).json({ error: 'No se pudo obtener propiedades', hint: '/api/properties?diag=1' });
+    return res.status(502).json({
+      error: 'No se pudo obtener propiedades de Inmovilla',
+      proxy_ip: currentIp,
+      hint: 'Abre /api/properties?diag=1 para más info'
+    });
   }
 
   const agencyNum = agency.split('_')[0]; // "5430"
 
-  // DEDUPLICAR por cod_ofer
+  // Deduplicar por cod_ofer
   const seen = new Set();
   const unique = rawList.filter(p => {
     const id = p.cod_ofer || p.codofer || p.id;
@@ -137,10 +119,11 @@ export default async function handler(req, res) {
 
   console.log(`[total] tras filtros: ${properties.length}`);
 
-  res.setHeader('Cache-Control', 's-maxage=30, stale-while-revalidate=60');
+  res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=120');
   return res.status(200).json({
     properties,
     total: properties.length,
+    proxy_ip: currentIp,
     updated: new Date().toISOString()
   });
 }
@@ -217,76 +200,74 @@ function mapProperty(p, agency) {
 
 function getSubtype(keyTipo, nbtipo) {
   const map = {
-    199:  'adosado',    299:  'bungalow',   399:  'casa',
-    499:  'chalet',     999:  'adosado',    1099: 'chalet',
-    2399: 'garaje',     2599: 'garaje',     2699: 'trastero',
-    2799: 'apartamento',2899: 'atico',      2999: 'duplex',
-    3099: 'estudio',    3199: 'habitacion', 3299: 'loft',
-    3399: 'piso',       3499: 'planta_baja',3599: 'triplex',
-    3699: 'finca',      3799: 'terreno',    3899: 'solar',
-    3999: 'terreno',    4099: 'terreno',    4199: 'terreno',
-    4399: 'atico',      4599: 'casa',       4699: 'atico',
-    4799: 'atico',      4999: 'chalet',     5099: 'terreno',
-    5299: 'sotano',     5499: 'bungalow',   5699: 'chalet',
-    5799: 'casa',       5999: 'casa',       6099: 'casa',
-    6299: 'casa',       6499: 'chalet',     6699: 'pazo',
-    6899: 'casa',       7099: 'casa',       7599: 'casa',
-    8699: 'finca',      8799: 'terreno',    8899: 'finca',
-    8999: 'finca',      9099: 'terreno',    9699: 'piso',
-    10999:'terreno',    11099:'finca',      11199:'finca',
-    11299:'finca',      11399:'finca',      11699:'casa',
-    11899:'finca',      20099:'chalet',     20199:'finca',
-    20299:'casa',       20399:'finca',      20899:'solar',
-    20999:'atico',      21099:'duplex',     21199:'casa',
+    199:'adosado',    299:'bungalow',    399:'casa',
+    499:'chalet',     999:'adosado',     1099:'chalet',
+    2399:'garaje',    2599:'garaje',     2699:'trastero',
+    2799:'apartamento', 2899:'atico',    2999:'duplex',
+    3099:'estudio',   3199:'habitacion', 3299:'loft',
+    3399:'piso',      3499:'planta_baja',3599:'triplex',
+    3699:'finca',     3799:'terreno',    3899:'solar',
+    3999:'terreno',   4099:'terreno',    4199:'terreno',
+    4399:'atico',     4599:'casa',       4699:'atico',
+    4799:'atico',     4999:'chalet',     5099:'terreno',
+    5299:'sotano',    5499:'bungalow',   5699:'chalet',
+    5799:'casa',      5999:'casa',       6099:'casa',
+    6299:'casa',      6499:'chalet',     6699:'pazo',
+    6899:'casa',      7099:'casa',       7599:'casa',
+    8699:'finca',     8799:'terreno',    8899:'finca',
+    8999:'finca',     9099:'terreno',    9699:'piso',
+    10999:'terreno',  11099:'finca',     11199:'finca',
+    11299:'finca',    11399:'finca',     11699:'casa',
+    11899:'finca',    20099:'chalet',    20199:'finca',
+    20299:'casa',     20399:'finca',     20899:'solar',
+    20999:'atico',    21099:'duplex',    21199:'casa',
     21399:'chalet',
   };
   if (map[keyTipo]) return map[keyTipo];
-  // Fallback por texto
   const nb = (nbtipo || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-  if (nb.includes('piso'))        return 'piso';
-  if (nb.includes('apartamento')) return 'apartamento';
-  if (nb.includes('atico'))       return 'atico';
-  if (nb.includes('chalet'))      return 'chalet';
-  if (nb.includes('casa'))        return 'casa';
-  if (nb.includes('duplex'))      return 'duplex';
-  if (nb.includes('adosado'))     return 'adosado';
+  if (nb.includes('piso'))         return 'piso';
+  if (nb.includes('apartamento'))  return 'apartamento';
+  if (nb.includes('atico'))        return 'atico';
+  if (nb.includes('chalet'))       return 'chalet';
+  if (nb.includes('casa'))         return 'casa';
+  if (nb.includes('duplex'))       return 'duplex';
+  if (nb.includes('adosado'))      return 'adosado';
   if (nb.includes('terreno') || nb.includes('solar') || nb.includes('parcela')) return 'terreno';
-  if (nb.includes('garaje'))      return 'garaje';
+  if (nb.includes('garaje'))       return 'garaje';
   return 'otro';
 }
 
 function buildFeatures(p) {
   const f = [];
-  if (p.terraza == 1)                            f.push('Terraza');
-  if (p.jardin == 1)                             f.push('Jardín');
-  if (p.piscina_com == 1 || p.piscina_prop == 1) f.push('Piscina');
-  if (p.garaje == 1)                             f.push('Garaje');
-  if (p.parking == 1)                            f.push('Parking');
-  if (p.ascensor == 1)                           f.push('Ascensor');
-  if (p.trastero == 1)                           f.push('Trastero');
-  if (p.aire_con == 1)                           f.push('Aire acondicionado');
-  if (p.muebles == 1)                            f.push('Amueblado');
-  if (p.calefaccion == 1)                        f.push('Calefacción');
-  if (p.electro == 1)                            f.push('Electrodomésticos');
-  if (p.todoext == 1)                            f.push('Todo exterior');
+  if (p.terraza == 1)                              f.push('Terraza');
+  if (p.jardin == 1)                               f.push('Jardín');
+  if (p.piscina_com == 1 || p.piscina_prop == 1)   f.push('Piscina');
+  if (p.garaje == 1)                               f.push('Garaje');
+  if (p.parking == 1)                              f.push('Parking');
+  if (p.ascensor == 1)                             f.push('Ascensor');
+  if (p.trastero == 1)                             f.push('Trastero');
+  if (p.aire_con == 1)                             f.push('Aire acondicionado');
+  if (p.muebles == 1)                              f.push('Amueblado');
+  if (p.calefaccion == 1)                          f.push('Calefacción');
+  if (p.electro == 1)                              f.push('Electrodomésticos');
   return f;
 }
 
-async function runDiag(res, agency, pass, fixieUrl) {
+async function runDiag(res, agency, pass, proxyUrl, proxyIp) {
   const phpRaw = (s) => s.split('').map(c =>
     /[A-Za-z0-9_.\-~]/.test(c) ? c : '%' + c.charCodeAt(0).toString(16).toUpperCase()
   ).join('');
 
-  let ip = 'error';
+  let currentIp = 'error';
   try {
-    const r = await fetchViaTunnel('https://api.ipify.org', '?format=json', fixieUrl, 'GET');
-    ip = JSON.parse(r).ip;
-  } catch(e) { ip = e.message; }
+    const r = await fetchViaProxy('https://api.ipify.org', '?format=json', proxyUrl, 'GET');
+    currentIp = JSON.parse(r).ip;
+  } catch(e) { currentIp = e.message; }
 
   const texto = `${agency};${pass};${IDIOMA};lostipos;paginacion;1;5;1;precioinmo`;
-  const body  = `param=${phpRaw(texto)}&elDominio=inmobiliariapedrosa.com&json=1&ia=${ip}`;
+  const body  = `param=${phpRaw(texto)}&elDominio=inmobiliariapedrosa.com&json=1&ia=${proxyIp}`;
   let raw = 'error';
-  try { raw = await fetchViaTunnel(INMOVILLA_URL, body, fixieUrl, 'POST'); } catch(e) { raw = e.message; }
+  try { raw = await fetchViaProxy(INMOVILLA_URL, body, proxyUrl, 'POST'); } catch(e) { raw = e.message; }
 
   let items = [];
   try {
@@ -296,19 +277,20 @@ async function runDiag(res, agency, pass, fixieUrl) {
 
   const firstItem = items[0] || null;
   return res.status(200).json({
-    ip,
-    ip_valida: ip === GOOD_IP ? '✅ correcta' : `❌ no autorizada (la buena es ${GOOD_IP})`,
+    proxy_ip_actual: currentIp,
+    proxy_ip_configurada: proxyIp,
+    ip_coincide: currentIp === proxyIp ? '✅ sí' : '❌ no coinciden',
+    inmovilla_acepta: !raw.includes('NECESITAMOS') ? '✅ sí' : '❌ no — IP no autorizada en Inmovilla',
     param_enviado: body.substring(0, 200),
     respuesta_inicio: raw.substring(0, 400),
     total_items_raw: items.length,
     primer_inmueble_campos: firstItem ? Object.keys(firstItem) : null,
     primer_inmueble: firstItem,
-    ok: !raw.includes('NECESITAMOS') && raw.length > 100
   });
 }
 
-// ── fetchViaTunnel ─────────────────────────────────────────────────────────────
-function fetchViaTunnel(targetUrl, pathOrBody, proxyUrl, method) {
+// ── fetchViaProxy — proxy HTTP CONNECT estándar ────────────────────────────
+function fetchViaProxy(targetUrl, pathOrBody, proxyUrl, method) {
   return new Promise((resolve, reject) => {
     const target = new URL(targetUrl);
     const proxy  = new URL(proxyUrl);
