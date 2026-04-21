@@ -1,8 +1,9 @@
-// /api/raw.js — Diagnóstico completo de la API Inmovilla
-// Muestra el JSON raw completo cuando pilla la IP buena
-// Uso: /api/raw?n=5  (muestra los primeros 5 inmuebles, por defecto 3)
-// Uso: /api/raw?keyacci=2  (alquiler en vez de venta)
-// Uso: /api/raw?full=1  (muestra TODO el raw sin parsear)
+// /api/raw.js — Diagnóstico con paginación
+// /api/raw?page=1        → página 1 (50 items)
+// /api/raw?page=2        → página 2
+// /api/raw?all=1         → TODAS las páginas, resumen completo de tipos (tarda ~30s)
+// /api/raw?orden=precio  → ordenar por precio (default)
+// /api/raw?orden=fecha   → ordenar por fecha
 
 import net from 'net';
 import tls from 'tls';
@@ -12,6 +13,7 @@ const INMOVILLA_URL = 'https://apiweb.inmovilla.com/apiweb/apiweb.php';
 const IDIOMA = 1;
 const GOOD_IP = '54.195.3.54';
 const BAD_IP  = '54.217.142.99';
+const PAGE_SIZE = 50;
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -21,187 +23,130 @@ export default async function handler(req, res) {
   const pass     = process.env.INMOVILLA_PASS;
   const fixieUrl = process.env.FIXIE_URL;
 
-  if (!pass)     return res.status(500).json({ error: 'INMOVILLA_PASS no configurada' });
-  if (!fixieUrl) return res.status(500).json({ error: 'FIXIE_URL no configurada' });
+  if (!pass || !fixieUrl) return res.status(500).json({ error: 'Variables de entorno no configuradas' });
 
-  const n       = parseInt(req.query?.n) || 3;
-  const keyacci = parseInt(req.query?.keyacci) || 1;
-  const full    = req.query?.full === '1';
+  const page  = parseInt(req.query?.page) || 1;
+  const all   = req.query?.all === '1';
+  const orden = req.query?.orden || 'precioinmo'; // precioinmo | fechaact | ref
 
   const phpRaw = (s) => s.split('').map(c => {
     if (/[A-Za-z0-9_.\-~]/.test(c)) return c;
     return '%' + c.charCodeAt(0).toString(16).toUpperCase();
   }).join('');
 
-  // ── 1. Buscar IP buena (hasta 20 intentos) ──
+  // Buscar IP buena
   let ip = null;
-  let ipAttempts = [];
   for (let i = 0; i < 20; i++) {
     try {
       const r = await fetchViaTunnel('https://api.ipify.org', '?format=json', fixieUrl, 'GET');
       const candidate = JSON.parse(r).ip;
-      ipAttempts.push(candidate);
       if (candidate === GOOD_IP) { ip = candidate; break; }
-    } catch(e) {
-      ipAttempts.push('error: ' + e.message);
-    }
+    } catch(e) {}
   }
-
-  const ipStats = {
-    intentos: ipAttempts.length,
-    ip_encontrada: ip || 'ninguna — siempre salió la mala',
-    ip_buena: GOOD_IP,
-    ip_mala: BAD_IP,
-    secuencia: ipAttempts,
-    distribucion: {
-      buenas: ipAttempts.filter(x => x === GOOD_IP).length,
-      malas:  ipAttempts.filter(x => x === BAD_IP).length,
-      errores: ipAttempts.filter(x => x.startsWith('error')).length,
-    }
-  };
 
   if (!ip) {
     return res.status(200).json({
       status: '❌ IP buena no encontrada en 20 intentos',
-      ip_stats: ipStats,
-      consejo: 'Inmovilla necesita autorizar también la IP ' + BAD_IP,
+      consejo: 'Inmovilla necesita autorizar también ' + BAD_IP,
     });
   }
 
-  // ── 2. Llamar a Inmovilla ──
-  const texto = `${agency};${pass};${IDIOMA};lostipos;paginacion;1;200;${keyacci};precioinmo`;
-  const body  = `param=${phpRaw(texto)}&elDominio=inmobiliariapedrosa.com&json=1&ia=${ip}`;
-
-  let raw = '';
-  let fetchError = null;
-  try {
-    raw = await fetchViaTunnel(INMOVILLA_URL, body, fixieUrl, 'POST');
-  } catch(e) {
-    fetchError = e.message;
+  // Función para pedir una página concreta
+  async function fetchPage(pageNum) {
+    const texto = `${agency};${pass};${IDIOMA};lostipos;paginacion;${pageNum};${PAGE_SIZE};;${orden}`;
+    const body  = `param=${phpRaw(texto)}&elDominio=inmobiliariapedrosa.com&json=1&ia=${ip}`;
+    const raw   = await fetchViaTunnel(INMOVILLA_URL, body, fixieUrl, 'POST');
+    if (raw.includes('NECESITAMOS')) throw new Error('IP rechazada: ' + raw.substring(0, 100));
+    const parsed = JSON.parse(raw);
+    if (!parsed?.paginacion) throw new Error('Estructura inesperada: ' + raw.substring(0, 200));
+    const meta  = parsed.paginacion.find(i => i.posicion !== undefined) || parsed.paginacion[0];
+    const items = parsed.paginacion.filter(i => i?.cod_ofer !== undefined);
+    return { meta, items };
   }
 
-  if (fetchError) {
-    return res.status(200).json({
-      status: '❌ Error al conectar con Inmovilla',
-      error: fetchError,
-      ip_stats: ipStats,
-    });
-  }
-
-  if (raw.includes('NECESITAMOS')) {
-    return res.status(200).json({
-      status: '❌ Inmovilla rechazó la IP',
-      ip_usada: ip,
-      respuesta_raw: raw.substring(0, 300),
-      ip_stats: ipStats,
-    });
-  }
-
-  // ── 3. Parsear ──
-  let parsed = null;
-  let parseError = null;
-  try {
-    parsed = JSON.parse(raw);
-  } catch(e) {
-    parseError = e.message;
-  }
-
-  if (full) {
-    return res.status(200).json({
-      status: '✅ OK — raw completo',
-      ip_stats: ipStats,
-      keyacci,
-      raw_length: raw.length,
-      raw_completo: parsed || raw,
-    });
-  }
-
-  // ── 4. Analizar estructura ──
-  let items = [];
-  let metadata = null;
-  let estructuraDetectada = 'desconocida';
-
-  if (parsed?.paginacion && Array.isArray(parsed.paginacion)) {
-    estructuraDetectada = 'paginacion[]';
-    // El primer elemento suele ser metadata
-    const first = parsed.paginacion[0];
-    if (first && (first.posicion !== undefined || first.elementos !== undefined || first.total !== undefined)) {
-      metadata = first;
-      items = parsed.paginacion.slice(1).filter(i => i?.cod_ofer !== undefined);
-    } else {
-      items = parsed.paginacion.filter(i => i?.cod_ofer !== undefined);
-    }
-  } else if (Array.isArray(parsed)) {
-    estructuraDetectada = 'array directo';
-    items = parsed.filter(i => i?.cod_ofer !== undefined);
-  } else if (parsed) {
-    for (const k of ['ofertas', 'inmuebles', 'data', 'properties']) {
-      if (parsed[k] && Array.isArray(parsed[k])) {
-        estructuraDetectada = `objeto.${k}[]`;
-        items = parsed[k];
+  if (all) {
+    // Pedir todas las páginas y hacer resumen completo
+    const { meta, items: firstItems } = await fetchPage(1);
+    const total     = meta?.total || 0;
+    const totalPages = Math.ceil(total / PAGE_SIZE);
+    
+    let allItems = [...firstItems];
+    for (let p = 2; p <= Math.min(totalPages, 20); p++) {
+      try {
+        const { items } = await fetchPage(p);
+        allItems.push(...items);
+      } catch(e) {
+        console.error(`[page ${p}] error: ${e.message}`);
         break;
       }
     }
+
+    // Resumen completo de tipos
+    const resumenTipos = {};
+    allItems.forEach(item => {
+      const k  = item.key_tipo || 'sin_key_tipo';
+      const nb = item.nbtipo   || 'sin_nbtipo';
+      const ka = item.keyacci  || '?';
+      const key = `key_tipo:${k} | nbtipo:"${nb}" | keyacci:${ka}`;
+      resumenTipos[key] = (resumenTipos[key] || 0) + 1;
+    });
+    const tiposOrdenados = Object.entries(resumenTipos)
+      .sort((a, b) => b[1] - a[1])
+      .reduce((acc, [k, v]) => { acc[k] = v; return acc; }, {});
+
+    // Resumen por keyacci
+    const porKeyacci = {};
+    allItems.forEach(item => {
+      const k = `keyacci:${item.keyacci}`;
+      porKeyacci[k] = (porKeyacci[k] || 0) + 1;
+    });
+
+    return res.status(200).json({
+      status: '✅ OK — resumen completo',
+      ip_usada: ip,
+      total_segun_api: total,
+      total_paginas: totalPages,
+      paginas_descargadas: Math.min(totalPages, 20),
+      total_items_descargados: allItems.length,
+      resumen_por_keyacci: porKeyacci,
+      resumen_tipos_completo: tiposOrdenados,
+    });
   }
 
-  const muestra = items.slice(0, n);
+  // Página individual
+  const { meta, items } = await fetchPage(page);
+  const total      = meta?.total || 0;
+  const totalPages = Math.ceil(total / PAGE_SIZE);
 
-  // ── 5. Análisis de campos y tipos ──
-  const camposPresentes = muestra.length > 0 ? Object.keys(muestra[0]) : [];
-  const camposClave = [
-    'cod_ofer','key_tipo','nbtipo','keyacci','key_acci',
-    'precioinmo','precioalq','precio',
-    'habitaciones','banyos','banios','sumaseos',
-    'm_cons','superficie','sup_cons',
-    'ciudad','zona','calle',
-    'fotoletra','foto_letra','numfotos',
-    'latitud','altitud',
-    'nodisponible','destacado','exclu',
-    'observaciones','descripcion',
-    'nombreagente','telefono1agente','emailagente',
-  ];
-  const camposEncontrados = {};
-  const camposFaltantes = [];
-  camposClave.forEach(c => {
-    if (camposPresentes.includes(c)) {
-      camposEncontrados[c] = muestra[0]?.[c];
-    } else {
-      camposFaltantes.push(c);
-    }
-  });
-
-  // Resumen de tipos en los 200 items
   const resumenTipos = {};
   items.forEach(item => {
-    const k = item.key_tipo || 'sin_key_tipo';
-    const nb = item.nbtipo || 'sin_nbtipo';
+    const k  = item.key_tipo || 'sin_key_tipo';
+    const nb = item.nbtipo   || 'sin_nbtipo';
     const key = `${k} — ${nb}`;
     resumenTipos[key] = (resumenTipos[key] || 0) + 1;
   });
-  // Ordenar por cantidad
-  const tiposOrdenados = Object.entries(resumenTipos)
-    .sort((a, b) => b[1] - a[1])
-    .reduce((acc, [k, v]) => { acc[k] = v; return acc; }, {});
 
   return res.status(200).json({
     status: '✅ OK',
-    ip_stats: ipStats,
-    keyacci: keyacci === 1 ? '1 (venta)' : keyacci === 2 ? '2 (alquiler)' : keyacci,
-    estructura_json: estructuraDetectada,
-    metadata_paginacion: metadata,
-    total_items_en_respuesta: items.length,
-    // Campos encontrados vs esperados
-    campos_presentes_en_item: camposPresentes,
-    campos_clave_encontrados: camposEncontrados,
-    campos_clave_faltantes: camposFaltantes,
-    // Resumen de tipos
-    resumen_tipos_key_tipo_nbtipo: tiposOrdenados,
-    // Muestra de N inmuebles completos
-    muestra_inmuebles: muestra,
+    ip_usada: ip,
+    orden,
+    pagina: page,
+    total_paginas: totalPages,
+    total_items_api: total,
+    items_en_esta_pagina: items.length,
+    resumen_tipos_esta_pagina: resumenTipos,
+    muestra_primeros_3: items.slice(0, 3).map(i => ({
+      cod_ofer: i.cod_ofer,
+      key_tipo: i.key_tipo,
+      nbtipo:   i.nbtipo,
+      keyacci:  i.keyacci,
+      precio:   i.precioinmo || i.precioalq,
+      ciudad:   i.ciudad,
+      zona:     i.zona,
+    })),
   });
 }
 
-// ── fetchViaTunnel ─────────────────────────────────────────────────────────
 function fetchViaTunnel(targetUrl, pathOrBody, proxyUrl, method) {
   return new Promise((resolve, reject) => {
     const target = new URL(targetUrl);
