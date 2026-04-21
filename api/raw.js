@@ -1,9 +1,6 @@
-// /api/raw.js — Diagnóstico con paginación
-// /api/raw?page=1        → página 1 (50 items)
-// /api/raw?page=2        → página 2
-// /api/raw?all=1         → TODAS las páginas, resumen completo de tipos (tarda ~30s)
-// /api/raw?orden=precio  → ordenar por precio (default)
-// /api/raw?orden=fecha   → ordenar por fecha
+// /api/raw.js — Prueba automática de credenciales y parámetros
+// /api/raw        → prueba todas las variantes automáticamente
+// /api/raw?page=N → página N con credenciales actuales
 
 import net from 'net';
 import tls from 'tls';
@@ -12,22 +9,14 @@ import { URL } from 'url';
 const INMOVILLA_URL = 'https://apiweb.inmovilla.com/apiweb/apiweb.php';
 const IDIOMA = 1;
 const GOOD_IP = '54.195.3.54';
-const BAD_IP  = '54.217.142.99';
-const PAGE_SIZE = 50;
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Cache-Control', 'no-store');
 
-  const agency   = process.env.INMOVILLA_AGENCY || '5430_244_ext';
   const pass     = process.env.INMOVILLA_PASS;
   const fixieUrl = process.env.FIXIE_URL;
-
   if (!pass || !fixieUrl) return res.status(500).json({ error: 'Variables de entorno no configuradas' });
-
-  const page  = parseInt(req.query?.page) || 1;
-  const all   = req.query?.all === '1';
-  const orden = req.query?.orden || 'precioinmo'; // precioinmo | fechaact | ref
 
   const phpRaw = (s) => s.split('').map(c => {
     if (/[A-Za-z0-9_.\-~]/.test(c)) return c;
@@ -43,107 +32,116 @@ export default async function handler(req, res) {
       if (candidate === GOOD_IP) { ip = candidate; break; }
     } catch(e) {}
   }
+  if (!ip) return res.status(200).json({ error: '❌ IP buena no encontrada en 20 intentos' });
 
-  if (!ip) {
-    return res.status(200).json({
-      status: '❌ IP buena no encontrada en 20 intentos',
-      consejo: 'Inmovilla necesita autorizar también ' + BAD_IP,
-    });
-  }
-
-  // Función para pedir una página concreta
-  async function fetchPage(pageNum) {
-    const texto = `${agency};${pass};${IDIOMA};lostipos;paginacion;${pageNum};${PAGE_SIZE};;${orden}`;
+  // Función base para hacer una petición
+  async function probar(agency, pagina, cantidad, keyacci, orden) {
+    const texto = `${agency};${pass};${IDIOMA};lostipos;paginacion;${pagina};${cantidad};${keyacci};${orden}`;
     const body  = `param=${phpRaw(texto)}&elDominio=inmobiliariapedrosa.com&json=1&ia=${ip}`;
     const raw   = await fetchViaTunnel(INMOVILLA_URL, body, fixieUrl, 'POST');
-    if (raw.includes('NECESITAMOS')) throw new Error('IP rechazada: ' + raw.substring(0, 100));
-    const parsed = JSON.parse(raw);
-    if (!parsed?.paginacion) throw new Error('Estructura inesperada: ' + raw.substring(0, 200));
-    const meta  = parsed.paginacion.find(i => i.posicion !== undefined) || parsed.paginacion[0];
-    const items = parsed.paginacion.filter(i => i?.cod_ofer !== undefined);
-    return { meta, items };
-  }
 
-  if (all) {
-    // Pedir todas las páginas y hacer resumen completo
-    const { meta, items: firstItems } = await fetchPage(1);
-    const total     = meta?.total || 0;
-    const totalPages = Math.ceil(total / PAGE_SIZE);
-    
-    let allItems = [...firstItems];
-    for (let p = 2; p <= Math.min(totalPages, 20); p++) {
-      try {
-        const { items } = await fetchPage(p);
-        allItems.push(...items);
-      } catch(e) {
-        console.error(`[page ${p}] error: ${e.message}`);
-        break;
-      }
+    if (raw.includes('NECESITAMOS')) return { error: 'IP rechazada', raw: raw.substring(0, 100) };
+    if (raw.includes('CREDENCIALES') || raw.includes('ACCESO') || raw.includes('ERROR')) {
+      return { error: 'Credenciales rechazadas', raw: raw.substring(0, 200) };
     }
 
-    // Resumen completo de tipos
-    const resumenTipos = {};
-    allItems.forEach(item => {
-      const k  = item.key_tipo || 'sin_key_tipo';
-      const nb = item.nbtipo   || 'sin_nbtipo';
-      const ka = item.keyacci  || '?';
-      const key = `key_tipo:${k} | nbtipo:"${nb}" | keyacci:${ka}`;
-      resumenTipos[key] = (resumenTipos[key] || 0) + 1;
-    });
-    const tiposOrdenados = Object.entries(resumenTipos)
-      .sort((a, b) => b[1] - a[1])
-      .reduce((acc, [k, v]) => { acc[k] = v; return acc; }, {});
+    let parsed;
+    try { parsed = JSON.parse(raw); } catch(e) { return { error: 'JSON inválido', raw: raw.substring(0, 200) }; }
 
-    // Resumen por keyacci
-    const porKeyacci = {};
-    allItems.forEach(item => {
-      const k = `keyacci:${item.keyacci}`;
-      porKeyacci[k] = (porKeyacci[k] || 0) + 1;
+    const paginacion = parsed?.paginacion || [];
+    const meta  = paginacion.find(i => i.posicion !== undefined);
+    const items = paginacion.filter(i => i?.cod_ofer !== undefined);
+
+    // Resumen de tipos
+    const tipos = {};
+    items.forEach(i => {
+      const k = `${i.key_tipo} — ${i.nbtipo} (keyacci:${i.keyacci})`;
+      tipos[k] = (tipos[k] || 0) + 1;
     });
 
-    return res.status(200).json({
-      status: '✅ OK — resumen completo',
-      ip_usada: ip,
-      total_segun_api: total,
-      total_paginas: totalPages,
-      paginas_descargadas: Math.min(totalPages, 20),
-      total_items_descargados: allItems.length,
-      resumen_por_keyacci: porKeyacci,
-      resumen_tipos_completo: tiposOrdenados,
-    });
+    return {
+      total_api: meta?.total,
+      elementos_pagina: meta?.elementos,
+      items_recibidos: items.length,
+      tipos_resumen: tipos,
+      primer_item: items[0] ? {
+        cod_ofer: items[0].cod_ofer,
+        key_tipo: items[0].key_tipo,
+        nbtipo:   items[0].nbtipo,
+        keyacci:  items[0].keyacci,
+        precio:   items[0].precioinmo || items[0].precioalq,
+        ciudad:   items[0].ciudad,
+      } : null,
+    };
   }
 
-  // Página individual
-  const { meta, items } = await fetchPage(page);
-  const total      = meta?.total || 0;
-  const totalPages = Math.ceil(total / PAGE_SIZE);
+  // ── PRUEBAS SISTEMÁTICAS ──
+  const resultados = {};
 
-  const resumenTipos = {};
-  items.forEach(item => {
-    const k  = item.key_tipo || 'sin_key_tipo';
-    const nb = item.nbtipo   || 'sin_nbtipo';
-    const key = `${k} — ${nb}`;
-    resumenTipos[key] = (resumenTipos[key] || 0) + 1;
-  });
+  // 1. Credenciales originales con _244_ext, keyacci vacío (sin filtro)
+  try {
+    resultados['A — 5430_244_ext, sin keyacci, pag1, orden precioinmo'] =
+      await probar('5430_244_ext', 1, 50, '', 'precioinmo');
+  } catch(e) { resultados['A'] = { error: e.message }; }
+
+  // 2. Solo agencia base 5430 sin sufijo
+  try {
+    resultados['B — 5430 (sin sufijo), sin keyacci, pag1, orden precioinmo'] =
+      await probar('5430', 1, 50, '', 'precioinmo');
+  } catch(e) { resultados['B'] = { error: e.message }; }
+
+  // 3. Credenciales originales, keyacci=1 (venta)
+  try {
+    resultados['C — 5430_244_ext, keyacci=1 (venta), pag1'] =
+      await probar('5430_244_ext', 1, 50, 1, 'precioinmo');
+  } catch(e) { resultados['C'] = { error: e.message }; }
+
+  // 4. Sin sufijo, keyacci=1 (venta)
+  try {
+    resultados['D — 5430, keyacci=1 (venta), pag1'] =
+      await probar('5430', 1, 50, 1, 'precioinmo');
+  } catch(e) { resultados['D'] = { error: e.message }; }
+
+  // 5. Credenciales originales, keyacci=2, orden por fecha (diferente ordenación)
+  try {
+    resultados['E — 5430_244_ext, keyacci=2, orden fechaact'] =
+      await probar('5430_244_ext', 1, 50, 2, 'fechaact');
+  } catch(e) { resultados['E'] = { error: e.message }; }
+
+  // 6. Sin sufijo, keyacci=2, orden fecha
+  try {
+    resultados['F — 5430, keyacci=2, orden fechaact'] =
+      await probar('5430', 1, 50, 2, 'fechaact');
+  } catch(e) { resultados['F'] = { error: e.message }; }
+
+  // 7. Credenciales originales, página 10 (última), sin keyacci
+  try {
+    resultados['G — 5430_244_ext, sin keyacci, pag10 (ultima)'] =
+      await probar('5430_244_ext', 10, 50, '', 'precioinmo');
+  } catch(e) { resultados['G'] = { error: e.message }; }
+
+  // 8. Sin sufijo, página 10
+  try {
+    resultados['H — 5430, sin keyacci, pag10 (ultima)'] =
+      await probar('5430', 10, 50, '', 'precioinmo');
+  } catch(e) { resultados['H'] = { error: e.message }; }
+
+  // 9. Probar cantidad 200 (como hacíamos antes)
+  try {
+    resultados['I — 5430_244_ext, cantidad=200, sin keyacci'] =
+      await probar('5430_244_ext', 1, 200, '', 'precioinmo');
+  } catch(e) { resultados['I'] = { error: e.message }; }
+
+  // 10. Sin sufijo, cantidad 200
+  try {
+    resultados['J — 5430, cantidad=200, sin keyacci'] =
+      await probar('5430', 1, 200, '', 'precioinmo');
+  } catch(e) { resultados['J'] = { error: e.message }; }
 
   return res.status(200).json({
-    status: '✅ OK',
     ip_usada: ip,
-    orden,
-    pagina: page,
-    total_paginas: totalPages,
-    total_items_api: total,
-    items_en_esta_pagina: items.length,
-    resumen_tipos_esta_pagina: resumenTipos,
-    muestra_primeros_3: items.slice(0, 3).map(i => ({
-      cod_ofer: i.cod_ofer,
-      key_tipo: i.key_tipo,
-      nbtipo:   i.nbtipo,
-      keyacci:  i.keyacci,
-      precio:   i.precioinmo || i.precioalq,
-      ciudad:   i.ciudad,
-      zona:     i.zona,
-    })),
+    nota: 'Cada letra es una combinación diferente de credenciales/parámetros. Busca cuál devuelve tipos distintos a locales/oficinas.',
+    resultados,
   });
 }
 
